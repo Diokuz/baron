@@ -1,6 +1,15 @@
 (function(window, undefined) {
     "use strict";
 
+    // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
+    function barSetState(on) {
+        if (on) {
+            DOMUtility(querySelector(bar)).addClass(barOnClass);
+        } else {
+            DOMUtility(querySelector(bar)).removeClass(barOnClass);
+        }
+    }
+
     var baron = function(data) {
         new baron.init(data);
     };
@@ -13,11 +22,30 @@
             topHeights,
             bottomHeights,
             rTimer,
+            querySelector,
+            eventManager,
+            DOMUtility,
+            wrapper,
             scroller,
             container,
-            bar;
+            bar,
+            barOnClass;
 
-        
+        // Engines initialization
+        $ = window.jQuery;
+        querySelector = gData.querySelector || $;
+        if (!querySelector) {
+            console.error('baron: no query selector engine found');
+        }
+        eventManager = gData.eventManager || $;
+        if (!eventManager) {
+            console.error('baron: no event manager engine found');
+        }
+        DOMUtility = gData.DOMUtility || $;
+        if (!DOMUtility) {
+            console.error('baron: no DOM utility engine founc');
+        }
+
         // Сбор данных из DOM
         headers = gData.headers;
         scroller = node('scroller');

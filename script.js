@@ -41,4 +41,18 @@ window.onload = function() {
             }
         });
     };
+
+    var pressed = false;
+    $('.scroller__bar').on('mousedown', function() {
+        pressed = true;
+    });
+    $('.scroller__bar').on('mouseup', function() {
+        pressed = false;
+    });
+    $('.wrapper').on('mousemove', function(e) {
+        console.log(e.offsetY);
+        
+    });
+
+
 };
