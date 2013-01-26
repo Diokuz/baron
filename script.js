@@ -6,9 +6,9 @@ window.onload = function() {
 
         baron(root, {
             scroller: '.scroller',
-            container: $(root).find('.container'),
-            bar: $(root).find('.scroller__bar'),
-            headers: $(root).find('.header__title'),
+            container: '.container',
+            bar: '.scroller__bar',
+            header: '.header__title',
             init: function(data) {
                 $(data.scroller).css('width', data.scrollerWidth).attr('data-acbar-inited', data.switchScrollbarOn);
                 $(data.bar).css('height', data.barHeight);

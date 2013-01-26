@@ -21,7 +21,6 @@
             querySelector,
             eventManager,
             DOMUtility,
-            wrapper,
             scroller,
             container,
             bar,
@@ -86,12 +85,10 @@
         }
 
         // DOM initialization
-        wrapper = root;
-        scroller = querySelector(gData.scroller, wrapper)[0];
-        headers = gData.headers;
-        
-        container = node('container');
-        bar = node('bar');
+        scroller = querySelector(gData.scroller, root)[0];
+        container = querySelector(gData.container, scroller)[0];
+        bar = querySelector(gData.bar, scroller)[0];
+        headers = querySelector(gData.header, container);
 
         // DOM данных
         if (!(scroller && container && bar)) {
