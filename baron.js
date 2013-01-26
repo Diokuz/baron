@@ -24,7 +24,9 @@
             scroller,
             container,
             bar,
+            barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
             headerFixedClass,
+            drag,
             i, j;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
@@ -65,7 +67,7 @@
 
         // Коэффициент отношения позиции бара к относительной позиции контейнера
         function k() {
-            return (scroller.clientHeight - bar.offsetHeight - ((gData.barTop + gData.barBottom) || 0));
+            return scroller.clientHeight - bar.offsetHeight - ((gData.barTop + gData.barBottom) || 0);
         }
 
         // Преобразование относительной позиции контейнера в позицию бара
@@ -118,8 +120,7 @@
         // Инициализация
         // Выставляем 100% ширину контента от враппера (скрываем нативный скроллбар) ДО прочей инициализации
         barOn(scroller.clientHeight < container.offsetHeight);
-        setScrollerWidth(root.clientWidth + scroller.offsetWidth - scroller.clientWidth);
-        //setInitMark();
+        setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
 
         // Расчет максимально возможной высоты вьюпорта одной секции с учётом всех заголовков
         // Должно происходить ПОСЛЕ установки ширины скроллера, иначе будут неправильные высоты
@@ -140,10 +141,10 @@
             headers = undefined;
         }
 
-        // Событие на скролл
+        // Events initialization
+        // onScroll Event
         eventManager(scroller, 'scroll', updateScrollBar);
-
-        // Событие на ресайз
+        // Resize event
         eventManager(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
             clearTimeout(rTimer);
@@ -153,6 +154,30 @@
                 updateScrollBar();
             }, 200);
         });
+        // Drag event group
+        var y = 0,
+            wrapperY0,
+            barTop0;
+        eventManager(bar, 'mousedown', function(e) {
+            drag = true;
+            y = e.clientY;
+        });
+        eventManager(root, 'mouseup', function() {
+            drag = false;
+        });
+        scroller.parentNode.addEventListener('mousedown', function(e) {
+            if (drag) {
+                wrapperY0 = e.clientY;
+                barTop0 = barTop;
+            }
+        });
+        scroller.parentNode.addEventListener('mousemove', function(e) {
+            if (drag) {
+                //scroller.scrollTop = topToRel(e.clientY - y + 33)
+                scroller.scrollTop = topToRel(e.clientY - wrapperY0 + barTop0) * (container.offsetHeight - scroller.clientHeight);
+            }
+            
+        });
 
         // Первичное обновление вида после инициализации
         updateScrollBar();
@@ -161,7 +186,6 @@
         // Особенность в том, что обновляются все данные, что важно при изменении контента контейнера
         function updateScrollBar() {
             var containerTop, // Виртуальная высота верхней границы контейнера над верхней границей скроллера (всегда положительная)
-                barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
                 oldBarHeight, newBarHeight; 
 
             containerTop = -(scroller.pageYOffset || scroller.scrollTop);
