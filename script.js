@@ -10,8 +10,7 @@ window.onload = function() {
             bar: '.scroller__bar',
             header: '.header__title',
             headerFixedClass: 'header__title_state_fixed',
-            barTop: 20,
-            barBottom: -15
+            barTop: 20
         });
     };
 

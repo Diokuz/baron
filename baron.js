@@ -27,6 +27,8 @@
             barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
             headerFixedClass,
             drag,
+            scrollerY0,
+            barTop0,
             i, j;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
@@ -67,7 +69,7 @@
 
         // Коэффициент отношения позиции бара к относительной позиции контейнера
         function k() {
-            return scroller.clientHeight - bar.offsetHeight - ((gData.barTop + gData.barBottom) || 0);
+            return scroller.clientHeight - bar.offsetHeight - gData.barTop || 0 - gData.barBottom || 0;
         }
 
         // Преобразование относительной позиции контейнера в позицию бара
@@ -80,28 +82,40 @@
             return (t - (gData.barTop || 0)) / k();
         }
 
+        // Функция для биндинга на событие selectstart
+        // function dontStartSelect() {
+        //     return false;
+        // }
+
+        // // Блокировка выделения текста при драге
+        // function selection(on) {
+        //     // document.unselectable = on ? 'off' : 'on';
+        //     // eventManager(document, "selectstart", dontStartSelect, on ? 'off' : '' );
+        //     // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' );
+        // }
+
         // Engines initialization
         var $ = window.jQuery;
         querySelector = gData.querySelector || $;
         if (!querySelector) {
-            console.error('baron: no query selector engine found');
+            // console.error('baron: no query selector engine found');
             return;
         }
         if (gData.eventManager) {
             eventManager = gData.eventManager;
         } else {
             if ($) {
-                eventManager = function (elem, event, func) {
-                    $(elem).on(event, func);
+                eventManager = function (elem, event, func, off) {
+                    $(elem)[off||'on'](event, func);
                 }
             } else {
-                console.error('baron: no event manager engine found');
+                // console.error('baron: no event manager engine found');
                 return;
             }
         }
         DOMUtility = gData.DOMUtility || $;
         if (!DOMUtility) {
-            console.error('baron: no DOM utility engine founc');
+            // console.error('baron: no DOM utility engine founc');
             return;
         }
 
@@ -113,7 +127,7 @@
 
         // DOM данных
         if (!(scroller && container && bar)) {
-            console.error('acbar: no scroller, container or bar dectected');
+            // console.error('acbar: no scroller, container or bar dectected');
             return;
         }
 
@@ -142,9 +156,10 @@
         }
 
         // Events initialization
-        // onScroll Event
+        // onScroll
         eventManager(scroller, 'scroll', updateScrollBar);
-        // Resize event
+
+        // Resize
         eventManager(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
             clearTimeout(rTimer);
@@ -154,32 +169,30 @@
                 updateScrollBar();
             }, 200);
         });
-        // Drag event group
-        var y = 0,
-            wrapperY0,
-            barTop0;
+
+        // Drag
         eventManager(bar, 'mousedown', function(e) {
+            e.preventDefault(); // Text selection disabling in Opera
+            // selection(); // Disable text selection
             drag = true;
-            y = e.clientY;
         });
-        eventManager(root, 'mouseup', function() {
+        eventManager(window, 'mouseup', function() {
+            // selection(1); // Enable text selection
             drag = false;
         });
-        scroller.parentNode.addEventListener('mousedown', function(e) {
+        eventManager(window, 'mousedown', function(e) {
             if (drag) {
-                wrapperY0 = e.clientY;
+                scrollerY0 = e.clientY;
                 barTop0 = barTop;
             }
         });
-        scroller.parentNode.addEventListener('mousemove', function(e) {
+        eventManager(window, 'mousemove', function(e) {
             if (drag) {
-                //scroller.scrollTop = topToRel(e.clientY - y + 33)
-                scroller.scrollTop = topToRel(e.clientY - wrapperY0 + barTop0) * (container.offsetHeight - scroller.clientHeight);
+                scroller.scrollTop = topToRel(e.clientY - scrollerY0 + barTop0) * (container.offsetHeight - scroller.clientHeight);
             }
-            
         });
 
-        // Первичное обновление вида после инициализации
+        // First update to initialize bar look
         updateScrollBar();
 
         // Обновление всех координат и состояний скролла в доме
