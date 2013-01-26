@@ -4,8 +4,8 @@ window.onload = function() {
     for (var i = 1 ; i <= 7 ; i++) {
         root = $('.test_' + i);
 
-        baron({
-            scroller: $(root).find('.scroller'),
+        baron(root, {
+            scroller: '.scroller',
             container: $(root).find('.container'),
             bar: $(root).find('.scroller__bar'),
             headers: $(root).find('.header__title'),
@@ -51,7 +51,7 @@ window.onload = function() {
     });
     $('.wrapper').on('mousemove', function(e) {
         console.log(e.offsetY);
-        
+
     });
 
 

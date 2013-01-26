@@ -1,21 +1,17 @@
 (function(window, undefined) {
     "use strict";
 
-    // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
-    function barSetState(on) {
-        if (on) {
-            DOMUtility(querySelector(bar)).addClass(barOnClass);
-        } else {
-            DOMUtility(querySelector(bar)).removeClass(barOnClass);
+    var baron = function(root, data) {
+        if (!root[0]) {
+            root = [root];
         }
-    }
-
-    var baron = function(data) {
-        new baron.init(data);
+        for (var i = 0 ; i < root.length ; i++) {
+            new baron.init(root[i], data);
+        }
     };
 
-    // gData - исходные данные от инициализации, не должны меняться
-    baron.init = function(gData) {
+    // gData - user defined data, not changed during baron work
+    baron.init = function(root, gData) {
         var headers,
             viewPortHeight, // Максимально возможная высота видимости одной секции контента
             headerTops, // Начальные позиции хидеров
@@ -29,36 +25,77 @@
             scroller,
             container,
             bar,
-            barOnClass;
+            barOnClass,
+            headerFixedClass;
+
+        // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
+        function barOn(on, height) {
+            if (on) {
+                DOMUtility(bar).addClass(barOnClass);
+            } else {
+                DOMUtility(bar).removeClass(barOnClass);
+            }
+            if (height) {
+                DOMUtility(bar).css('height', height + 'px');
+            }
+        }
+
+        // Set scroller width, fires once on initialization and on each window resize
+        function setScrollerWidth(width) {
+            DOMUtility(scroller).css('width', width + 'px');
+        }
+
+        // Ставит отметку инициализации в DOM
+        function setInitMark() {
+            DOMUtility(scroller).attr('data-acbar-inited', 'true');
+        }
+
+        // Прилипить хидер
+        function fixHeader(header, top) {
+            DOMUtility(header).css('top', top + 'px').addClass(headerFixedClass);
+        }
+
+        // Убрать прилипание хидера
+        function unfixHeader(header) {
+            DOMUtility(header).removeClass(headerFixedClass).css('top', '');
+        }
 
         // Engines initialization
-        $ = window.jQuery;
+        var $ = window.jQuery;
         querySelector = gData.querySelector || $;
         if (!querySelector) {
             console.error('baron: no query selector engine found');
+            return;
         }
-        eventManager = gData.eventManager || $;
-        if (!eventManager) {
-            console.error('baron: no event manager engine found');
+        if (gData.eventManager) {
+            eventManager = gData.eventManager;
+        } else {
+            if ($) {
+                eventManager = function (elem, event, func) {
+                    $(elem).on(event, func);
+                }
+            } else {
+                console.error('baron: no event manager engine found');
+                return;
+            }
         }
         DOMUtility = gData.DOMUtility || $;
         if (!DOMUtility) {
             console.error('baron: no DOM utility engine founc');
+            return;
         }
 
-        // Сбор данных из DOM
+        // DOM initialization
+        wrapper = root;
+        scroller = querySelector(gData.scroller, wrapper)[0];
         headers = gData.headers;
-        scroller = node('scroller');
+        
         container = node('container');
         bar = node('bar');
 
-        // Валидация DOM данных
+        // DOM данных
         if (!(scroller && container && bar)) {
             console.error('acbar: no scroller, container or bar dectected');
-            return;
-        }
-        if (gData.scroller.length > 1) {
-            console.error('acbar: more than 1 scroller detected');
             return;
         }
 
@@ -102,7 +139,8 @@
         
 
         // Событие на скролл
-        func('EventsToUpdateScrollbar', scroller, updateScrollBar);
+        eventManager(scroller, 'scroll', updateScrollBar);
+        //func('EventsToUpdateScrollbar', scroller, updateScrollBar);
 
         // Событие на ресайз
         func('onResize', window, function() {
