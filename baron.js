@@ -172,11 +172,11 @@
 
         // Drag
         eventManager(bar, 'mousedown', function(e) {
-            e.preventDefault(); // Text selection disabling in Opera
+            e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
             // selection(); // Disable text selection
             drag = true;
         });
-        eventManager(window, 'mouseup', function() {
+        eventManager(window, 'mouseup blur', function() {
             // selection(1); // Enable text selection
             drag = false;
         });
