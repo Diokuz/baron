@@ -24,17 +24,25 @@
             scroller,
             container,
             bar,
-            barOnClass,
             headerFixedClass;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
-        function barOn(on, height) {
+        function barOn(on) {
             if (on) {
-                DOMUtility(bar).addClass(barOnClass);
+                DOMUtility(bar).addClass(gData.barOnClass);
             } else {
-                DOMUtility(bar).removeClass(barOnClass);
+                DOMUtility(bar).removeClass(gData.barOnClass);
             }
-            if (height) {
+        }
+
+        function posBar(top, height) {
+            var barMinHeight = gData.barMinHeight || 20;
+
+            DOMUtility(bar).css('top', top + 'px');
+            if (height !== undefined) {
+                if (height > 0 && height < barMinHeight) {
+                    height = barMinHeight;
+                }
                 DOMUtility(bar).css('height', height + 'px');
             }
         }
@@ -104,14 +112,21 @@
 
         // Инициализация
         // Выставляем 100% ширину контента от враппера (скрываем нативный скроллбар) ДО прочей инициализации
-        var init = function(barOn){
-            func('init', {
+        var init = function(on){
+            var barHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
+            if (scroller.clientHeight >= container.offsetHeight) {
+                barHeight = 0;
+            }
+            barOn(on, 0);
+            setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
+            setInitMark();
+            /*func('init', {
                 scroller: scroller,
                 scrollerWidth: scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px',
                 bar: bar,
                 barHeight: scroller.clientHeight * scroller.clientHeight / container.offsetHeight + 'px',
                 switchScrollbarOn: barOn
-            });
+            });*/
         };
         init(scroller.clientHeight < container.offsetHeight);
 
@@ -202,10 +217,12 @@
             // Позиционирование бара
             if (bar) {
                 if (oldBarHeight !== newBarHeight) {
-                    func('posBar', bar, barTop, newBarHeight);
+                    posBar(barTop, newBarHeight);
+                    //func('posBar', bar, barTop, newBarHeight);
                     oldBarHeight = newBarHeight;
                 } else {
-                    func('posBar', bar, barTop);
+                    posBar(barTop);
+                    //func('posBar', bar, barTop);
                 }
             }
 

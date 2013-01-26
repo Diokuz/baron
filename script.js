@@ -10,22 +10,22 @@ window.onload = function() {
             bar: '.scroller__bar',
             header: '.header__title',
             init: function(data) {
-                $(data.scroller).css('width', data.scrollerWidth).attr('data-acbar-inited', data.switchScrollbarOn);
-                $(data.bar).css('height', data.barHeight);
-                if (data.switchScrollbarOn) {
-                    $(data.bar).addClass('scroller__bar_active_true');
-                } else {
-                    $(data.bar).removeClass('scroller__bar_active_true')
-                }
+                // $(data.scroller).css('width', data.scrollerWidth).attr('data-acbar-inited', data.switchScrollbarOn);
+                // $(data.bar).css('height', data.barHeight);
+                // if (data.switchScrollbarOn) {
+                //     $(data.bar).addClass('scroller__bar_active_true');
+                // } else {
+                //     $(data.bar).removeClass('scroller__bar_active_true')
+                // }
             },
             inited: function(data) {
                 return $(data.scroller).attr('data-acbar-inited') === 'true';
             },
             posBar: function(bar, barTop, barHeight) {
-                $(bar).css('top', barTop + 'px');
-                if (barHeight) {
-                    $(bar).css('height', barHeight + 'px');
-                }
+                // $(bar).css('top', barTop + 'px');
+                // if (barHeight) {
+                //     $(bar).css('height', barHeight + 'px');
+                // }
             },
             fixHeader: function(header, top) {
                 $(header).css('top', top + 'px').addClass('header__title_state_fixed');

@@ -61,15 +61,10 @@ html, body {height: 100%;margin: 0; padding: 0}
     z-index: 1;
     top: 0;
     right: 4px;
-    display: none;
     width: 8px;
-    min-height: 20px;
     border-radius: 3px;
     background: #987;
     opacity: .6;
-}
-.scroller__bar_active_true {
-    display: block;
 }
 
 .container {
