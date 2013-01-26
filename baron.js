@@ -24,7 +24,8 @@
             scroller,
             container,
             bar,
-            headerFixedClass;
+            headerFixedClass,
+            i, j;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
         function barOn(on) {
@@ -52,11 +53,6 @@
             DOMUtility(scroller).css('width', width + 'px');
         }
 
-        // Ставит отметку инициализации в DOM
-        function setInitMark() {
-            DOMUtility(scroller).attr('data-acbar-inited', 'true');
-        }
-
         // Прилипить хидер
         function fixHeader(header, top) {
             DOMUtility(header).css('top', top + 'px').addClass(headerFixedClass);
@@ -65,6 +61,21 @@
         // Убрать прилипание хидера
         function unfixHeader(header) {
             DOMUtility(header).removeClass(headerFixedClass).css('top', '');
+        }
+
+        // Коэффициент отношения позиции бара к относительной позиции контейнера
+        function k() {
+            return (scroller.clientHeight - bar.offsetHeight - ((gData.barTop + gData.barBottom) || 0));
+        }
+
+        // Преобразование относительной позиции контейнера в позицию бара
+        function relToTop(r) {
+            return r * k() + (gData.barTop || 0);
+        }
+
+        // Преобразование позиции бара в относительную позицию контейнера
+        function topToRel(t) {
+            return (t - (gData.barTop || 0)) / k();
         }
 
         // Engines initialization
@@ -104,140 +115,84 @@
             return;
         }
 
-        // Проверка на вторую инициализацию того же скролла
-        if (func('inited', scroller)) {
-            console.error('acbar: scroller already initialized');
-            return;
-        }
-
         // Инициализация
         // Выставляем 100% ширину контента от враппера (скрываем нативный скроллбар) ДО прочей инициализации
-        var init = function(on){
-            var barHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
-            if (scroller.clientHeight >= container.offsetHeight) {
-                barHeight = 0;
-            }
-            barOn(on, 0);
-            setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
-            setInitMark();
-            /*func('init', {
-                scroller: scroller,
-                scrollerWidth: scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px',
-                bar: bar,
-                barHeight: scroller.clientHeight * scroller.clientHeight / container.offsetHeight + 'px',
-                switchScrollbarOn: barOn
-            });*/
-        };
-        init(scroller.clientHeight < container.offsetHeight);
+        barOn(scroller.clientHeight < container.offsetHeight);
+        setScrollerWidth(root.clientWidth + scroller.offsetWidth - scroller.clientWidth);
+        //setInitMark();
 
         // Расчет максимально возможной высоты вьюпорта одной секции с учётом всех заголовков
         // Должно происходить ПОСЛЕ установки ширины скроллера, иначе будут неправильные высоты
         viewPortHeight = scroller.clientHeight;
         headerTops = [];
         if (headers) {
-            for (var i = 0 ; i < headers.length ; i++) {
+            for (i = 0 ; i < headers.length ; i++) {
                 viewPortHeight -= headers[i].offsetHeight;
                 headerTops[i] = headers[i].parentNode.offsetTop;
             }
         }
         topHeights = [];
         bottomHeights = [];
+        headerFixedClass = gData.headerFixedClass;
 
         // Проверяем вьюпорт на перекрываемость заголовками
         if (viewPortHeight <= 0) {
             headers = undefined;
         }
 
-        
-
         // Событие на скролл
         eventManager(scroller, 'scroll', updateScrollBar);
-        //func('EventsToUpdateScrollbar', scroller, updateScrollBar);
 
         // Событие на ресайз
-        func('onResize', window, function() {
+        eventManager(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
             clearTimeout(rTimer);
             // И навешиваем новый
             rTimer = setTimeout(function() {
-                if (container.offsetHeight > scroller.clientHeight) {
-                    //initScrollBar(true);
-                    init(true);
-                    updateScrollBar();
-                } else {
-                    init(false);
-                    /*func('init', {
-                        scroller: scroller,
-                        scrollerWidth: '',
-                        bar: bar,
-                        barHeight: '',
-                        switchScrollbarOn: ''
-                    });*/
-                }
+                barOn(container.offsetHeight > scroller.clientHeight);
+                updateScrollBar();
             }, 200);
         });
 
+        // Первичное обновление вида после инициализации
         updateScrollBar();
-
-        // Инкапсуляция user-defined нод
-        function node(name) {
-            if (gData[name]) {
-                var node = gData[name][0] || gData[name];
-                if (node.nodeType === 1) {
-                    return node;
-                }
-            }
-        };
-
-        // Инкапсуляция user-defined функций. Первый аргумент - имя, остальные - параметры функции
-        function func() {
-            var fname = [].shift.apply(arguments);
-            if (typeof gData[fname] === 'function') {
-                return gData[fname].apply(this, arguments);
-            }
-        }
 
         // Обновление всех координат и состояний скролла в доме
         // Особенность в том, что обновляются все данные, что важно при изменении контента контейнера
         function updateScrollBar() {
             var containerTop, // Виртуальная высота верхней границы контейнера над верхней границей скроллера (всегда положительная)
-                barTopLimit = 0, // Крайнее верхнее пложение бара от верха скроллера
-                barBottomLimit = 0, // Расстояние от крайне нижнего положения бара до низа скроллера
-                relativeContainerTop, // Относительное положение контейнера, от 0 до 1
                 barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
                 oldBarHeight, newBarHeight; 
 
-
-            containerTop = topPos(scroller);
-            barTopLimit = (headers && headers[0]) ? headers[0].offsetHeight : 0;
-            relativeContainerTop = - containerTop / (container.offsetHeight - scroller.clientHeight);
-            barTop = relativeContainerTop * (scroller.clientHeight - bar.offsetHeight - barTopLimit - barBottomLimit) + barTopLimit;
+            containerTop = -(scroller.pageYOffset || scroller.scrollTop);
+            barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
             newBarHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
 
+            // Если скроллбар не нужен делаем его высоту нулевой
+            if (scroller.clientHeight >= container.offsetHeight) {
+                newBarHeight = 0;
+            }
+
             // Позиционирование бара
-            if (bar) {
-                if (oldBarHeight !== newBarHeight) {
-                    posBar(barTop, newBarHeight);
-                    //func('posBar', bar, barTop, newBarHeight);
-                    oldBarHeight = newBarHeight;
-                } else {
-                    posBar(barTop);
-                    //func('posBar', bar, barTop);
-                }
+            if (oldBarHeight !== newBarHeight) {
+                posBar(barTop, newBarHeight);
+                oldBarHeight = newBarHeight;
+            } else {
+                posBar(barTop);
             }
 
             // Позиционирование хидеров
-            if (headers && headers.length) {
-                for (var i = 0 ; i < headers.length ; i++) {
+            if (headers) {
+                for (i = 0 ; i < headers.length ; i++) {
                     if (headerTops[i] + containerTop <= getTopHeadersSumHeight(i)) {
                         // Хидер пытается проскочить вверх
-                        func('fixHeader', headers[i], getTopHeadersSumHeight(i));
+                        fixHeader(headers[i], getTopHeadersSumHeight(i));
                     } else if (headerTops[i] + containerTop >= scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight) {
                         // Хидер пытается проскочить вниз
-                        func('fixHeader', headers[i], scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
+                        fixHeader(headers[i], scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
                     } else {
                         // Хидер во вьюпорте, позиционировать не нужно
-                        func('unfixHeader', headers[i]);
+                        unfixHeader(headers[i]);
                     }
                 }
             }
@@ -246,7 +201,7 @@
             function getTopHeadersSumHeight(i) {
                 if (topHeights[i] === undefined) {
                     topHeights[i] = 0;
-                    for (var j = 0 ; j < i ; j++) {
+                    for (j = 0 ; j < i ; j++) {
                         topHeights[i] += headers[j].offsetHeight;
                     }
                 }
@@ -258,17 +213,12 @@
             function getBottomHeadersSumHeight(i) {
                 if (bottomHeights[i] === undefined) {
                     bottomHeights[i] = 0;
-                    for (var j = i + 1 ; j < headers.length ; j++) {
+                    for (j = i + 1 ; j < headers.length ; j++) {
                         bottomHeights[i] += headers[j].offsetHeight;
                     }
                 }
 
                 return bottomHeights[i];
-            }
-
-            // Возвращает эквивалент свойства "top" для скроллируемого объекта, который находится внутри node
-            function topPos(node) {
-                return -(node.pageYOffset || node.scrollTop);
             }
         }
     }
