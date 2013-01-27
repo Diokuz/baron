@@ -51,21 +51,12 @@
             }
         }
 
-        // Set scroller width, fires once on initialization and on each window resize
-        // function setScrollerWidth(width) {
-        //     DOMUtility(scroller).css('width', width + 'px');
-        // }
-
-        // Прилипить хидер
-        function fixHeader(i, top, fix) {
-            hFixFlag[i] = fix;
-            DOMUtility(headers[i]).css('top', top + 'px').addClass(headerFixedClass);
-        }
-
-        // Убрать прилипание хидера
-        function unfixHeader(i) {
-            hFixFlag[i] = 0;
-            DOMUtility(headers[i]).css('top', '').removeClass(headerFixedClass);
+        // (un)Fix headers[i]
+        function fixHeader(i, top) {
+            if (top !== undefined) {
+                top += 'px';
+            }
+            DOMUtility(headers[i]).css('top', top)[((top === undefined) ? 'remove' : 'add') + 'Class'](headerFixedClass);
         }
 
         // Коэффициент отношения позиции бара к относительной позиции контейнера
@@ -215,34 +206,26 @@
             }
 
             // Позиционирование хидеров
-            var fix;
+            var fixState;
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
+                    fixState = 0;
                     if (headerTops[i] + containerTop < getTopHeadersSumHeight(i)) {
                         // Хидер пытается проскочить вверх
-                        // fixHeader(i, getTopHeadersSumHeight(i));
-                        if (hFixFlag[i] == 2) {
-                            fix = 1;
-                            hFixFlag[i] = 0;
-                        }
+                        fixState = 1;
                         hTop = getTopHeadersSumHeight(i);
                     } else if (headerTops[i] + containerTop > getTopHeadersSumHeight(i) + viewPortHeight) {
                         // Хидер пытается проскочить вниз
-                        // fixHeader(i, scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
-                        if (hFixFlag[i] == 1){
-                            fix = 2;
-                            hFixFlag[i] = 0;
-                        }
+                        fixState = 2;
                         hTop = getTopHeadersSumHeight(i) + viewPortHeight;
                     } else {
                         // Хидер во вьюпорте, позиционировать не нужно
-                        // unfixHeader(i);
+                        fixState = 3;
                         hTop = undefined;
                     }
-                    if (hTop === undefined) {
-                        unfixHeader(i);
-                    } else if (!hFixFlag[i]) {
-                        fixHeader(i, hTop, fix);
+                    if (fixState !== hFixFlag[i]) {
+                        fixHeader(i, hTop);
+                        hFixFlag[i] = fixState;
                     }
                 }
             }
