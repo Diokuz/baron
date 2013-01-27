@@ -127,13 +127,19 @@
         // Должно происходить ПОСЛЕ установки ширины скроллера, иначе будут неправильные высоты
         viewPortHeight = scroller.clientHeight;
         headerTops = [];
+        topHeights = [];
         if (headers) {
             for (i = 0 ; i < headers.length ; i++) {
+                // Summary headers height above current
+                topHeights[i] = (topHeights[i - 1] || 0);
+                if (headers[i - 1]) {
+                    topHeights[i] += headers[i - 1].offsetHeight;
+                }
+                // Between fixed headers
                 viewPortHeight -= headers[i].offsetHeight;
                 headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
             }
         }
-        topHeights = [];
         headerFixedClass = gData.headerFixedClass;
 
         // Проверяем вьюпорт на перекрываемость заголовками
@@ -186,7 +192,8 @@
         function updateScrollBar() {
             var containerTop, // Виртуальная высота верхней границы контейнера над верхней границей скроллера (всегда положительная)
                 oldBarHeight, newBarHeight,
-                hTop; 
+                hTop,
+                fixState; 
 
             containerTop = -(scroller.pageYOffset || scroller.scrollTop);
             barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
@@ -206,18 +213,17 @@
             }
 
             // Позиционирование хидеров
-            var fixState;
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] + containerTop < getTopHeadersSumHeight(i)) {
+                    if (headerTops[i] + containerTop < topHeights[i]) {
                         // Хидер пытается проскочить вверх
                         fixState = 1;
-                        hTop = getTopHeadersSumHeight(i);
-                    } else if (headerTops[i] + containerTop > getTopHeadersSumHeight(i) + viewPortHeight) {
+                        hTop = topHeights[i];
+                    } else if (headerTops[i] + containerTop > topHeights[i] + viewPortHeight) {
                         // Хидер пытается проскочить вниз
                         fixState = 2;
-                        hTop = getTopHeadersSumHeight(i) + viewPortHeight;
+                        hTop = topHeights[i] + viewPortHeight;
                     } else {
                         // Хидер во вьюпорте, позиционировать не нужно
                         fixState = 3;
@@ -228,18 +234,6 @@
                         hFixFlag[i] = fixState;
                     }
                 }
-            }
-
-            // Ленивая сумма высот всех заголовков выше i-го
-            function getTopHeadersSumHeight(i) {
-                if (!topHeights[i]) {
-                    topHeights[i] = 0;
-                    for (j = 0 ; j < i ; j++) {
-                        topHeights[i] += headers[j].offsetHeight;
-                    }
-                }
-                
-                return topHeights[i];
             }
         }
     }
