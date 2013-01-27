@@ -26,9 +26,10 @@
             bar,
             barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
             headerFixedClass,
+            hFixFlag = [],
             drag,
             scrollerY0,
-            barTop0,
+            // barTop0,
             i, j;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
@@ -53,18 +54,20 @@
         }
 
         // Set scroller width, fires once on initialization and on each window resize
-        function setScrollerWidth(width) {
-            DOMUtility(scroller).css('width', width + 'px');
-        }
+        // function setScrollerWidth(width) {
+        //     DOMUtility(scroller).css('width', width + 'px');
+        // }
 
         // Прилипить хидер
-        function fixHeader(header, top) {
-            DOMUtility(header).css('top', top + 'px').addClass(headerFixedClass);
+        function fixHeader(i, top, fix) {
+            hFixFlag[i] = fix;
+            DOMUtility(headers[i]).css('top', top + 'px').addClass(headerFixedClass);
         }
 
         // Убрать прилипание хидера
-        function unfixHeader(header) {
-            DOMUtility(header).removeClass(headerFixedClass).css('top', '');
+        function unfixHeader(i) {
+            hFixFlag[i] = 0;
+            DOMUtility(headers[i]).css('top', '').removeClass(headerFixedClass);
         }
 
         // Коэффициент отношения позиции бара к относительной позиции контейнера
@@ -101,17 +104,11 @@
             // console.error('baron: no query selector engine found');
             return;
         }
-        if (gData.eventManager) {
-            eventManager = gData.eventManager;
-        } else {
-            if ($) {
-                eventManager = function(elem, event, func, off) {
-                    $(elem)[off||'on'](event, func);
-                }
-            } else {
-                // console.error('baron: no event manager engine found');
-                return;
-            }
+        eventManager = gData.eventManager || function(elem, event, func, off) {
+            $(elem)[off||'on'](event, func);
+        };
+        if (!gData.eventManager && !$) {
+            return;
         }
         DOMUtility = gData.DOMUtility || $;
         if (!DOMUtility) {
@@ -134,7 +131,8 @@
         // Инициализация
         // Выставляем 100% ширину контента от враппера (скрываем нативный скроллбар) ДО прочей инициализации
         barOn(scroller.clientHeight < container.offsetHeight);
-        setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
+        DOMUtility(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
+        // setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
 
         // Расчет максимально возможной высоты вьюпорта одной секции с учётом всех заголовков
         // Должно происходить ПОСЛЕ установки ширины скроллера, иначе будут неправильные высоты
@@ -199,7 +197,8 @@
         // Особенность в том, что обновляются все данные, что важно при изменении контента контейнера
         function updateScrollBar() {
             var containerTop, // Виртуальная высота верхней границы контейнера над верхней границей скроллера (всегда положительная)
-                oldBarHeight, newBarHeight; 
+                oldBarHeight, newBarHeight,
+                hTop; 
 
             containerTop = -(scroller.pageYOffset || scroller.scrollTop);
             barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
@@ -219,17 +218,34 @@
             }
 
             // Позиционирование хидеров
+            var fix;
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
                     if (headerTops[i] + containerTop < getTopHeadersSumHeight(i)) {
                         // Хидер пытается проскочить вверх
-                        fixHeader(headers[i], getTopHeadersSumHeight(i));
+                        // fixHeader(i, getTopHeadersSumHeight(i));
+                        if (hFixFlag[i] == 2) {
+                            fix = 1;
+                            hFixFlag[i] = 0;
+                        }
+                        hTop = getTopHeadersSumHeight(i);
                     } else if (headerTops[i] + containerTop > scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight) {
                         // Хидер пытается проскочить вниз
-                        fixHeader(headers[i], scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
+                        // fixHeader(i, scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
+                        if (hFixFlag[i] == 1){
+                            fix = 2;
+                            hFixFlag[i] = 0;
+                        }
+                        hTop = scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight;
                     } else {
                         // Хидер во вьюпорте, позиционировать не нужно
-                        unfixHeader(headers[i]);
+                        // unfixHeader(i);
+                        hTop = undefined;
+                    }
+                    if (hTop === undefined) {
+                        unfixHeader(i);
+                    } else if (!hFixFlag[i]) {
+                        fixHeader(i, hTop, fix);
                     }
                 }
             }
