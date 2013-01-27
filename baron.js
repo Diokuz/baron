@@ -16,7 +16,6 @@
             viewPortHeight, // Максимально возможная высота видимости одной секции контента
             headerTops, // Начальные позиции хидеров
             topHeights,
-            bottomHeights,
             rTimer,
             querySelector,
             eventManager,
@@ -29,7 +28,6 @@
             hFixFlag = [],
             drag,
             scrollerY0,
-            // barTop0,
             i, j;
 
         // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
@@ -145,7 +143,6 @@
             }
         }
         topHeights = [];
-        bottomHeights = [];
         headerFixedClass = gData.headerFixedClass;
 
         // Проверяем вьюпорт на перекрываемость заголовками
@@ -229,14 +226,14 @@
                             hFixFlag[i] = 0;
                         }
                         hTop = getTopHeadersSumHeight(i);
-                    } else if (headerTops[i] + containerTop > scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight) {
+                    } else if (headerTops[i] + containerTop > getTopHeadersSumHeight(i) + viewPortHeight) {
                         // Хидер пытается проскочить вниз
                         // fixHeader(i, scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
                         if (hFixFlag[i] == 1){
                             fix = 2;
                             hFixFlag[i] = 0;
                         }
-                        hTop = scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight;
+                        hTop = getTopHeadersSumHeight(i) + viewPortHeight;
                     } else {
                         // Хидер во вьюпорте, позиционировать не нужно
                         // unfixHeader(i);
@@ -260,18 +257,6 @@
                 }
                 
                 return topHeights[i];
-            }
-
-            // Ленивая сумма высот всех заголовков ниже i-го
-            function getBottomHeadersSumHeight(i) {
-                if (!bottomHeights[i]) {
-                    bottomHeights[i] = 0;
-                    for (j = i + 1 ; j < headers.length ; j++) {
-                        bottomHeights[i] += headers[j].offsetHeight;
-                    }
-                }
-
-                return bottomHeights[i];
             }
         }
     }
