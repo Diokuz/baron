@@ -1,4 +1,4 @@
-(function(window, undefined) {
+!function(undefined) {
     "use strict";
 
     var baron = function(root, data) {
@@ -83,16 +83,16 @@
         }
 
         // Функция для биндинга на событие selectstart
-        // function dontStartSelect() {
-        //     return false;
-        // }
+        function dontStartSelect() {
+            return false;
+        }
 
-        // // Блокировка выделения текста при драге
-        // function selection(on) {
-        //     // document.unselectable = on ? 'off' : 'on';
-        //     // eventManager(document, "selectstart", dontStartSelect, on ? 'off' : '' );
-        //     // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' );
-        // }
+        // Блокировка выделения текста при драге
+        function selection(on) {
+            // document.unselectable = on ? 'off' : 'on';
+            eventManager(document, "selectstart", dontStartSelect, on ? 'off' : '' );
+            // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' );
+        }
 
         // Engines initialization
         var $ = window.jQuery;
@@ -105,7 +105,7 @@
             eventManager = gData.eventManager;
         } else {
             if ($) {
-                eventManager = function (elem, event, func, off) {
+                eventManager = function(elem, event, func, off) {
                     $(elem)[off||'on'](event, func);
                 }
             } else {
@@ -143,7 +143,7 @@
         if (headers) {
             for (i = 0 ; i < headers.length ; i++) {
                 viewPortHeight -= headers[i].offsetHeight;
-                headerTops[i] = headers[i].parentNode.offsetTop;
+                headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
             }
         }
         topHeights = [];
@@ -152,7 +152,7 @@
 
         // Проверяем вьюпорт на перекрываемость заголовками
         if (viewPortHeight <= 0) {
-            headers = undefined;
+            headers = 0; // undefined takes +1 byte :)
         }
 
         // Events initialization
@@ -173,22 +173,22 @@
         // Drag
         eventManager(bar, 'mousedown', function(e) {
             e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-            // selection(); // Disable text selection
-            drag = true;
+            selection(); // Disable text selection in ie8
+            drag = 1; // Another one byte
         });
-        eventManager(window, 'mouseup blur', function() {
-            // selection(1); // Enable text selection
-            drag = false;
+        eventManager(document, 'mouseup blur', function() {
+            selection(1); // Enable text selection
+            drag = 0;
         });
-        eventManager(window, 'mousedown', function(e) {
+        eventManager(document, 'mousedown', function(e) { // document for ie8
+            //if (drag) {
+                scrollerY0 = e.clientY - barTop;
+                // barTop0 = barTop;
+            //}
+        });
+        eventManager(document, 'mousemove', function(e) { // document for ie8
             if (drag) {
-                scrollerY0 = e.clientY;
-                barTop0 = barTop;
-            }
-        });
-        eventManager(window, 'mousemove', function(e) {
-            if (drag) {
-                scroller.scrollTop = topToRel(e.clientY - scrollerY0 + barTop0) * (container.offsetHeight - scroller.clientHeight);
+                scroller.scrollTop = topToRel(e.clientY - scrollerY0) * (container.offsetHeight - scroller.clientHeight);
             }
         });
 
@@ -221,10 +221,10 @@
             // Позиционирование хидеров
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
-                    if (headerTops[i] + containerTop <= getTopHeadersSumHeight(i)) {
+                    if (headerTops[i] + containerTop < getTopHeadersSumHeight(i)) {
                         // Хидер пытается проскочить вверх
                         fixHeader(headers[i], getTopHeadersSumHeight(i));
-                    } else if (headerTops[i] + containerTop >= scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight) {
+                    } else if (headerTops[i] + containerTop > scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight) {
                         // Хидер пытается проскочить вниз
                         fixHeader(headers[i], scroller.clientHeight - getBottomHeadersSumHeight(i) - headers[i].offsetHeight);
                     } else {
@@ -236,7 +236,7 @@
 
             // Ленивая сумма высот всех заголовков выше i-го
             function getTopHeadersSumHeight(i) {
-                if (topHeights[i] === undefined) {
+                if (!topHeights[i]) {
                     topHeights[i] = 0;
                     for (j = 0 ; j < i ; j++) {
                         topHeights[i] += headers[j].offsetHeight;
@@ -248,7 +248,7 @@
 
             // Ленивая сумма высот всех заголовков ниже i-го
             function getBottomHeadersSumHeight(i) {
-                if (bottomHeights[i] === undefined) {
+                if (!bottomHeights[i]) {
                     bottomHeights[i] = 0;
                     for (j = i + 1 ; j < headers.length ; j++) {
                         bottomHeights[i] += headers[j].offsetHeight;
@@ -261,4 +261,4 @@
     }
 
     window.baron = baron;
-})(window);
+}()
