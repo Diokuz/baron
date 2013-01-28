@@ -13,8 +13,8 @@
     // gData - user defined data, not changed during baron work
     baron.init = function(root, gData) {
         var headers,
-            viewPortHeight, // Максимально возможная высота видимости одной секции контента
-            headerTops, // Начальные позиции хидеров
+            viewPortHeight, // Non-headers viewable content summary height
+            headerTops, // Initial top positions of headers
             topHeights,
             rTimer,
             querySelector,
@@ -23,15 +23,16 @@
             scroller,
             container,
             bar,
-            barTop, // Позиция top для бара, с учётом пределов и высоты самого бара
-            headerFixedClass,
-            hFixFlag = [],
+            barTop, // bar position
+            headerFixedClass, // CSS to be added on fixed headers
+            hFixFlag = [], // State of current header (top-fix, free, bottom-fix), change of state leads to dom manipulation
             drag,
             scrollerY0,
             i, j;
 
-        // Ставит активирующий видимость бара класс, если on == true, и снимает его иначе
+        // Switch on the bar by adding user-defined CSS classname
         function barOn(on) {
+            // DOMUtility(bar)[on ? 'addClass' : 'removeClass'](gData.barOnClass);
             if (on) {
                 DOMUtility(bar).addClass(gData.barOnClass);
             } else {
@@ -83,7 +84,7 @@
         function selection(on) {
             // document.unselectable = on ? 'off' : 'on';
             eventManager(document, "selectstart", dontStartSelect, on ? 'off' : '' );
-            // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' );
+            // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
         }
 
         // Engines initialization
@@ -111,20 +112,17 @@
         bar = querySelector(gData.bar, scroller)[0];
         headers = querySelector(gData.header, container);
 
-        // DOM данных
+        // DOM data
         if (!(scroller && container && bar)) {
             // console.error('acbar: no scroller, container or bar dectected');
             return;
         }
 
-        // Инициализация
-        // Выставляем 100% ширину контента от враппера (скрываем нативный скроллбар) ДО прочей инициализации
+        // Initialization. Setting scrollbar width BEFORE all other work
         barOn(scroller.clientHeight < container.offsetHeight);
         DOMUtility(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
-        // setScrollerWidth(scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth);
 
-        // Расчет максимально возможной высоты вьюпорта одной секции с учётом всех заголовков
-        // Должно происходить ПОСЛЕ установки ширины скроллера, иначе будут неправильные высоты
+        // Viewport height calculation
         viewPortHeight = scroller.clientHeight;
         headerTops = [];
         topHeights = [];
@@ -142,8 +140,8 @@
         }
         headerFixedClass = gData.headerFixedClass;
 
-        // Проверяем вьюпорт на перекрываемость заголовками
-        if (viewPortHeight <= 0) {
+        // Viewport must be positive to allow header fixing
+        if (viewPortHeight < 1) {
             headers = 0; // undefined takes +1 byte :)
         }
 
@@ -153,13 +151,15 @@
 
         // onMouseWheel bubbling in webkit
         eventManager(headers, 'mousewheel', function(e) {
-            var evt = document.createEvent("WheelEvent");
-            // console.log(e);
-            if (evt.initWebKitWheelEvent) {
-                // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                evt.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                scroller.dispatchEvent(evt);
-                e.preventDefault();
+            if (document.createEvent) {
+                var evt = document.createEvent("WheelEvent");
+                // console.log(e);
+                if (evt.initWebKitWheelEvent) {
+                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                    evt.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                    scroller.dispatchEvent(evt);
+                    e.preventDefault();
+                }
             }
         });
 
@@ -184,13 +184,10 @@
             selection(1); // Enable text selection
             drag = 0;
         });
-        eventManager(document, 'mousedown', function(e) { // document for ie8
-            //if (drag) {
-                scrollerY0 = e.clientY - barTop;
-                // barTop0 = barTop;
-            //}
+        eventManager(document, 'mousedown', function(e) { // document, not window, for ie8
+            scrollerY0 = e.clientY - barTop;
         });
-        eventManager(document, 'mousemove', function(e) { // document for ie8
+        eventManager(document, 'mousemove', function(e) { // document, not window, for ie8
             if (drag) {
                 scroller.scrollTop = topToRel(e.clientY - scrollerY0) * (container.offsetHeight - scroller.clientHeight);
             }
@@ -199,10 +196,9 @@
         // First update to initialize bar look
         updateScrollBar();
 
-        // Обновление всех координат и состояний скролла в доме
-        // Особенность в том, что обновляются все данные, что важно при изменении контента контейнера
+        // Total positions data update, container height dependences included
         function updateScrollBar() {
-            var containerTop, // Виртуальная высота верхней границы контейнера над верхней границей скроллера (всегда положительная)
+            var containerTop, // Container virtual top position
                 oldBarHeight, newBarHeight,
                 hTop,
                 fixState; 
@@ -211,12 +207,12 @@
             barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
             newBarHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
 
-            // Если скроллбар не нужен делаем его высоту нулевой
+            // We dont need no scrollbat -> making bar 0px height
             if (scroller.clientHeight >= container.offsetHeight) {
                 newBarHeight = 0;
             }
 
-            // Позиционирование бара
+            // Positioning bar
             if (oldBarHeight !== newBarHeight) {
                 posBar(barTop, newBarHeight);
                 oldBarHeight = newBarHeight;
@@ -224,20 +220,20 @@
                 posBar(barTop);
             }
 
-            // Позиционирование хидеров
+            // Positioning headers
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
                     fixState = 0;
                     if (headerTops[i] + containerTop < topHeights[i]) {
-                        // Хидер пытается проскочить вверх
+                        // Header trying to go up
                         fixState = 1;
                         hTop = topHeights[i];
                     } else if (headerTops[i] + containerTop > topHeights[i] + viewPortHeight) {
-                        // Хидер пытается проскочить вниз
+                        // Header trying to go down
                         fixState = 2;
                         hTop = topHeights[i] + viewPortHeight;
                     } else {
-                        // Хидер во вьюпорте, позиционировать не нужно
+                        // Header in viewport
                         fixState = 3;
                         hTop = undefined;
                     }
