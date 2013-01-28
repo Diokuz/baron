@@ -1,0 +1,32 @@
+html, body {height: 100%;margin: 0; padding: 0}
+
+.test {
+	width: 30%;
+	height: 400px;
+	display: inline-block;
+	background: #eee;
+	margin: 5px;
+	box-shadow: 0 0 4px #ccc;
+	vertical-align: top;
+}
+
+.test_flex {
+	height: 40%;
+}
+.test_flex .wrapper {
+	height: 70%;
+}
+
+.wrapper {
+	position: relative;
+	overflow: hidden;
+	width: 300px;
+	height: 70%;
+	margin: 10px auto;
+	background: #fff;
+	border: 10px solid #fc9;
+}
+
+.scroller__bar {
+	background: #333;
+}

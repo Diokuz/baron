@@ -17,9 +17,9 @@
             headerTops, // Initial top positions of headers
             topHeights,
             rTimer,
-            querySelector,
-            eventManager,
-            DOMUtility,
+            selector,
+            event,
+            dom,
             scroller,
             container,
             bar,
@@ -32,23 +32,23 @@
 
         // Switch on the bar by adding user-defined CSS classname
         function barOn(on) {
-            // DOMUtility(bar)[on ? 'addClass' : 'removeClass'](gData.barOnClass);
+            // dom(bar)[on ? 'addClass' : 'removeClass'](gData.barOnClass);
             if (on) {
-                DOMUtility(bar).addClass(gData.barOnClass);
+                dom(bar).addClass(gData.barOnClass);
             } else {
-                DOMUtility(bar).removeClass(gData.barOnClass);
+                dom(bar).removeClass(gData.barOnClass);
             }
         }
 
         function posBar(top, height) {
             var barMinHeight = gData.barMinHeight || 20;
 
-            DOMUtility(bar).css('top', top + 'px');
+            dom(bar).css('top', top + 'px');
             if (height !== undefined) {
                 if (height > 0 && height < barMinHeight) {
                     height = barMinHeight;
                 }
-                DOMUtility(bar).css('height', height + 'px');
+                dom(bar).css('height', height + 'px');
             }
         }
 
@@ -57,60 +57,60 @@
             if (top !== undefined) {
                 top += 'px';
             }
-            DOMUtility(headers[i]).css('top', top)[((top === undefined) ? 'remove' : 'add') + 'Class'](headerFixedClass);
+            dom(headers[i]).css({top: top})[((top === undefined) ? 'remove' : 'add') + 'Class'](headerFixedClass);
         }
 
-        // Коэффициент отношения позиции бара к относительной позиции контейнера
+        // Relation of bar top position to container relative top position
         function k() {
-            return scroller.clientHeight - bar.offsetHeight - gData.barTop || 0 - gData.barBottom || 0;
+            return scroller.clientHeight - bar.offsetHeight - (gData.barTop || 0);
         }
 
-        // Преобразование относительной позиции контейнера в позицию бара
+        // Relative container top position to bar top position
         function relToTop(r) {
             return r * k() + (gData.barTop || 0);
         }
 
-        // Преобразование позиции бара в относительную позицию контейнера
+        // Bar top position to relative container top position
         function topToRel(t) {
             return (t - (gData.barTop || 0)) / k();
         }
 
-        // Функция для биндинга на событие selectstart
+        // Text selection start preventing
         function dontStartSelect() {
             return false;
         }
 
-        // Блокировка выделения текста при драге
+        // Text selection preventing on drag
         function selection(on) {
             // document.unselectable = on ? 'off' : 'on';
-            eventManager(document, "selectstart", dontStartSelect, on ? 'off' : '' );
-            // DOMUtility(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
+            event(document, "selectstart", dontStartSelect, on ? 'off' : '' );
+            // dom(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
         }
 
         // Engines initialization
         var $ = window.jQuery;
-        querySelector = gData.querySelector || $;
-        if (!querySelector) {
+        selector = gData.selector || $;
+        if (!selector) {
             // console.error('baron: no query selector engine found');
             return;
         }
-        eventManager = gData.eventManager || function(elem, event, func, off) {
+        event = gData.event || function(elem, event, func, off) {
             $(elem)[off||'on'](event, func);
         };
-        if (!gData.eventManager && !$) {
+        if (!gData.event && !$) {
             return;
         }
-        DOMUtility = gData.DOMUtility || $;
-        if (!DOMUtility) {
+        dom = gData.dom || $;
+        if (!dom) {
             // console.error('baron: no DOM utility engine founc');
             return;
         }
 
         // DOM initialization
-        scroller = querySelector(gData.scroller, root)[0];
-        container = querySelector(gData.container, scroller)[0];
-        bar = querySelector(gData.bar, scroller)[0];
-        headers = querySelector(gData.header, container);
+        scroller = selector(gData.scroller, root)[0];
+        container = selector(gData.container, scroller)[0];
+        bar = selector(gData.bar, scroller)[0];
+        headers = selector(gData.header, container);
 
         // DOM data
         if (!(scroller && container && bar)) {
@@ -120,7 +120,7 @@
 
         // Initialization. Setting scrollbar width BEFORE all other work
         barOn(scroller.clientHeight < container.offsetHeight);
-        DOMUtility(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
+        dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
 
         // Viewport height calculation
         viewPortHeight = scroller.clientHeight;
@@ -147,10 +147,10 @@
 
         // Events initialization
         // onScroll
-        eventManager(scroller, 'scroll', updateScrollBar);
+        event(scroller, 'scroll', updateScrollBar);
 
         // onMouseWheel bubbling in webkit
-        eventManager(headers, 'mousewheel', function(e) {
+        event(headers, 'mousewheel', function(e) {
             if (document.createEvent) {
                 var evt = document.createEvent("WheelEvent");
                 // console.log(e);
@@ -164,7 +164,7 @@
         });
 
         // Resize
-        eventManager(window, 'resize', function() {
+        event(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
             clearTimeout(rTimer);
             // И навешиваем новый
@@ -175,19 +175,19 @@
         });
 
         // Drag
-        eventManager(bar, 'mousedown', function(e) {
+        event(bar, 'mousedown', function(e) {
             e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
             selection(); // Disable text selection in ie8
             drag = 1; // Another one byte
         });
-        eventManager(document, 'mouseup blur', function() {
+        event(document, 'mouseup blur', function() {
             selection(1); // Enable text selection
             drag = 0;
         });
-        eventManager(document, 'mousedown', function(e) { // document, not window, for ie8
+        event(document, 'mousedown', function(e) { // document, not window, for ie8
             scrollerY0 = e.clientY - barTop;
         });
-        eventManager(document, 'mousemove', function(e) { // document, not window, for ie8
+        event(document, 'mousemove', function(e) { // document, not window, for ie8
             if (drag) {
                 scroller.scrollTop = topToRel(e.clientY - scrollerY0) * (container.offsetHeight - scroller.clientHeight);
             }
