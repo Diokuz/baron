@@ -151,6 +151,18 @@
         // onScroll
         eventManager(scroller, 'scroll', updateScrollBar);
 
+        // onMouseWheel bubbling in webkit
+        eventManager(headers, 'mousewheel', function(e) {
+            var evt = document.createEvent("WheelEvent");
+            // console.log(e);
+            if (evt.initWebKitWheelEvent) {
+                // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                evt.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                scroller.dispatchEvent(evt);
+                e.preventDefault();
+            }
+        });
+
         // Resize
         eventManager(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
