@@ -13,13 +13,13 @@ Baron just hides system scrollbar, but not removing it. This can guarantee scrol
 
 To start using baron.js go throught following steps:
 
-1. Include dev or min version of baron.js:
+* Include dev or min version of baron.js:
 
 ```js
 <script src="baron.js"></script>
 ```
 
-2. Make some html:
+* Make some html:
 
 ```html
 <div class="wrapper">
@@ -32,7 +32,7 @@ To start using baron.js go throught following steps:
 </div>
 ```
 
-3. And some CSS:
+* And some CSS:
 
 ```css
 .wrapper {
@@ -58,7 +58,9 @@ To start using baron.js go throught following steps:
 }
 ```
 
-4. At least, initialize baron:
+Note: you can choose any class names, and slylize them as you want.
+
+* Initialize baron:
 
 ```js
 baron($('.wrapper'), {
