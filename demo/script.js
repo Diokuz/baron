@@ -6,6 +6,6 @@ window.onload = function() {
         barTop: 20,
         barOnClass: 'scroller__bar_state_on',
         header: '.header__title',
-        headerFixedClass: 'header__title_state_fixed'
+        hFixCls: 'header__title_state_fixed'
     });
 };

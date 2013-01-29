@@ -24,7 +24,7 @@
             container,
             bar,
             barTop, // bar position
-            headerFixedClass, // CSS to be added on fixed headers
+            hFixCls, // CSS to be added on fixed headers
             hFixFlag = [], // State of current header (top-fix, free, bottom-fix), change of state leads to dom manipulation
             drag,
             scrollerY0,
@@ -53,10 +53,13 @@
 
         // (un)Fix headers[i]
         function fixHeader(i, top) {
+            if (viewPortHeight < gData.viewMinH || 0) { // No headers fixing when no enought space for viewport
+                top = undefined;
+            }
             if (top !== undefined) {
                 top += 'px';
             }
-            dom(headers[i]).css({top: top})[((top === undefined) ? 'remove' : 'add') + 'Class'](headerFixedClass);
+            dom(headers[i]).css({top: top})[((top === undefined) ? 'remove' : 'add') + 'Class'](hFixCls);
         }
 
         // Relation of bar top position to container relative top position
@@ -88,6 +91,7 @@
 
         // Viewport calculation
         function viewport(h) {
+            headers = selector(gData.header, container);
             viewPortHeight = scroller.clientHeight;
             if (h) {
                 headerTops = [];
@@ -133,7 +137,6 @@
         scroller = selector(gData.scroller, root)[0];
         container = selector(gData.container, scroller)[0];
         bar = selector(gData.bar, scroller)[0];
-        headers = selector(gData.header, container);
 
         // DOM data
         if (!(scroller && container && bar)) {
@@ -148,12 +151,7 @@
         // Viewport height calculation
         viewport(1);
 
-        headerFixedClass = gData.headerFixedClass;
-
-        // Viewport must be positive to allow header fixing
-        if (viewPortHeight < 1) {
-            headers = 0; // undefined takes +1 byte :)
-        }
+        hFixCls = gData.hFixCls;
 
         // Events initialization
         // onScroll

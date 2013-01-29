@@ -1,7 +1,7 @@
 {
   "name": "baron",
   "description": "A small, fast and crossbrowser vertical custom scrollbar with native system scroll mechanic",
-  "version": "0.1",
+  "version": "0.2",
   "homepage": "https://github.com/Diokuz/baron",
   "authors": [
     "Dmitry Kuznecov <@Diokuz>"

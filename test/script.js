@@ -7,7 +7,7 @@ window.onload = function() {
         container: '.container',
         bar: '.scroller__bar',
         header: '.header__title',
-        headerFixedClass: 'header__title_state_fixed'
+        hFixCls: 'header__title_state_fixed'
     });
 
 
@@ -17,7 +17,7 @@ window.onload = function() {
         container: '.container',
         bar: '.scroller__bar',
         header: '.header__title',
-        headerFixedClass: 'header__title_state_fixed',
+        hFixCls: 'header__title_state_fixed',
         barTop: 36
     });
 
@@ -48,7 +48,8 @@ window.onload = function() {
         container: '.container',
         bar: '.scroller__bar',
         header: '.header__title',
-        headerFixedClass: 'header__title_state_fixed'
+        hFixCls: 'header__title_state_fixed',
+        viewMinH: 100
     });
 
     // No js .test__no-js
@@ -61,7 +62,7 @@ window.onload = function() {
         barOnClass: '.scroller__bar_state_on',
         barTop: 40,
         header: '.header__title',
-        headerFixedClass: 'header__title_state_fixed',
+        hFixCls: 'header__title_state_fixed',
         selector: qwery, // Selector engine
         event: function(elem, event, func, off) { // Events manager
             if (off) {
