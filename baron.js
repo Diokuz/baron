@@ -122,21 +122,30 @@
         dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
 
         // Viewport height calculation
-        viewPortHeight = scroller.clientHeight;
-        headerTops = [];
-        topHeights = [];
-        if (headers) {
-            for (i = 0 ; i < headers.length ; i++) {
-                // Summary headers height above current
-                topHeights[i] = (topHeights[i - 1] || 0);
-                if (headers[i - 1]) {
-                    topHeights[i] += headers[i - 1].offsetHeight;
+        function viewport(h) {
+            viewPortHeight = scroller.clientHeight;
+            if (h) {
+                headerTops = [];
+            }
+            hFixFlag = [];
+            topHeights = [];
+            if (headers) {
+                for (i = 0 ; i < headers.length ; i++) {
+                    // Summary headers height above current
+                    topHeights[i] = (topHeights[i - 1] || 0);
+                    if (headers[i - 1]) {
+                        topHeights[i] += headers[i - 1].offsetHeight;
+                    }
+                    // Between fixed headers
+                    viewPortHeight -= headers[i].offsetHeight;
+                    if (h) {
+                        headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
+                    }
                 }
-                // Between fixed headers
-                viewPortHeight -= headers[i].offsetHeight;
-                headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
             }
         }
+        viewport(1);
+
         headerFixedClass = gData.headerFixedClass;
 
         // Viewport must be positive to allow header fixing
@@ -165,8 +174,9 @@
             clearTimeout(rTimer);
             // И навешиваем новый
             rTimer = setTimeout(function() {
-                barOn(container.offsetHeight > scroller.clientHeight);
+                viewport();
                 updateScrollBar();
+                barOn(container.offsetHeight > scroller.clientHeight);
             }, 200);
         });
 
