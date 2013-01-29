@@ -6,6 +6,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed'
     });
@@ -16,6 +17,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         barTop: 36
@@ -25,21 +27,24 @@ window.onload = function() {
     baron($('.test_wo-headers'), {
         scroller: '.scroller',
         container: '.container',
-        bar: '.scroller__bar'
+        bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on'
     });
 
     // Negative viewport
     baron($('.test_negative-viewport'), {
         scroller: '.scroller',
         container: '.container',
-        bar: '.scroller__bar'
+        bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on'
     });
 
     // Flexible height
     baron($('.test_flex'), {
         scroller: '.scroller',
         container: '.container',
-        bar: '.scroller__bar'
+        bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on'
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
@@ -47,6 +52,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
+        barOnClass: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         viewMinH: 100
