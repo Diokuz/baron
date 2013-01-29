@@ -42,6 +42,15 @@ window.onload = function() {
         bar: '.scroller__bar'
     });
 
+    // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
+    baron($('.test_flex-headers'), {
+        scroller: '.scroller',
+        container: '.container',
+        bar: '.scroller__bar',
+        header: '.header__title',
+        headerFixedClass: 'header__title_state_fixed'
+    });
+
     // No js .test__no-js
 
     // Maximum variables
