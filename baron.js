@@ -47,7 +47,7 @@
                 if (height > 0 && height < barMinHeight) {
                     height = barMinHeight;
                 }
-                dom(bar).css('height', height + 'px');
+                dom(bar).css({height: height + 'px'});
             }
         }
 
@@ -86,6 +86,30 @@
             // dom(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
         }
 
+        // Viewport calculation
+        function viewport(h) {
+            viewPortHeight = scroller.clientHeight;
+            if (h) {
+                headerTops = [];
+            }
+            hFixFlag = [];
+            topHeights = [];
+            if (headers) {
+                for (i = 0 ; i < headers.length ; i++) {
+                    // Summary headers height above current
+                    topHeights[i] = (topHeights[i - 1] || 0);
+                    if (headers[i - 1]) {
+                        topHeights[i] += headers[i - 1].offsetHeight;
+                    }
+                    // Between fixed headers
+                    viewPortHeight -= headers[i].offsetHeight;
+                    if (h) {
+                        headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
+                    }
+                }
+            }
+        }
+
         // Engines initialization
         var $ = window.jQuery;
         selector = gData.selector || $;
@@ -122,28 +146,6 @@
         dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
 
         // Viewport height calculation
-        function viewport(h) {
-            viewPortHeight = scroller.clientHeight;
-            if (h) {
-                headerTops = [];
-            }
-            hFixFlag = [];
-            topHeights = [];
-            if (headers) {
-                for (i = 0 ; i < headers.length ; i++) {
-                    // Summary headers height above current
-                    topHeights[i] = (topHeights[i - 1] || 0);
-                    if (headers[i - 1]) {
-                        topHeights[i] += headers[i - 1].offsetHeight;
-                    }
-                    // Between fixed headers
-                    viewPortHeight -= headers[i].offsetHeight;
-                    if (h) {
-                        headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
-                    }
-                }
-            }
-        }
         viewport(1);
 
         headerFixedClass = gData.headerFixedClass;
@@ -253,4 +255,4 @@
     }
 
     window.baron = baron;
-}()
+}();
