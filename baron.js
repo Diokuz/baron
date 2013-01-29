@@ -150,15 +150,13 @@
 
         // onMouseWheel bubbling in webkit
         event(headers, 'mousewheel', function(e) {
-            if (document.createEvent) {
+            try {
                 i = document.createEvent('WheelEvent'); // i - for extra byte
-                if (i.initWebKitWheelEvent) {
-                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                    scroller.dispatchEvent(i);
-                    e.preventDefault();
-                }
-            }
+                // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                scroller.dispatchEvent(i);
+                e.preventDefault();
+            } catch (e) {};
         });
 
         // Resize
