@@ -71,3 +71,15 @@ baron($('.wrapper'), {
 ```
 
 There may be many wrappers on page, but only first scroller, container and scroller__bar on each wrapper will be initialized. Also, make sure you have either jQuery or custom DOM, events and selector engines.
+
+## Browsers support
+
+Full support: Chrome, Firefox, Safari, Opera on Windows, OS X and iOs. Also, the best browser download program - Internet Explorer - supported since version 8.
+
+Partial support: IE7 (without fixable headers).
+
+Not supported: Opera mini, Old versions of Android browser, and other browsers which does not implemented overflow: scroll CSS property.
+
+## TODO
+
+- Disable Modern UI scrollbar in fullscreen mode of Win8 IE10: html {-ms-overflow-style:scrollbar;}
