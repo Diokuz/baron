@@ -6,7 +6,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on',
+        barOnCls: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed'
     });
@@ -17,7 +17,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on',
+        barOnCls: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         barTop: 36
@@ -28,7 +28,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on'
+        barOnCls: 'scroller__bar_state_on'
     });
 
     // Negative viewport
@@ -36,7 +36,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on'
+        barOnCls: 'scroller__bar_state_on'
     });
 
     // Flexible height
@@ -44,7 +44,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on'
+        barOnCls: 'scroller__bar_state_on'
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
@@ -52,7 +52,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: 'scroller__bar_state_on',
+        barOnCls: 'scroller__bar_state_on',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         viewMinH: 100
@@ -65,7 +65,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnClass: '.scroller__bar_state_on',
+        barOnCls: '.scroller__bar_state_on',
         barTop: 40,
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
