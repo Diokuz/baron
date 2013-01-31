@@ -65,16 +65,22 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: '.scroller__bar_state_on',
+        barOnCls: 'scroller__bar_state_on',
         barTop: 40,
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         selector: qwery, // Selector engine
         event: function(elem, event, func, off) { // Events manager
-            if (off) {
-                bean.off(elem, event, func);
-            } else {
-                bean.on(elem, event, func);
+            //if (Object.prototype.toString.call(elem) !== "[object Array]") {
+            if (!elem.length) {
+                elem = [elem]; // bean not supported arrays
+            }
+            for (var i = 0 ; i < elem.length ; i++) {
+                if (off) {
+                    bean.off(elem[i], event, func);
+                } else {
+                    bean.on(elem[i], event, func);
+                }
             }
         },
         dom: bonzo // DOM utility
