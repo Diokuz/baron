@@ -32,34 +32,50 @@
 
         // Switch on the bar by adding user-defined CSS classname
         function barOn(on) {
+            if(!gData.barOnCls)
+                return;
             if (on) {
-                dom(bar).addClass(gData.barOnCls);
+                bar.classList.add(gData.barOnCls);
             } else {
-                dom(bar).removeClass(gData.barOnCls);
+                bar.classList.remove(gData.barOnCls);
             }
         }
 
         function posBar(top, height) {
             var barMinHeight = gData.barMinHeight || 20;
 
-            dom(bar).css('top', top + 'px');
+            bar.style.top = top + 'px';
+
             if (height !== undefined) {
                 if (height > 0 && height < barMinHeight) {
                     height = barMinHeight;
                 }
-                dom(bar).css({height: height + 'px'});
+
+                bar.style.height = height + 'px';
             }
         }
 
         // (un)Fix headers[i]
         function fixHeader(i, top) {
+
             if (viewPortHeight < gData.viewMinH || 0) { // No headers fixing when no enought space for viewport
                 top = undefined;
             }
+
             if (top !== undefined) {
                 top += 'px';
             }
-            dom(headers[i]).css({top: top})[((top === undefined) ? 'remove' : 'add') + 'Class'](hFixCls);
+
+            //setting undefined to style.top is invalid, prevent error in IE8
+            if(!top)
+                headers[i].style.top = 0;
+            else
+                headers[i].style.top = top;
+
+            if(top === undefined)
+                headers[i].classList.remove(hFixCls);
+            else
+                headers[i].classList.add(hFixCls);
         }
 
         // Relation of bar top position to container relative top position
@@ -115,23 +131,30 @@
         }
 
         // Engines initialization
-        var $ = window.jQuery;
-        selector = gData.selector || $;
+        selector = gData.selector || function(selector, context) {
+            return context.querySelectorAll(selector);
+        };
         if (!selector) {
-            // console.error('baron: no query selector engine found');
+            console.error('baron: no query selector engine found');
             return;
         }
         event = gData.event || function(elem, event, func, off) {
-            $(elem)[off||'on'](event, func);
+            if(!off)
+                elem.addEventListener(event, func, false);
+            else
+                elem.removeEventListener(event, func, false);
         };
-        if (!gData.event && !$) {
+        if (!event) {
             return;
         }
-        dom = gData.dom || $;
+
+        /*
+        dom = gData.dom;
         if (!dom) {
-            // console.error('baron: no DOM utility engine founc');
+            console.error('baron: no DOM utility engine founc');
             return;
         }
+        */
 
         // DOM initialization
         scroller = selector(gData.scroller, root)[0];
@@ -140,13 +163,13 @@
 
         // DOM data
         if (!(scroller && container && bar)) {
-            // console.error('acbar: no scroller, container or bar dectected');
+            console.error('baron: no scroller, container or bar dectected');
             return;
         }
 
         // Initialization. Setting scrollbar width BEFORE all other work
         barOn(scroller.clientHeight < container.offsetHeight);
-        dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
+        scroller.style.width = scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px';
 
         // Viewport height calculation
         viewport(1);
@@ -158,15 +181,19 @@
         event(scroller, 'scroll', updateScrollBar);
 
         // onMouseWheel bubbling in webkit
-        event(headers, 'mousewheel', function(e) {
-            try {
-                i = document.createEvent('WheelEvent'); // i - for extra byte
-                // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                scroller.dispatchEvent(i);
-                e.preventDefault();
-            } catch (e) {};
-        });
+        for(var i; i < headers.length; i++) {
+
+            event(headers[i], 'mousewheel', function(e) {
+                try {
+                    i = document.createEvent('WheelEvent'); // i - for extra byte
+                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                    scroller.dispatchEvent(i);
+                    e.preventDefault();
+                } catch (e) {};
+            });
+
+        }
 
         // Resize
         event(window, 'resize', function() {
