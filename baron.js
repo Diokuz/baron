@@ -57,14 +57,21 @@
 
         // (un)Fix headers[i]
         function fixHeader(i, top) {
+
             if (viewPortHeight < gData.viewMinH || 0) { // No headers fixing when no enought space for viewport
                 top = undefined;
             }
+
             if (top !== undefined) {
                 top += 'px';
             }
 
-            headers[i].style.top = top;
+            //setting undefined to style.top is invalid, prevent error in IE8
+            if(!top)
+                headers[i].style.top = 0;
+            else
+                headers[i].style.top = top;
+
             if(top === undefined)
                 headers[i].classList.remove(hFixCls);
             else
