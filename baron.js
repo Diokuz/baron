@@ -1,16 +1,22 @@
+/* https://github.com/Diokuz/baron */
 !function(undefined) {
     "use strict";
 
     var baron = function(root, data) {
+        var out = [];
+
         if (!root[0]) {
             root = [root];
         }
         for (var i = 0 ; i < root.length ; i++) {
-            new baron.init(root[i], data);
+            out[i] = new baron.init(root[i], data);
         }
+
+        return out;
     };
 
     // gData - user defined data, not changed during baron work
+    // Constructor!
     baron.init = function(root, gData) {
         var headers,
             viewPortHeight, // Non-headers viewable content summary height
@@ -33,9 +39,9 @@
         // Switch on the bar by adding user-defined CSS classname
         function barOn(on) {
             if (on) {
-                dom(bar).addClass(gData.barOnCls);
+                dom(bar).addClass(gData.barOnCls || '');
             } else {
-                dom(bar).removeClass(gData.barOnCls);
+                dom(bar).removeClass(gData.barOnCls || '');
             }
         }
 
@@ -89,8 +95,8 @@
             // dom(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
         }
 
-        // Viewport calculation
-        function viewport(h) {
+        // Viewport (re)calculation
+        this.viewport = function(h) {
             headers = selector(gData.header, container);
             viewPortHeight = scroller.clientHeight;
             if (h) {
@@ -108,7 +114,71 @@
                     // Between fixed headers
                     viewPortHeight -= headers[i].offsetHeight;
                     if (h) {
-                        headerTops[i] = headers[i].offsetTop; // No paddings for parentNode
+                        headerTops[i] = headers[i].parentNode.offsetTop; // No paddings for parentNode
+                    }
+                }
+            }
+        }
+
+        // Total positions data update, container height dependences included
+        this.updateScrollBar = function() {
+            var containerTop, // Container virtual top position
+                oldBarHeight, newBarHeight,
+                hTop,
+                fixState; 
+
+            containerTop = -(scroller.pageYOffset || scroller.scrollTop);
+            barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
+            newBarHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
+
+            // We dont need no scrollbat -> making bar 0px height
+            if (scroller.clientHeight >= container.offsetHeight) {
+                newBarHeight = 0;
+            }
+
+            // Positioning bar
+            if (oldBarHeight !== newBarHeight) {
+                posBar(barTop, newBarHeight);
+                oldBarHeight = newBarHeight;
+            } else {
+                posBar(barTop);
+            }
+
+            // Positioning headers
+            if (headers) {
+                var change;
+                for (i = 0 ; i < headers.length ; i++) {
+                    fixState = 0;
+                    if (headerTops[i] + containerTop < topHeights[i]) {
+                        // Header trying to go up
+                        fixState = 1;
+                        hTop = topHeights[i];
+                    } else if (headerTops[i] + containerTop > topHeights[i] + viewPortHeight) {
+                        // Header trying to go down
+                        fixState = 2;
+                        hTop = topHeights[i] + viewPortHeight;
+                    } else {
+                        // Header in viewport
+                        fixState = 3;
+                        hTop = undefined;
+                    }
+                    if (fixState !== hFixFlag[i]) {
+                        fixHeader(i, hTop);
+                        hFixFlag[i] = fixState;
+                        change = true;
+                    }
+                }
+
+                // Adding positioning classes (on last top and first bottom header)
+                if (change) { // At leats one change in headers flag structure occured
+                    for (i = 0 ; i < headers.length ; i++) {
+                        if (hFixFlag[i] !== hFixFlag[i + 1] && hFixFlag[i] === 1 && gData.hTopFixCls) {
+                            dom(headers[i]).addClass(gData.hTopFixCls).removeClass(gData.hBottomFixCls + ''); // Last top fixed header
+                        } else if (hFixFlag[i] !== hFixFlag[i - 1] && hFixFlag[i] === 2 && gData.hBottomFixCls) {
+                            dom(headers[i]).addClass(gData.hBottomFixCls).removeClass(gData.hTopFixCls + ''); // First bottom fixed header
+                        } else {
+                            dom(headers[i]).removeClass(gData.hTopFixCls + '').removeClass(gData.hBottomFixCls + '');
+                        }
                     }
                 }
             }
@@ -149,13 +219,13 @@
         dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
 
         // Viewport height calculation
-        viewport(1);
+        this.viewport(1);
 
         hFixCls = gData.hFixCls;
 
         // Events initialization
         // onScroll
-        event(scroller, 'scroll', updateScrollBar);
+        event(scroller, 'scroll', this.updateScrollBar);
 
         // onMouseWheel bubbling in webkit
         event(headers, 'mousewheel', function(e) {
@@ -174,8 +244,8 @@
             clearTimeout(rTimer);
             // И навешиваем новый
             rTimer = setTimeout(function() {
-                viewport();
-                updateScrollBar();
+                this.viewport();
+                this.updateScrollBar();
                 barOn(container.offsetHeight > scroller.clientHeight);
             }, 200);
         });
@@ -186,13 +256,16 @@
             selection(); // Disable text selection in ie8
             drag = 1; // Another one byte
         });
+
         event(document, 'mouseup blur', function() {
             selection(1); // Enable text selection
             drag = 0;
         });
+
         event(document, 'mousedown', function(e) { // document, not window, for ie8
             scrollerY0 = e.clientY - barTop;
         });
+
         event(document, 'mousemove', function(e) { // document, not window, for ie8
             if (drag) {
                 scroller.scrollTop = topToRel(e.clientY - scrollerY0) * (container.offsetHeight - scroller.clientHeight);
@@ -200,56 +273,14 @@
         });
 
         // First update to initialize bar look
-        updateScrollBar();
+        this.updateScrollBar();
 
-        // Total positions data update, container height dependences included
-        function updateScrollBar() {
-            var containerTop, // Container virtual top position
-                oldBarHeight, newBarHeight,
-                hTop,
-                fixState; 
+        return this;
+    }
 
-            containerTop = -(scroller.pageYOffset || scroller.scrollTop);
-            barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
-            newBarHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
-
-            // We dont need no scrollbat -> making bar 0px height
-            if (scroller.clientHeight >= container.offsetHeight) {
-                newBarHeight = 0;
-            }
-
-            // Positioning bar
-            if (oldBarHeight !== newBarHeight) {
-                posBar(barTop, newBarHeight);
-                oldBarHeight = newBarHeight;
-            } else {
-                posBar(barTop);
-            }
-
-            // Positioning headers
-            if (headers) {
-                for (i = 0 ; i < headers.length ; i++) {
-                    fixState = 0;
-                    if (headerTops[i] + containerTop < topHeights[i]) {
-                        // Header trying to go up
-                        fixState = 1;
-                        hTop = topHeights[i];
-                    } else if (headerTops[i] + containerTop > topHeights[i] + viewPortHeight) {
-                        // Header trying to go down
-                        fixState = 2;
-                        hTop = topHeights[i] + viewPortHeight;
-                    } else {
-                        // Header in viewport
-                        fixState = 3;
-                        hTop = undefined;
-                    }
-                    if (fixState !== hFixFlag[i]) {
-                        fixHeader(i, hTop);
-                        hFixFlag[i] = fixState;
-                    }
-                }
-            }
-        }
+    baron.init.prototype.reinit = function() {
+        this.viewport(1);
+        this.updateScrollBar();
     }
 
     window.baron = baron;

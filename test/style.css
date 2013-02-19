@@ -1,6 +1,7 @@
 html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 
 .test {
+	z-index: 0;
 	width: 30%;
 	height: 400px;
 	display: inline-block;

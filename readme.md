@@ -86,4 +86,7 @@ Not supported: Opera mini, Old versions of Android browser, and other browsers w
 
 ## TODO
 
-- Disable Modern UI scrollbar in fullscreen mode of Win8 IE10: html {-ms-overflow-style:scrollbar;}
+- Android 4.0.4 (build-in browser)
+- Bar resize when window.resize()
+- Fix z-indexes on test page
+- try "overflow: auto; & -webkit-overflow-scrolling: touch;" for ipad
