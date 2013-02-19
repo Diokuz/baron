@@ -59,13 +59,16 @@
 
         // (un)Fix headers[i]
         function fixHeader(i, top) {
-            if (viewPortHeight < gData.viewMinH || 0) { // No headers fixing when no enought space for viewport
+            if (viewPortHeight < (gData.viewMinH || 0)) { // No headers fixing when no enought space for viewport
                 top = undefined;
             }
+
             if (top !== undefined) {
                 top += 'px';
+                dom(headers[i]).css({top: top}).addClass(hFixCls);
+            } else {
+                dom(headers[i]).css({top: top}).removeClass(hFixCls);
             }
-            dom(headers[i]).css({top: top})[((top === undefined) ? 'remove' : 'add') + 'Class'](hFixCls);
         }
 
         // Relation of bar top position to container relative top position
@@ -99,20 +102,26 @@
         this.viewport = function(h) {
             headers = selector(gData.header, container);
             viewPortHeight = scroller.clientHeight;
+
             if (h) {
                 headerTops = [];
             }
+
             hFixFlag = [];
             topHeights = [];
+
             if (headers) {
                 for (i = 0 ; i < headers.length ; i++) {
                     // Summary headers height above current
                     topHeights[i] = (topHeights[i - 1] || 0);
+
                     if (headers[i - 1]) {
                         topHeights[i] += headers[i - 1].offsetHeight;
                     }
+
                     // Between fixed headers
                     viewPortHeight -= headers[i].offsetHeight;
+
                     if (h) {
                         headerTops[i] = headers[i].parentNode.offsetTop; // No paddings for parentNode
                     }
@@ -239,13 +248,14 @@
         });
 
         // Resize
+        var that = this;
         event(window, 'resize', function() {
             // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
             clearTimeout(rTimer);
             // И навешиваем новый
             rTimer = setTimeout(function() {
-                this.viewport();
-                this.updateScrollBar();
+                that.viewport();
+                that.updateScrollBar();
                 barOn(container.offsetHeight > scroller.clientHeight);
             }, 200);
         });
