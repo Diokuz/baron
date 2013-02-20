@@ -84,9 +84,11 @@ Partial support: IE7 (without fixable headers).
 
 Not supported: Opera mini, Old versions of Android browser, and other browsers which do not implement the `overflow: scroll` CSS property.
 
+## License
+
+MIT.
+
 ## TODO
 
 - Android 4.0.4 (build-in browser)
-- Bar resize when window.resize()
-- Fix z-indexes on test page
 - try "overflow: auto; & -webkit-overflow-scrolling: touch;" for ipad

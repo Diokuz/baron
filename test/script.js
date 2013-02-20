@@ -2,15 +2,16 @@ window.onload = function() {
     var root;
 
     // Simple initialization with minimum parameters, but with headers
-    baron($('.test_simple'), {
-        scroller: '.scroller',
-        container: '.container',
-        bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on',
-        header: '.header__title',
-        hFixCls: 'header__title_state_fixed'
-    });
-
+    for (var i = 0 ; i < 100 ; i++) {
+        baron($('.test_simple'), {
+            scroller: '.scroller',
+            container: '.container',
+            bar: '.scroller__bar',
+            barOnCls: 'scroller__bar_state_on',
+            header: '.header__title',
+            hFixCls: 'header__title_state_fixed'
+        });
+    }
 
     // Array initialization + barTopLimit
     baron($('.test_arr'), {
