@@ -74,7 +74,39 @@ baron($('.wrapper'), {
 });
 ```
 
+or
+
+```js
+var scroll = baron($('.wrapper'), {
+    scroller: '.scroller',
+    container: '.container',
+    bar: '.scroller__bar'
+});
+```
+
 There may be many wrappers on page, but only the first scroller, container and scroller__bar on each wrapper will be initialized. Also, make sure you have either jQuery or custom DOM, for events and selector engines.
+
+* Update baron coordinates
+
+When container size changed (for example: you load additional data to container by ajax), you should call u() method:
+
+```js
+scroll.u();
+```
+
+or u() method of all baron scrolls on page:
+
+```js
+baron.u();
+```
+
+or fire custom event to wrapper:
+
+```js
+$('.wrapper').trigger('heightChange');
+```
+
+or repeat the initialization (not true-style, but will work).
 
 ## Browsers support
 

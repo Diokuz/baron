@@ -31,6 +31,8 @@
     -moz-box-sizing: border-box;
     box-sizing: border-box; /* For padding and border, if exist */
     background: #999;
+
+    /* pointer-events: none; /* IE9+ https://developer.mozilla.org/en-US/docs/CSS/pointer-events */
 }
 .header__title_state_fixed {
     position: absolute;
