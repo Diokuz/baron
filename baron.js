@@ -1,10 +1,21 @@
 /* https://github.com/Diokuz/baron */
-!function(undefined) {
+(function($, undefined) {
     'use strict';
 
     var scrolls = [];
 
     var baron = function(root, data) {
+        var data,
+            root;
+
+        if (arguments[1] === undefined) { // jQuery plugin mode
+            root = this;
+            data = arguments[0] || {};
+        } else {
+            root = arguments[0];
+            data = arguments[1];
+        }
+
         scrolls.push(new constructor(root, data));
         return scrolls[scrolls.length - 1];
     };
@@ -204,10 +215,23 @@
             }
 
             // DOM initialization
-            scroller = selector(gData.scroller, root)[0];
-            container = selector(gData.container, scroller)[0];
-            bar = selector(gData.bar, scroller)[0];
-
+            if (gData.scroller) {
+                scroller = selector(gData.scroller, root)[0];
+            } else {
+                scroller = selector('*', root)[0];
+            }
+            if (gData.container) {
+                container = selector(gData.container, scroller)[0];
+            } else {
+                container = selector('*', scroller)[0];
+            }
+            if (gData.bar) {
+                bar = selector(gData.bar, scroller)[0];
+            } else {
+                bar = selector('*', scroller);
+                bar = bar[bar.length - 1];
+            }
+            
             // DOM data
             if (!(scroller && container && bar)) {
                 // console.error('acbar: no scroller, container or bar dectected');
@@ -290,7 +314,6 @@
         };
 
         // Engines initialization
-        var $ = window.jQuery;
         selector = data.selector || $;
         if (!selector) {
             // console.error('baron: no query selector engine found');
@@ -333,5 +356,9 @@
         } 
     };
 
+    if ($ && $.fn) {
+        $.fn.baron = baron;
+    }
+
     window.baron = baron;
-}();
+})(window.jQuery);

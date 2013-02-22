@@ -1,12 +1,11 @@
 window.onload = function() {
     var root;
 
+    $('.wrapper_very-simple').baron();
+
     // Simple initialization with minimum parameters, but with headers
     for (var i = 0 ; i < 100 ; i++) {
-        baron($('.test_simple'), {
-            scroller: '.scroller',
-            container: '.container',
-            bar: '.scroller__bar',
+        $('.wrapper_simple').baron({
             barOnCls: 'scroller__bar_state_on',
             header: '.header__title',
             hFixCls: 'header__title_state_fixed'
@@ -14,7 +13,7 @@ window.onload = function() {
     }
 
     // Array initialization + barTopLimit
-    baron($('.test_arr'), {
+    $('.test_arr').baron({
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
@@ -25,7 +24,7 @@ window.onload = function() {
     });
 
     // Init without headers
-    baron($('.test_wo-headers'), {
+    $('.test_wo-headers').baron({
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
@@ -33,7 +32,7 @@ window.onload = function() {
     });
 
     // Negative viewport
-    baron($('.test_negative-viewport'), {
+    $('.test_negative-viewport').baron({
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
@@ -49,7 +48,7 @@ window.onload = function() {
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
-    baron($('.test_flex-headers'), {
+    baron(document.getElementsByClassName('test_flex-headers'), {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
@@ -67,21 +66,17 @@ window.onload = function() {
         container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'scroller__bar_state_on',
-        barTop: 40,
+        barTop: 2,
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         selector: qwery, // Selector engine
-        event: function(elem, event, func, off) { // Events manager
+        event: function(elem, event, func, mode) { // Events manager
             //if (Object.prototype.toString.call(elem) !== "[object Array]") {
             if (!elem.length) {
                 elem = [elem]; // bean not supported arrays
             }
-            for (var i = 0 ; i < elem.length ; i++) {
-                if (off) {
-                    bean.off(elem[i], event, func);
-                } else {
-                    bean.on(elem[i], event, func);
-                }
+             for (var i = 0 ; i < elem.length ; i++) {
+                bean[mode || 'on'](elem[i], event, func);
             }
         },
         dom: bonzo // DOM utility
