@@ -67,17 +67,13 @@ Note: you can choose any class names, and slyle them as you want.
 * Initialize baron:
 
 ```js
-baron($('.wrapper'), {
-    scroller: '.scroller',
-    container: '.container',
-    bar: '.scroller__bar'
-});
+$('.wrapper').baron();
 ```
 
 or
 
 ```js
-var scroll = baron($('.wrapper'), {
+var scroll = baron(document.getElementsByClassName('wrapper'), {
     scroller: '.scroller',
     container: '.container',
     bar: '.scroller__bar'

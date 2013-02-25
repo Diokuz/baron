@@ -4,7 +4,7 @@
 
     var scrolls = [];
 
-    var baron = function(root, data) {
+    var baron = function() {
         var data,
             root;
 
@@ -104,16 +104,12 @@
 
             // Text selection start preventing
             function dontStartSelect() {
-                //alert('dontStartSelect');
                 return false;
-                
             }
 
             // Text selection preventing on drag
             function selection(enable) {
-                // document.unselectable = enable ? 'off' : 'on';
                 event(document, 'selectstart', dontStartSelect, enable ? 'off' : 'on');
-                // dom(document.body).css('MozUserSelect', on ? '' : 'none' ); // Old versions of firefox
             }
 
             this.root = root;
@@ -215,7 +211,7 @@
             }
 
             // DOM initialization
-            if (gData.scroller) {
+            if (gData.scroller !== undefined) {
                 scroller = selector(gData.scroller, root)[0];
             } else {
                 scroller = selector('*', root)[0];
