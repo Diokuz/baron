@@ -75,8 +75,13 @@ $('.wrapper').baron();
 You can specify some parameters at baron initialization:
 
 ```js
-$('.wrapper').baron(params);
+var scroll = $('.wrapper').baron(params);
+
+// or 
+var scroll = baron($('.wrapper'), params);
 ```
+
+and store baron scrollbar object to `scroll` variable.
 
 where:
 
@@ -124,7 +129,7 @@ params = {
         if (!elem.length) {
             elem = [elem]; // bean not support arrays
         }
-         for (var i = 0 ; i < elem.length ; i++) {
+        for (var i = 0 ; i < elem.length ; i++) {
             bean[mode || 'on'](elem[i], event, func);
         }
     },
@@ -136,6 +141,12 @@ params = {
 ```
 
 All parameters are optional.
+
+`scroll` methods:
+
+```js
+scroll.u(); // Update all coordinates
+```
 
 ##Update baron coordinates
 
@@ -164,9 +175,9 @@ or repeat the initialization (not true-style, but will work).
 
 ## Browsers support
 
-Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 12+ on Windows, OS X and iOS. Also, the best browser downloader ever: Internet Explorer is supported from version 8.
+Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 9+ on Windows, OS X and iOS. Also, the best ever browser downloader - Internet Explorer - supported since version 8.
 
-Partial support: IE7 (without fixable headers).
+Partial support: IE6, IE7 (without fixable headers).
 
 Not supported: Opera mini, old versions of Android browser, and other browsers which do not implement the `overflow: scroll` CSS property.
 
