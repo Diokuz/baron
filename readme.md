@@ -70,19 +70,74 @@ Note: you can choose any class names, and slyle them as you want.
 $('.wrapper').baron();
 ```
 
-or
+##Advanced usage
+
+You can specify some parameters at baron initialization:
 
 ```js
-var scroll = baron(document.getElementsByClassName('wrapper'), {
-    scroller: '.scroller',
-    container: '.container',
-    bar: '.scroller__bar'
-});
+$('.wrapper').baron(params);
 ```
 
-There may be many wrappers on page, but only the first scroller, container and scroller__bar on each wrapper will be initialized. Also, make sure you have either jQuery or custom DOM, for events and selector engines.
+where:
 
-* Update baron coordinates
+```js
+params = {
+    // Selector for scroller element
+    // Default: 'root:first-child'
+    scroller: '.scroller',
+
+    // Selector for container element
+    // Default: 'scroller:first-child'
+    container: '.container',
+
+    // Selector for bar element
+    // Default: 'scroller:last-child'
+    bar: '.scroller__bar',
+
+    // CSS classname for bar when its needed (when container height above scroller heights)
+    // Default: ''
+    barOnCls: 'scroller__bar_state_on',
+
+    // Top limit position for bar in pixels.
+    // Default: 0
+    barTop: 2,
+
+    // CSS selector for fixable header
+    header: '.header__title',
+
+    // CSS class for fixed headers
+    hFixCls: 'header__title_state_fixed',
+
+    // CSS class for lowest fixed header of top headers group
+    hTopFixCls: 'header__title_position_top',
+
+    // CSS class for uppermost fixed header of bottom headers group
+    hBottomFixCls: 'header__title_position_bottom',
+
+    // Selector engine
+    // Default: window.jQuery
+    selector: qwery,
+
+    // Event manager
+    // Default: function(elem, event, func, mode) { DOM(elem)[mode || 'on'](event, func); };
+    event: function(elem, event, func, mode) { // Events manager
+        if (!elem.length) {
+            elem = [elem]; // bean not support arrays
+        }
+         for (var i = 0 ; i < elem.length ; i++) {
+            bean[mode || 'on'](elem[i], event, func);
+        }
+    },
+
+    // DOM utility
+    // Default: window.jQuery
+    dom: bonzo
+}
+```
+
+All parameters are optional.
+
+##Update baron coordinates
 
 When container size changed (for example: you load additional data to container by ajax), you should call u() method:
 
@@ -93,10 +148,13 @@ scroll.u();
 or u() method of all baron scrolls on page:
 
 ```js
+$.baron.u();
+
+// or
 baron.u();
 ```
 
-or fire custom event to wrapper:
+or fire custom event 'heightChange' to wrapper:
 
 ```js
 $('.wrapper').trigger('heightChange');
@@ -106,17 +164,12 @@ or repeat the initialization (not true-style, but will work).
 
 ## Browsers support
 
-Full support: Chrome, Firefox, Safari, Opera on Windows, OS X and iOS. Also, the best browser in history: Internet Explorer is supported from version 8.
+Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 12+ on Windows, OS X and iOS. Also, the best browser downloader ever: Internet Explorer is supported from version 8.
 
 Partial support: IE7 (without fixable headers).
 
-Not supported: Opera mini, Old versions of Android browser, and other browsers which do not implement the `overflow: scroll` CSS property.
+Not supported: Opera mini, old versions of Android browser, and other browsers which do not implement the `overflow: scroll` CSS property.
 
 ## License
 
 MIT.
-
-## TODO
-
-- Android 4.0.4 (build-in browser)
-- try "overflow: auto; & -webkit-overflow-scrolling: touch;" for ipad
