@@ -89,17 +89,17 @@
 
             // Relation of bar top position to container relative top position
             function k() {
-                return scroller.clientHeight - bar.offsetHeight - (gData.barTop || 0);
+                return bar.parentNode.clientHeight - bar.offsetHeight;
             }
 
             // Relative container top position to bar top position
             function relToTop(r) {
-                return r * k() + (gData.barTop || 0);
+                return r * k();
             }
 
             // Bar top position to relative container top position
             function topToRel(t) {
-                return (t - (gData.barTop || 0)) / k();
+                return t / k();
             }
 
             // Text selection start preventing

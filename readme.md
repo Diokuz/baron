@@ -106,6 +106,7 @@ params = {
     // Top limit position for bar in pixels.
     // Default: 0
     barTop: 2,
+    // !Removed. Use bar wrapper and CSS instead. See /demo/ for details
 
     // CSS selector for fixable header
     header: '.header__title',
