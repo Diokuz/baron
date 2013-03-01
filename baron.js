@@ -116,6 +116,9 @@
 
             // Viewport (re)calculation
             var viewport = this.viewport = function(h) {
+                // Setting scrollbar width BEFORE all other work
+                dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
+
                 headers = selector(gData.header, container);
                 viewPortHeight = scroller.clientHeight;
 
@@ -237,9 +240,7 @@
             // Prevent double-init
             root.setAttribute('data-baron', 'inited');
 
-            // Initialization. Setting scrollbar width BEFORE all other work
             barOn(scroller.clientHeight < container.offsetHeight);
-            dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
 
             // Viewport height calculation
             viewport(1);
