@@ -68,6 +68,8 @@ body {
     height: 20px;
 }
 .header__title {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 20px;
     margin: 0;
@@ -86,7 +88,7 @@ body {
 .header__title_state_fixed {
     position: absolute;
     z-index: 1;
-    background-color: rgba(220, 229, 250, .8);
+    background-color: rgba(220, 209, 250, .95);
     text-shadow: 0 0 5px #fff;
 }
 .header__title_position_top {
@@ -99,8 +101,8 @@ body {
     bottom: -30px;
     width: 100%;
     height: 30px;
-    background: -webkit-linear-gradient(top, rgba(100, 100, 255, .4) 0%, rgba(100, 100, 255, 0) 100%);
-    background: linear-gradient(to bottom, rgba(100, 100, 255, .4) 0%, rgba(100, 100, 255, 0) 100%);
+    background: -webkit-linear-gradient(top, rgba(200, 200, 255, .4) 0%, rgba(200, 200, 255, 0) 100%);
+    background: linear-gradient(to bottom, rgba(200, 200, 255, .4) 0%, rgba(200, 200, 255, 0) 100%);
 }
 .header__title_position_bottom {
     background-color: rgba(240, 229, 250, .8);
