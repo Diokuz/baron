@@ -6,7 +6,7 @@ window.onload = function() {
     // Simple initialization with minimum parameters, but with headers
     for (var i = 0 ; i < 100 ; i++) {
         $('.wrapper_simple').baron({
-            barOnCls: 'scroller__bar_state_on',
+            barOnCls: 'baron',
             header: '.header__title',
             hFixCls: 'header__title_state_fixed'
         });
@@ -17,10 +17,9 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on',
+        barOnCls: 'baron',
         header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
-        barTop: 36
+        hFixCls: 'header__title_state_fixed'
     });
 
     // Init without headers
@@ -28,7 +27,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on'
+        barOnCls: 'baron'
     });
 
     // Negative viewport
@@ -36,7 +35,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on'
+        barOnCls: 'baron'
     });
 
     // Flexible height
@@ -44,7 +43,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on'
+        barOnCls: 'baron'
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
@@ -52,10 +51,10 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on',
+        barOnCls: 'baron',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
-        viewMinH: 100
+        viewMinSize: 100
     });
 
     // No js .test__no-js
@@ -65,8 +64,7 @@ window.onload = function() {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
-        barOnCls: 'scroller__bar_state_on',
-        barTop: 2,
+        barOnCls: 'baron',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
         selector: qwery, // Selector engine
@@ -75,10 +73,22 @@ window.onload = function() {
             if (!elem.length) {
                 elem = [elem]; // bean not supported arrays
             }
-             for (var i = 0 ; i < elem.length ; i++) {
+            
+            for (var i = 0 ; i < elem.length ; i++) {
                 bean[mode || 'on'](elem[i], event, func);
             }
         },
         dom: bonzo // DOM utility
     });
+
+    // Horizontal scroll
+    // $('.test_horizontal').baron({
+    //     scroller: '.scroller',
+    //     container: '.container',
+    //     bar: '.scroller__bar',
+    //     barOnCls: 'baron',
+    //     header: '.header__title',
+    //     hFixCls: 'header__title_state_fixed',
+    //     h: true
+    // });
 };

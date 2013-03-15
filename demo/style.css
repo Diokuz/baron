@@ -52,12 +52,11 @@ body {
     opacity: .6;
     -webkit-transition: width .2s linear;
     transition: width .2s linear;
-
 }
 .scroller__bar:hover {
     opacity: .8;
 }
-.scroller__bar_state_on {
+.baron .scroller__bar {
     display: block;
 }
 

@@ -2,7 +2,36 @@
 (function($, undefined) {
     'use strict';
 
-    var scrolls = [];
+    var scrolls = [],
+        direction = {
+            vertical: {
+                x: 'Y',
+                pos: 'top',
+                crossPos: 'left',
+                size: 'height',
+                crossSize: 'width',
+                client: 'clientHeight',
+                crossClient: 'clientWidth',
+                offset: 'offsetHeight',
+                crossOffset: 'offsetWidth',
+                offsetPos: 'offsetTop',
+                scroll: 'scrollTop'
+            },
+
+            horizontal: {
+                x: 'X',
+                pos: 'left',
+                crossPos: 'top',
+                size: 'width',
+                crossSize: 'height',
+                client: 'clientWidth',
+                crossClient: 'clientHeight',
+                offset: 'offsetWidth',
+                crossOffset: 'offsetHeight',
+                offsetPos: 'offsetLeft',
+                scroll: 'scrollLeft'
+            }
+        };
 
     var baron = function() {
         var data,
@@ -36,93 +65,97 @@
         // Constructor!
         baron.init = function(root, gData) {
             var headers,
-                viewPortHeight, // Non-headers viewable content summary height
+                viewPortSize, // Non-headers viewable content summary height
                 headerTops, // Initial top positions of headers
                 topHeights,
                 rTimer,
                 scroller,
                 container,
                 bar,
-                barTop, // bar position
+                track, // Bar parent
+                barPos, // bar position
                 hFixCls, // CSS to be added on fixed headers
                 hFixFlag = [], // State of current header (top-fix, free, bottom-fix), change of state leads to dom manipulation
+                dir,
                 drag,
                 scrollerY0,
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname
             function barOn(on) {
-                if (on) {
-                    dom(bar).addClass(gData.barOnCls || '');
-                } else {
-                    dom(bar).removeClass(gData.barOnCls || '');
+                if (gData.barOnCls) {
+                    if (on) {
+                        dom(root).addClass(gData.barOnCls || '');
+                    } else {
+                        dom(root).removeClass(gData.barOnCls || '');
+                    }
                 }
             }
 
-            function heighBar(height) {
-                var barMinHeight = gData.barMinHeight || 20;
+            function setBarSize(size) {
+                var barMinSize = gData.barMinSize || 20;
 
-                if (height > 0 && height < barMinHeight) {
-                    height = barMinHeight;
+                if (size > 0 && size < barMinSize) {
+                    size = barMinSize;
                 }
 
-                dom(bar).css({height: height + 'px'});
+                dom(bar).css(dir.size, size + 'px');
             }
 
-            function posBar(top, height) {
-                dom(bar).css('top', top + 'px');
+            function posBar(pos) {
+                dom(bar).css(dir.pos, pos + 'px');
             }
 
             // (un)Fix headers[i]
-            function fixHeader(i, top) {
-                if (viewPortHeight < (gData.viewMinH || 0)) { // No headers fixing when no enought space for viewport
-                    top = undefined;
+            function fixHeader(i, pos) {
+                if (viewPortSize < (gData.viewMinSize || 0)) { // No headers fixing when no enought space for viewport
+                    pos = undefined;
                 }
 
-                if (top !== undefined) {
-                    top += 'px';
-                    dom(headers[i]).css({top: top}).addClass(hFixCls);
+                if (pos !== undefined) {
+                    pos += 'px';
+                    dom(headers[i]).css(dir.pos, pos).addClass(hFixCls);
                 } else {
-                    dom(headers[i]).css({top: top}).removeClass(hFixCls);
+                    dom(headers[i]).css(dir.pos, '').removeClass(hFixCls);
                 }
             }
 
-            // Relation of bar top position to container relative top position
+            // Free path for bar
             function k() {
-                return bar.parentNode.clientHeight - bar.offsetHeight;
+                return track[dir.client] - bar[dir.offset];
             }
 
             // Relative container top position to bar top position
-            function relToTop(r) {
+            function relToPos(r) {
                 return r * k();
             }
 
-            // Bar top position to relative container top position
-            function topToRel(t) {
+            // Bar position to relative container position
+            function posToRel(t) {
                 return t / k();
             }
 
-            // Text selection start preventing
-            function dontStartSelect() {
+            // Text selection pos preventing
+            function dontPosSelect() {
                 return false;
             }
 
             // Text selection preventing on drag
             function selection(enable) {
-                event(document, 'selectstart', dontStartSelect, enable ? 'off' : 'on');
+                event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
             this.root = root;
 
             // Viewport (re)calculation
-            var viewport = this.viewport = function(h) {
+            var viewport = this.viewport = function(force) {
                 // Setting scrollbar width BEFORE all other work
-                dom(scroller).css('width', scroller.parentNode.clientWidth + scroller.offsetWidth - scroller.clientWidth + 'px');
+                dom(scroller).css(dir.crossSize, scroller.parentNode[dir.crossClient] + scroller[dir.crossOffset] - scroller[dir.crossClient] + 'px');
 
                 headers = selector(gData.header, container);
-                viewPortHeight = scroller.clientHeight;
+                viewPortSize = scroller[dir.client];
 
-                if (h) {
+                if (force) {
                     headerTops = [];
                 }
 
@@ -135,57 +168,52 @@
                         topHeights[i] = (topHeights[i - 1] || 0);
 
                         if (headers[i - 1]) {
-                            topHeights[i] += headers[i - 1].offsetHeight;
+                            topHeights[i] += headers[i - 1][dir.offset];
                         }
 
                         // Between fixed headers
-                        viewPortHeight -= headers[i].offsetHeight;
+                        viewPortSize -= headers[i][dir.offset];
 
-                        if (h) {
-                            headerTops[i] = headers[i].parentNode.offsetTop; // No paddings for parentNode
+                        if (force) {
+                            headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
                         }
                     }
                 }
             }
 
-            // Total positions data update, container height dependences included
+            // Total positions data update, container size dependences included
             var updateScrollBar = this.updateScrollBar = function() {
-                var containerTop, // Container virtual top position
-                    oldBarHeight, newBarHeight,
+                var containerPos, // Container virtual position
+                    oldBarSize, newBarSize,
                     hTop,
                     fixState;
 
-                newBarHeight = scroller.clientHeight * scroller.clientHeight / container.offsetHeight;
-
-                if (scroller.clientHeight >= container.offsetHeight) {
-                    // We dont need no scrollbar -> making bar 0px height
-                    newBarHeight = 0;
-                }
+                newBarSize = track[dir.client] * scroller[dir.client] / container[dir.offset];
 
                 // Positioning bar
-                if (oldBarHeight !== newBarHeight) {
-                    heighBar(newBarHeight);
-                    oldBarHeight = newBarHeight;
+                if (oldBarSize != newBarSize) {
+                    setBarSize(newBarSize);
+                    oldBarSize = newBarSize;
                 }
                 
-                containerTop = -(scroller.pageYOffset || scroller.scrollTop);
-                barTop = relToTop(- containerTop / (container.offsetHeight - scroller.clientHeight));
+                containerPos = -(scroller['page' + dir.x + 'Offset'] || scroller[dir.scroll]);
+                barPos = relToPos(- containerPos / (container[dir.offset] - scroller[dir.client]));
 
-                posBar(barTop);
+                posBar(barPos);
 
                 // Positioning headers
                 if (headers) {
                     var change;
                     for (i = 0 ; i < headers.length ; i++) {
                         fixState = 0;
-                        if (headerTops[i] + containerTop < topHeights[i]) {
+                        if (headerTops[i] + containerPos < topHeights[i]) {
                             // Header trying to go up
                             fixState = 1;
                             hTop = topHeights[i];
-                        } else if (headerTops[i] + containerTop > topHeights[i] + viewPortHeight) {
+                        } else if (headerTops[i] + containerPos > topHeights[i] + viewPortSize) {
                             // Header trying to go down
                             fixState = 2;
-                            hTop = topHeights[i] + viewPortHeight;
+                            hTop = topHeights[i] + viewPortSize;
                         } else {
                             // Header in viewport
                             fixState = 3;
@@ -201,12 +229,12 @@
                     // Adding positioning classes (on last top and first bottom header)
                     if (change) { // At leats one change in headers flag structure occured
                         for (i = 0 ; i < headers.length ; i++) {
-                            if (hFixFlag[i] !== hFixFlag[i + 1] && hFixFlag[i] === 1 && gData.hTopFixCls) {
-                                dom(headers[i]).addClass(gData.hTopFixCls).removeClass(gData.hBottomFixCls + ''); // Last top fixed header
-                            } else if (hFixFlag[i] !== hFixFlag[i - 1] && hFixFlag[i] === 2 && gData.hBottomFixCls) {
-                                dom(headers[i]).addClass(gData.hBottomFixCls).removeClass(gData.hTopFixCls + ''); // First bottom fixed header
+                            if (hFixFlag[i] !== hFixFlag[i + 1] && hFixFlag[i] === 1 && gData.hBeforeFixCls) {
+                                dom(headers[i]).addClass(gData.hBeforeFixCls).removeClass(gData.hAfterFixCls + ''); // Last top fixed header
+                            } else if (hFixFlag[i] !== hFixFlag[i - 1] && hFixFlag[i] === 2 && gData.hAfterFixCls) {
+                                dom(headers[i]).addClass(gData.hAfterFixCls).removeClass(gData.hBeforeFixCls + ''); // First bottom fixed header
                             } else {
-                                dom(headers[i]).removeClass(gData.hTopFixCls + '').removeClass(gData.hBottomFixCls + '');
+                                dom(headers[i]).removeClass(gData.hBeforeFixCls + '').removeClass(gData.hAfterFixCls + '');
                             }
                         }
                     }
@@ -230,6 +258,7 @@
                 bar = selector('*', scroller);
                 bar = bar[bar.length - 1];
             }
+            track = bar.parentNode;
             
             // DOM data
             if (!(scroller && container && bar)) {
@@ -240,7 +269,12 @@
             // Prevent double-init
             root.setAttribute('data-baron', 'inited');
 
-            barOn(scroller.clientHeight < container.offsetHeight);
+            dir = direction.vertical;
+            if (gData.h) {
+                dir = direction.horizontal;
+            }
+
+            barOn(scroller[dir.client] < container[dir.offset]);
 
             // Viewport height calculation
             viewport(1);
@@ -268,9 +302,9 @@
                 clearTimeout(rTimer);
                 // И навешиваем новый
                 rTimer = setTimeout(function() {
+                    barOn(container[dir.offset] > scroller[dir.client]);
                     viewport();
                     updateScrollBar();
-                    barOn(container.offsetHeight > scroller.clientHeight);
                 }, 200);
             };
 
@@ -290,12 +324,12 @@
             });
 
             event(document, 'mousedown', function(e) { // document, not window, for ie8
-                scrollerY0 = e.clientY - barTop;
+                scrollerY0 = e.clientY - barPos;
             });
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
                 if (drag) {
-                    scroller.scrollTop = topToRel(e.clientY - scrollerY0) * (container.offsetHeight - scroller.clientHeight);
+                    scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (container[dir.offset] - scroller[dir.client]);
                 }
             });
 
