@@ -99,14 +99,15 @@ params = {
     // Default: 'scroller:last-child'
     bar: '.scroller__bar',
 
-    // CSS classname for bar when its needed (when container height above scroller heights)
+    // CSS classname for ROOT (not bar) when its needed (when container height above scroller heights)
     // Default: ''
-    barOnCls: 'scroller__bar_state_on',
+    barOnCls: 'baron',
+    // !!! Now applied to root element, not bar!
 
     // Top limit position for bar in pixels.
     // Default: 0
-    barTop: 2,
-    // !Removed. Use bar wrapper and CSS instead. See /demo/ for details
+    // barTop: 2,
+    // !!! Removed. Use bar wrapper and CSS instead. See /demo/ for details
 
     // CSS selector for fixable header
     header: '.header__title',
@@ -115,10 +116,12 @@ params = {
     hFixCls: 'header__title_state_fixed',
 
     // CSS class for lowest fixed header of top headers group
-    hTopFixCls: 'header__title_position_top',
+    hBeforeFixCls: 'header__title_position_top',
+    // !!! Remaned from hTopFixCls
 
     // CSS class for uppermost fixed header of bottom headers group
-    hBottomFixCls: 'header__title_position_bottom',
+    hAfterFixCls: 'header__title_position_bottom',
+    // !!! Remaned from hBottomFixCls
 
     // Selector engine
     // Default: window.jQuery
