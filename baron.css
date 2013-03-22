@@ -21,12 +21,8 @@
     overflow: hidden; /* For possible margin collapse removing */
 }
 
-.header {
-    height: 36px;
-}
 .header__title {
     width: 100%;
-    height: 36px; /* Must be same as header */
     margin: 0;
     -moz-box-sizing: border-box;
     box-sizing: border-box; /* For padding and border, if exist */

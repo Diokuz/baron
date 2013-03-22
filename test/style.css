@@ -26,8 +26,8 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 
 .wrapper {
     position: relative;
+    z-index: 1;
     overflow: hidden;
-    width: 300px;
     height: 70%;
     margin: 1px auto;
     background: #fff;
@@ -86,11 +86,11 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 }
 
 .header {
-    height: 20px;
+    /*height: 20px;*/
 }
 .header__title {
     width: 100%;
-    height: 20px;
+    /*height: 20px;*/
     margin: 0;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -99,7 +99,6 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     box-shadow: 0 -1px 0 rgba(0, 0, 0, .05);
     color: #222;
     font-size: 14px;
-    line-height: 20px; /* sync with .search-results__header-wrapper height */
     opacity: 1;
     -webkit-transition: background-color 2s;
     transition: background-color 2s;
@@ -107,10 +106,8 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 .header__title_state_fixed {
     position: absolute;
     z-index: 1;
-    /*text-align: right;*/
     background-color: rgba(220, 229, 250, .6);
     text-shadow: 0 0 5px #fff;
-    /*font-weight: 400; */
 }
 
 .text {

@@ -81,6 +81,17 @@ window.onload = function() {
         dom: bonzo // DOM utility
     });
 
+    // Variable header 
+    baron(document.getElementsByClassName('test_varheights'), {
+        scroller: '.scroller',
+        container: '.container',
+        bar: '.scroller__bar',
+        barOnCls: 'baron',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed',
+        viewMinSize: 100
+    });
+
     // Horizontal scroll
     // $('.test_horizontal').baron({
     //     scroller: '.scroller',

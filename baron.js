@@ -79,6 +79,7 @@
                 dir,
                 drag,
                 scrollerY0,
+                pos,
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname
@@ -171,12 +172,15 @@
                             topHeights[i] += headers[i - 1][dir.offset];
                         }
 
+                        // Variable header heights
+                        pos = {};
+                        pos[dir.size] = headers[i][dir.offset];
+                        dom(headers[i].parentNode).css(pos);
+
                         // Between fixed headers
                         viewPortSize -= headers[i][dir.offset];
 
-                        if (force) {
-                            headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
-                        }
+                        headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
                     }
                 }
             }
@@ -302,9 +306,9 @@
                 clearTimeout(rTimer);
                 // И навешиваем новый
                 rTimer = setTimeout(function() {
-                    barOn(container[dir.offset] > scroller[dir.client]);
                     viewport();
                     updateScrollBar();
+                    barOn(container[dir.offset] > scroller[dir.client]);
                 }, 200);
             };
 
