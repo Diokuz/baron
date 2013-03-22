@@ -124,6 +124,13 @@ params = {
     hAfterFixCls: 'header__title_position_bottom',
     // !!! Remaned from hBottomFixCls
 
+    // true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
+    trackSmartLim: true,
+    // !!! new
+
+    // Div wich contains bar, bar.parentNode by default
+    track: '.track'
+
     // Selector engine
     // Default: window.jQuery
     selector: qwery,

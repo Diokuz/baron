@@ -186,6 +186,12 @@
                         headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
                     }
                 }
+
+                if (gData.trackSmartLim) {
+                    pos = {};
+                    pos[dir.pos] = headers[0].parentNode[dir.offset];
+                    dom(track).css(pos);
+                }
             }
 
             // Total positions data update, container size dependences included
@@ -265,7 +271,8 @@
                 bar = selector('*', scroller);
                 bar = bar[bar.length - 1];
             }
-            track = bar.parentNode;
+            track = selector(gData.track, scroller)[0];
+            track = track || bar.parentNode;
             
             // DOM data
             if (!(scroller && container && bar)) {
