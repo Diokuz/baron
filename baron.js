@@ -176,6 +176,9 @@
                         pos = {};
                         pos[dir.size] = headers[i][dir.offset];
                         dom(headers[i].parentNode).css(pos);
+                        pos = {};
+                        pos[dir.crossSize] = headers[i].parentNode[dir.crossClient];
+                        dom(headers[i]).css(pos);
 
                         // Between fixed headers
                         viewPortSize -= headers[i][dir.offset];
