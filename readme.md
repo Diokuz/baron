@@ -110,6 +110,7 @@ params = {
     // !!! Removed. Use bar wrapper and CSS instead. See /demo/ for details
 
     // CSS selector for fixable header
+    // Must have parentNode with same height (see demo for details)
     header: '.header__title',
 
     // CSS class for fixed headers
