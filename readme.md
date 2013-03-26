@@ -131,6 +131,10 @@ params = {
     // Div wich contains bar, bar.parentNode by default
     track: '.track'
 
+    // Radius for header fixing in px. Default vaule is 0.
+    fixRadius: 10
+    // !!! new
+
     // Selector engine
     // Default: window.jQuery
     selector: qwery,

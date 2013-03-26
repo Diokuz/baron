@@ -8,7 +8,8 @@ window.onload = function() {
         $('.wrapper_simple').baron({
             barOnCls: 'baron',
             header: '.header__title',
-            hFixCls: 'header__title_state_fixed'
+            hFixCls: 'header__title_state_fixed',
+            fixRadius: 10
         });
     }
 

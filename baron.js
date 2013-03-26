@@ -80,6 +80,7 @@
                 drag,
                 scrollerY0,
                 pos,
+                fixRadius,
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname
@@ -219,11 +220,11 @@
                     var change;
                     for (i = 0 ; i < headers.length ; i++) {
                         fixState = 0;
-                        if (headerTops[i] + containerPos < topHeights[i]) {
+                        if (headerTops[i] + containerPos < topHeights[i] + fixRadius) {
                             // Header trying to go up
                             fixState = 1;
                             hTop = topHeights[i];
-                        } else if (headerTops[i] + containerPos > topHeights[i] + viewPortSize) {
+                        } else if (headerTops[i] + containerPos > topHeights[i] + viewPortSize - fixRadius) {
                             // Header trying to go down
                             fixState = 2;
                             hTop = topHeights[i] + viewPortSize;
@@ -287,6 +288,9 @@
             if (gData.h) {
                 dir = direction.horizontal;
             }
+
+            fixRadius = gData.fixRadius || 0;
+            console.log('fixRadius', fixRadius);
 
             barOn(scroller[dir.client] < container[dir.offset]);
 
