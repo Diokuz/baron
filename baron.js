@@ -65,7 +65,7 @@
         // Constructor!
         baron.init = function(root, gData) {
             var headers,
-                viewPortSize, // Non-headers viewable content summary height
+                viewPortSize, // Non-headers viewable content summary size
                 headerTops, // Initial top positions of headers
                 topHeights,
                 rTimer,
@@ -166,14 +166,14 @@
 
                 if (headers) {
                     for (i = 0 ; i < headers.length ; i++) {
-                        // Summary headers height above current
+                        // Summary headers size above current
                         topHeights[i] = (topHeights[i - 1] || 0);
 
                         if (headers[i - 1]) {
                             topHeights[i] += headers[i - 1][dir.offset];
                         }
 
-                        // Variable header heights
+                        // Variable header sizes
                         pos = {};
                         pos[dir.size] = headers[i][dir.offset];
                         dom(headers[i].parentNode).css(pos);
@@ -294,7 +294,7 @@
 
             barOn(scroller[dir.client] < container[dir.offset]);
 
-            // Viewport height calculation
+            // Viewport size calculation
             viewport(1);
 
             hFixCls = gData.hFixCls;
@@ -327,7 +327,7 @@
             };
 
             event(window, 'resize', resize);
-            event(root, 'heightChange', resize);
+            event(root, 'sizeChange', resize);
 
             // Drag
             event(bar, 'mousedown', function(e) {
@@ -390,7 +390,7 @@
             if (!root[i].getAttribute('data-baron')) {
                 this[i] = new baron.init(root[i], data);
             } else {
-                event(root[i], 'heightChange', undefined, 'trigger');
+                event(root[i], 'sizeChange', undefined, 'trigger');
             }
         }
 

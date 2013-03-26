@@ -110,7 +110,7 @@ params = {
     // !!! Removed. Use bar wrapper and CSS instead. See /demo/ for details
 
     // CSS selector for fixable header
-    // Must have parentNode with same height (see demo for details)
+    // Must have parentNode with same height (see demo for details). Also see trackSmartLim parameter.
     header: '.header__title',
 
     // CSS class for fixed headers
@@ -181,10 +181,12 @@ $.baron.u();
 baron.u();
 ```
 
-or fire custom event 'heightChange' to wrapper:
+or fire custom event 'sizeChange' to wrapper:
+
+!!! Changed from heightChange
 
 ```js
-$('.wrapper').trigger('heightChange');
+$('.wrapper').trigger('sizeChange');
 ```
 
 or repeat the initialization (not true-style, but will work).

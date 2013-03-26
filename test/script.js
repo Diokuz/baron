@@ -9,7 +9,7 @@ window.onload = function() {
             barOnCls: 'baron',
             header: '.header__title',
             hFixCls: 'header__title_state_fixed',
-            fixRadius: 10
+            fixRadius: 30
         });
     }
 
