@@ -15,7 +15,8 @@
                 offset: 'offsetHeight',
                 crossOffset: 'offsetWidth',
                 offsetPos: 'offsetTop',
-                scroll: 'scrollTop'
+                scroll: 'scrollTop',
+                scrollSize: 'scrollHeight'
             },
 
             horizontal: {
@@ -29,7 +30,8 @@
                 offset: 'offsetWidth',
                 crossOffset: 'offsetHeight',
                 offsetPos: 'offsetLeft',
-                scroll: 'scrollLeft'
+                scroll: 'scrollLeft',
+                scrollSize: 'scrollWidth'
             }
         };
 
@@ -65,7 +67,7 @@
         // Constructor!
         baron.init = function(root, gData) {
             var headers,
-                viewPortSize, // Non-headers viewable content summary size
+                viewPortSize, // Non-headers viewable content summary height
                 headerTops, // Initial top positions of headers
                 topHeights,
                 rTimer,
@@ -166,14 +168,14 @@
 
                 if (headers) {
                     for (i = 0 ; i < headers.length ; i++) {
-                        // Summary headers size above current
+                        // Summary headers height above current
                         topHeights[i] = (topHeights[i - 1] || 0);
 
                         if (headers[i - 1]) {
                             topHeights[i] += headers[i - 1][dir.offset];
                         }
 
-                        // Variable header sizes
+                        // Variable header heights
                         pos = {};
                         pos[dir.size] = headers[i][dir.offset];
                         dom(headers[i].parentNode).css(pos);
@@ -202,7 +204,7 @@
                     hTop,
                     fixState;
 
-                newBarSize = track[dir.client] * scroller[dir.client] / container[dir.offset];
+                newBarSize = track[dir.client] * scroller[dir.client] / scroller[dir.scrollSize];
 
                 // Positioning bar
                 if (oldBarSize != newBarSize) {
@@ -211,7 +213,7 @@
                 }
                 
                 containerPos = -(scroller['page' + dir.x + 'Offset'] || scroller[dir.scroll]);
-                barPos = relToPos(- containerPos / (container[dir.offset] - scroller[dir.client]));
+                barPos = relToPos(- containerPos / (scroller[dir.scrollSize] - scroller[dir.client]));
 
                 posBar(barPos);
 
@@ -290,10 +292,11 @@
             }
 
             fixRadius = gData.fixRadius || 0;
+            console.log('fixRadius', fixRadius);
 
-            barOn(scroller[dir.client] < container[dir.offset]);
+            barOn(scroller[dir.client] < scroller[dir.scrollSize]);
 
-            // Viewport size calculation
+            // Viewport height calculation
             viewport(1);
 
             hFixCls = gData.hFixCls;
@@ -321,12 +324,12 @@
                 rTimer = setTimeout(function() {
                     viewport();
                     updateScrollBar();
-                    barOn(container[dir.offset] > scroller[dir.client]);
+                    barOn(scroller[dir.scrollSize] > scroller[dir.client]);
                 }, 200);
             };
 
             event(window, 'resize', resize);
-            event(root, 'sizeChange', resize);
+            event(root, 'heightChange', resize);
 
             // Drag
             event(bar, 'mousedown', function(e) {
@@ -346,7 +349,7 @@
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
                 if (drag) {
-                    scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (container[dir.offset] - scroller[dir.client]);
+                    scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                 }
             });
 
@@ -389,7 +392,7 @@
             if (!root[i].getAttribute('data-baron')) {
                 this[i] = new baron.init(root[i], data);
             } else {
-                event(root[i], 'sizeChange', undefined, 'trigger');
+                event(root[i], 'heightChange', undefined, 'trigger');
             }
         }
 

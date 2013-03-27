@@ -18,7 +18,6 @@
     background: #999;
 }
 .container { /* Data wrapper */
-    overflow: hidden; /* For possible margin collapse removing */
 }
 
 .header__title {

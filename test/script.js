@@ -48,7 +48,7 @@ window.onload = function() {
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
-    baron(document.getElementsByClassName('test_flex-headers'), {
+    baron($('.test_flex-headers'), {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
@@ -83,7 +83,18 @@ window.onload = function() {
     });
 
     // Variable header 
-    baron(document.getElementsByClassName('test_varheights'), {
+    baron($('.test_varheights'), {
+        scroller: '.scroller',
+        container: '.container',
+        bar: '.scroller__bar',
+        barOnCls: 'baron',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed',
+        viewMinSize: 100
+    });
+
+    // Elements outside container
+    baron($('.test_scroll-height'), {
         scroller: '.scroller',
         container: '.container',
         bar: '.scroller__bar',
