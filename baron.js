@@ -72,7 +72,6 @@
                 topHeights,
                 rTimer,
                 scroller,
-                container,
                 bar,
                 track, // Bar parent
                 barPos, // bar position
@@ -156,7 +155,7 @@
                 // Setting scrollbar width BEFORE all other work
                 dom(scroller).css(dir.crossSize, scroller.parentNode[dir.crossClient] + scroller[dir.crossOffset] - scroller[dir.crossClient] + 'px');
 
-                headers = selector(gData.header, container);
+                headers = selector(gData.header, scroller);
                 viewPortSize = scroller[dir.client];
 
                 if (force) {
@@ -263,11 +262,6 @@
             } else {
                 scroller = selector('*', root)[0];
             }
-            if (gData.container) {
-                container = selector(gData.container, scroller)[0];
-            } else {
-                container = selector('*', scroller)[0];
-            }
             if (gData.bar) {
                 bar = selector(gData.bar, scroller)[0];
             } else {
@@ -278,8 +272,8 @@
             track = track || bar.parentNode;
             
             // DOM data
-            if (!(scroller && container && bar)) {
-                // console.error('acbar: no scroller, container or bar dectected');
+            if (!(scroller && bar)) {
+                // console.error('acbar: no scroller or bar dectected');
                 return;
             }
 

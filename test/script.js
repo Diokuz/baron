@@ -16,7 +16,6 @@ window.onload = function() {
     // Array initialization + barTopLimit
     $('.test_arr').baron({
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -26,7 +25,6 @@ window.onload = function() {
     // Init without headers
     $('.test_wo-headers').baron({
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
@@ -34,7 +32,6 @@ window.onload = function() {
     // Negative viewport
     $('.test_negative-viewport').baron({
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
@@ -42,7 +39,6 @@ window.onload = function() {
     // Flexible height
     baron($('.test_flex'), {
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
@@ -50,7 +46,6 @@ window.onload = function() {
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
     baron($('.test_flex-headers'), {
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -63,7 +58,7 @@ window.onload = function() {
     // Maximum variables
     baron($('.test_advanced'), {
         scroller: '.scroller',
-        container: '.container',
+        //container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -85,7 +80,6 @@ window.onload = function() {
     // Variable header 
     baron($('.test_varheights'), {
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -96,7 +90,6 @@ window.onload = function() {
     // Elements outside container
     baron($('.test_scroll-height'), {
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',

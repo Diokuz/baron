@@ -60,10 +60,6 @@ body {
     display: block;
 }
 
-.container {
-    overflow: hidden;
-}
-
 .header__title {
     position: relative;
     z-index: 1;

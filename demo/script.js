@@ -1,7 +1,6 @@
 window.onload = function() {
     baron($('.wrapper_1'), {
         scroller: '.scroller',
-        container: '.container',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',

@@ -57,9 +57,6 @@ To start using baron.js:
     width: 10px;
     background: #999;
 }
-.container { /* Data wrapper */
-    overflow: hidden; /* To remove margin collapse */
-}
 ```
 
 Note: you can choose any class names, and slyle them as you want.
@@ -93,7 +90,8 @@ params = {
 
     // Selector for container element
     // Default: 'scroller:first-child'
-    container: '.container',
+    // container: '.container',
+    // !!! Removed
 
     // Selector for bar element
     // Default: 'scroller:last-child'
