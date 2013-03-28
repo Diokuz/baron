@@ -286,7 +286,6 @@
             }
 
             fixRadius = gData.fixRadius || 0;
-            console.log('fixRadius', fixRadius);
 
             barOn(scroller[dir.client] < scroller[dir.scrollSize]);
 
