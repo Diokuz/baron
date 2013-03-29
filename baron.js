@@ -88,11 +88,15 @@
             function barOn(on) {
                 if (gData.barOnCls) {
                     if (on) {
-                        dom(root).addClass(gData.barOnCls || '');
+                        dom(root).addClass(gData.barOnCls);
                     } else {
-                        dom(root).removeClass(gData.barOnCls || '');
+                        dom(root).removeClass(gData.barOnCls);
                     }
                 }
+            }
+
+            function invalidateBar() {
+                barOn(scroller[dir.client] < scroller[dir.scrollSize]);
             }
 
             function setBarSize(size) {
@@ -149,6 +153,8 @@
             }
 
             this.root = root;
+
+            this.invalidateBar = invalidateBar;
 
             // Viewport (re)calculation
             var viewport = this.viewport = function(force) {
@@ -287,7 +293,7 @@
 
             fixRadius = gData.fixRadius || 0;
 
-            barOn(scroller[dir.client] < scroller[dir.scrollSize]);
+            invalidateBar();
 
             // Viewport height calculation
             viewport(1);
@@ -317,7 +323,7 @@
                 rTimer = setTimeout(function() {
                     viewport();
                     updateScrollBar();
-                    barOn(scroller[dir.scrollSize] > scroller[dir.client]);
+                    invalidateBar();
                 }, 200);
             };
 
@@ -355,6 +361,7 @@
         baron.init.prototype.update = function() {
             this.viewport(1);
             this.updateScrollBar();
+            this.invalidateBar();
         };
 
         // Engines initialization

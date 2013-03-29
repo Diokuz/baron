@@ -1,5 +1,5 @@
 window.onload = function() {
-    baron($('.wrapper_1'), {
+    window.dima = baron($('.wrapper_1'), {
         scroller: '.scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
