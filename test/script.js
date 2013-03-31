@@ -13,12 +13,13 @@ window.onload = function() {
         });
     }
 
-    // Array initialization + barTopLimit
+    // Array initialization + barTopLimit + only before fix class
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
-        hFixCls: 'header__title_state_fixed'
+        hFixCls: 'header__title_state_fixed',
+        hBeforeFixCls: 'header__title_position_top'
     });
 
     // Init without headers
@@ -65,7 +66,7 @@ window.onload = function() {
                 if (mode == 'trigger') {
                     mode = 'fire';
                 }
-                
+
                 if (!elem.length) {
                     elem = [elem]; // bean not supported arrays
                 }
