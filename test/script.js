@@ -41,8 +41,11 @@ window.onload = function() {
         barOnCls: 'baron'
     });
 
+    var anotherBaron = babaron = baron.noConflict();
+    console.log('Original baron value is: ', baron);
+
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
-    baron({
+    anotherBaron({
         scroller: '.test_flex-headers .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
@@ -55,7 +58,7 @@ window.onload = function() {
 
     // Maximum variables
     for (var i = 0 ; i < 10 ; i++) {
-        baron({
+        anotherBaron({
             scroller: '.test_advanced .scroller',
             bar: '.scroller__bar',
             barOnCls: 'baron',
@@ -80,7 +83,7 @@ window.onload = function() {
     }
 
     // Variable header 
-    baron({
+    anotherBaron({
         scroller: '.test_varheights .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
@@ -90,7 +93,7 @@ window.onload = function() {
     });
 
     // Elements outside container
-    baron({
+    anotherBaron({
         scroller: '.test_scroll-height .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',

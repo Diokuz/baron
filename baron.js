@@ -1,8 +1,10 @@
 /* https://github.com/Diokuz/baron */
-(function($, undefined) {
+(function(window, undefined) {
     'use strict';
 
     var scrolls = [],
+        stored = window.baron, // Stored baron vaule for noConflict usage
+        $ = window.jQuery, // Trying to use jQuery
         direction = {
             vertical: {
                 x: 'Y',
@@ -53,6 +55,15 @@
             scrolls[i].u();
         }
     };
+
+    // Use when you need "baron" global var for another purposes
+    baron.noConflict = function() {
+        window.baron = stored; // Restoring original value of "baron" global var
+
+        return baron; // Returning baron
+    };
+
+    baron.version = '0.4';
 
     // Main constructor returning baron collection object with u() method in proto
     var constructor = function(data) {
@@ -411,4 +422,4 @@
     }
 
     window.baron = baron;
-})(window.jQuery);
+})(window);

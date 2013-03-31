@@ -183,6 +183,18 @@ $('.scroller').trigger('sizeChange');
 
 or repeat the initialization (not true-style, but will work).
 
+##noConflict mode
+
+If you need window.baron for another purposes you can restore original value:
+```js
+// !!! window.baron points to some other library
+...
+// you include baron, it replaces the window.baron variable to baron namespace
+
+var babaron = baron.noConflict();
+// now window.baron points to that other library again, and you can use window.babaron.u() etc.
+```
+
 ## Browsers support
 
 Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 9+ on Windows, OS X and iOS. Also, the best ever browser downloader - Internet Explorer - supported since version 8.
