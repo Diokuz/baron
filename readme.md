@@ -26,23 +26,17 @@ To start using baron.js:
 * Make some HTML:
 
 ```html
-<div class="wrapper">
-    <div class="scroller">
-        <div class="container">
-        	Your scrollable content here
-        </div>
-        <div class="scroller__bar"></div>
+<div class="scroller">
+    <div class="container">
+        Your scrollable content here
     </div>
+    <div class="scroller__bar"></div>
 </div>
 ```
 
 * And some CSS:
 
 ```css
-.wrapper {
-    position: relative;
-    overflow: hidden;
-}
 .scroller {
     height: 100%;
     overflow-y: scroll;
@@ -64,7 +58,7 @@ Note: you can choose any class names, and slyle them as you want.
 * Initialize baron:
 
 ```js
-$('.wrapper').baron();
+$('.scroller').baron();
 ```
 
 ##Advanced usage
@@ -72,10 +66,11 @@ $('.wrapper').baron();
 You can specify some parameters at baron initialization:
 
 ```js
-var scroll = $('.wrapper').baron(params);
+var scroll = $('.scroller').baron(params);
 
-// or 
-var scroll = baron($('.wrapper'), params);
+// or
+// !!! root var removed 
+var scroll = baron(params);
 ```
 
 and store baron scrollbar object to `scroll` variable.
@@ -84,8 +79,8 @@ where:
 
 ```js
 params = {
-    // Selector for scroller element
-    // Default: 'root:first-child'
+    // Selector for scroller element.
+    // Default: this (in jQuery mode).
     scroller: '.scroller',
 
     // Selector for container element
@@ -154,15 +149,15 @@ params = {
 }
 ```
 
-All parameters are optional.
+All parameters are optional (except scroller, if you not using baron as jQuery plugin).
 
 `scroll` methods:
 
 ```js
-scroll.u(); // Update all coordinates
+scroll.u(); // Update scroller
 ```
 
-##Update baron coordinates
+##Update baron
 
 When container size changed (for example: you load additional data to container by ajax), you should call u() method:
 
@@ -181,10 +176,9 @@ baron.u();
 
 or fire custom event 'sizeChange' to wrapper:
 
-!!! Changed from heightChange
-
 ```js
-$('.wrapper').trigger('sizeChange');
+// !!! Changed from heightChange
+$('.scroller').trigger('sizeChange');
 ```
 
 or repeat the initialization (not true-style, but will work).

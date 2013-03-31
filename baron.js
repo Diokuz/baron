@@ -35,19 +35,12 @@
             }
         };
 
-    var baron = function() {
-        var data,
-            root;
+    var baron = function(params) {
+        params = params || {};
+        params.scroller = params.scroller || this; // jQuery plugin mode
 
-        if (arguments[1] === undefined) { // jQuery plugin mode
-            root = this;
-            data = arguments[0] || {};
-        } else {
-            root = arguments[0];
-            data = arguments[1];
-        }
+        scrolls.push(new constructor(params));
 
-        scrolls.push(new constructor(root, data));
         return scrolls[scrolls.length - 1];
     };
 
@@ -58,26 +51,56 @@
     };
 
     // Main constructor returning baron collection object with u() method in proto
-    var constructor = function(root, data) {
+    var constructor = function(data) {
         var event,
             selector,
-            dom;
+            dom,
+            scroller;
+
+        // Engines initialization
+        selector = data.selector || $;
+        if (!selector) {
+            // console.error('baron: no query selector engine found');
+            return;
+        }
+
+        event = data.event || function(elem, event, func, mode) {
+            $(elem)[mode || 'on'](event, func);
+        };
+        if (!data.event && !$) {
+            return;
+        }
+
+        dom = data.dom || $;
+        if (!dom) {
+            // console.error('baron: no DOM utility engine found');
+            return;
+        }
+
+        scroller = selector(data.scroller);
+        if (!scroller) {
+            // console.error('baron: no scroller found');
+            return;
+        }
+
+        if (!scroller[0]) {
+            scroller = [scroller];
+        }
 
         // gData - user defined data, not changed during baron work
-        // Constructor!
-        baron.init = function(root, gData) {
+        baron.init = function(gData) {
             var headers,
                 viewPortSize, // Non-headers viewable content summary height
                 headerTops, // Initial top positions of headers
                 topHeights,
                 rTimer,
-                scroller,
                 bar,
                 track, // Bar parent
                 barPos, // bar position
                 hFixCls, // CSS to be added on fixed headers
                 hFixFlag = [], // State of current header (top-fix, free, bottom-fix), change of state leads to dom manipulation
                 dir,
+                scroller,
                 drag,
                 scrollerY0,
                 pos,
@@ -88,9 +111,9 @@
             function barOn(on) {
                 if (gData.barOnCls) {
                     if (on) {
-                        dom(root).addClass(gData.barOnCls);
+                        dom(scroller).addClass(gData.barOnCls);
                     } else {
-                        dom(root).removeClass(gData.barOnCls);
+                        dom(scroller).removeClass(gData.barOnCls);
                     }
                 }
             }
@@ -152,7 +175,7 @@
                 event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
-            this.root = root;
+            scroller = this.scroller = gData.scroller;
 
             this.invalidateBar = invalidateBar;
 
@@ -263,11 +286,6 @@
             }
 
             // DOM initialization
-            if (gData.scroller !== undefined) {
-                scroller = selector(gData.scroller, root)[0];
-            } else {
-                scroller = selector('*', root)[0];
-            }
             if (gData.bar) {
                 bar = selector(gData.bar, scroller)[0];
             } else {
@@ -284,7 +302,7 @@
             }
 
             // Prevent double-init
-            root.setAttribute('data-baron', 'inited');
+            gData.scroller.setAttribute('data-baron', 'inited');
 
             dir = direction.vertical;
             if (gData.h) {
@@ -293,6 +311,7 @@
 
             fixRadius = gData.fixRadius || 0;
 
+            // Switching on or off the bar
             invalidateBar();
 
             // Viewport height calculation
@@ -302,7 +321,7 @@
 
             // Events initialization
             // onScroll
-            event(scroller, 'scroll', updateScrollBar, 'on');
+            event(scroller, 'scroll', updateScrollBar);
 
             // onMouseWheel bubbling in webkit
             event(headers, 'mousewheel', function(e) {
@@ -328,7 +347,7 @@
             };
 
             event(window, 'resize', resize);
-            event(root, 'heightChange', resize);
+            event(scroller, 'sizeChange', resize);
 
             // Drag
             event(bar, 'mousedown', function(e) {
@@ -364,35 +383,12 @@
             this.invalidateBar();
         };
 
-        // Engines initialization
-        selector = data.selector || $;
-        if (!selector) {
-            // console.error('baron: no query selector engine found');
-            return;
-        }
-
-        event = data.event || function(elem, event, func, mode) {
-            $(elem)[mode || 'on'](event, func);
-        };
-        if (!data.event && !$) {
-            return;
-        }
-
-        dom = data.dom || $;
-        if (!dom) {
-            // console.error('baron: no DOM utility engine founc');
-            return;
-        }
-
-        if (!root[0]) {
-            root = [root];
-        }
-
-        for (var i = 0 ; i < root.length ; i++) {
-            if (!root[i].getAttribute('data-baron')) {
-                this[i] = new baron.init(root[i], data);
+        for (var i = 0 ; i < scroller.length ; i++) {
+            if (!scroller[i].getAttribute('data-baron')) {
+                data.scroller = scroller[i];
+                this[i] = new baron.init(data);
             } else {
-                event(root[i], 'heightChange', undefined, 'trigger');
+                event(scroller[i], 'sizeChange', undefined, 'trigger');
             }
         }
 

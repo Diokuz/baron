@@ -1,11 +1,11 @@
 window.onload = function() {
     var root;
 
-    $('.wrapper_very-simple').baron();
+    $('.wrapper_very-simple .scroller').baron();
 
     // Simple initialization with minimum parameters, but with headers
     for (var i = 0 ; i < 100 ; i++) {
-        $('.wrapper_simple').baron({
+        $('.wrapper_simple .scroller').baron({
             barOnCls: 'baron',
             header: '.header__title',
             hFixCls: 'header__title_state_fixed',
@@ -14,8 +14,7 @@ window.onload = function() {
     }
 
     // Array initialization + barTopLimit
-    $('.test_arr').baron({
-        scroller: '.scroller',
+    $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -23,29 +22,27 @@ window.onload = function() {
     });
 
     // Init without headers
-    $('.test_wo-headers').baron({
-        scroller: '.scroller',
+    $('.test_wo-headers .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
 
     // Negative viewport
-    $('.test_negative-viewport').baron({
-        scroller: '.scroller',
+    $('.test_negative-viewport .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
 
     // Flexible height
-    baron($('.test_flex'), {
-        scroller: '.scroller',
+    baron({
+        scroller: '.test_flex .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
-    baron($('.test_flex-headers'), {
-        scroller: '.scroller',
+    baron({
+        scroller: '.test_flex-headers .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -56,30 +53,34 @@ window.onload = function() {
     // No js .test__no-js
 
     // Maximum variables
-    baron($('.test_advanced'), {
-        scroller: '.scroller',
-        //container: '.container',
-        bar: '.scroller__bar',
-        barOnCls: 'baron',
-        header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
-        selector: qwery, // Selector engine
-        event: function(elem, event, func, mode) { // Events manager
-            //if (Object.prototype.toString.call(elem) !== "[object Array]") {
-            if (!elem.length) {
-                elem = [elem]; // bean not supported arrays
-            }
-            
-            for (var i = 0 ; i < elem.length ; i++) {
-                bean[mode || 'on'](elem[i], event, func);
-            }
-        },
-        dom: bonzo // DOM utility
-    });
+    for (var i = 0 ; i < 10 ; i++) {
+        baron({
+            scroller: '.test_advanced .scroller',
+            bar: '.scroller__bar',
+            barOnCls: 'baron',
+            header: '.header__title',
+            hFixCls: 'header__title_state_fixed',
+            selector: qwery, // Selector engine
+            event: function(elem, event, func, mode) { // Events manager
+                if (mode == 'trigger') {
+                    mode = 'fire';
+                }
+                
+                if (!elem.length) {
+                    elem = [elem]; // bean not supported arrays
+                }
+                
+                for (var i = 0 ; i < elem.length ; i++) {
+                    bean[mode || 'on'](elem[i], event, func);
+                }
+            },
+            dom: bonzo // DOM utility
+        });
+    }
 
     // Variable header 
-    baron($('.test_varheights'), {
-        scroller: '.scroller',
+    baron({
+        scroller: '.test_varheights .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -88,8 +89,8 @@ window.onload = function() {
     });
 
     // Elements outside container
-    baron($('.test_scroll-height'), {
-        scroller: '.scroller',
+    baron({
+        scroller: '.test_scroll-height .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',

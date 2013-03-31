@@ -1,6 +1,6 @@
 window.onload = function() {
-    window.dima = baron($('.wrapper_1'), {
-        scroller: '.scroller',
+    window.dima = baron({
+        scroller: '.wrapper_1 .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
@@ -9,5 +9,5 @@ window.onload = function() {
         hAfterFixCls: 'header__title_position_bottom'
     });
 
-    $('.wrapper_2').baron({barOnCls: 'baron'});
+    $('.wrapper_2 .scroller').baron({barOnCls: 'baron'});
 };
