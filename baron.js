@@ -362,7 +362,9 @@
             });
 
             event(document, 'mousedown', function(e) { // document, not window, for ie8
-                scrollerY0 = e.clientY - barPos;
+                if (e.button != 2) { // Not RM
+                    scrollerY0 = e.clientY - barPos;
+                }
             });
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
