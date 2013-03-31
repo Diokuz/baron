@@ -122,7 +122,7 @@
                 fixRadius,
                 i, j;
 
-            // Switch on the bar by adding user-defined CSS classname
+            // Switch on the bar by adding user-defined CSS classname to scroller
             function barOn(on) {
                 if (gData.barOnCls) {
                     if (on) {
@@ -133,10 +133,12 @@
                 }
             }
 
+            // Swinching bar on when scrollable content is too hight, and off when scroll is not possible because of lack on content
             function invalidateBar() {
                 barOn(scroller[dir.client] < scroller[dir.scrollSize]);
             }
 
+            // Updating height or width of bar
             function setBarSize(size) {
                 var barMinSize = gData.barMinSize || 20;
 
@@ -147,11 +149,12 @@
                 dom(bar).css(dir.size, size + 'px');
             }
 
+            // Updating top or left bar position
             function posBar(pos) {
                 dom(bar).css(dir.pos, pos + 'px');
             }
 
-            // (un)Fix headers[i]
+            // fixing or unfixing headers[i]
             function fixHeader(i, pos) {
                 if (viewPortSize < (gData.viewMinSize || 0)) { // No headers fixing when no enought space for viewport
                     pos = undefined;
@@ -190,6 +193,7 @@
                 event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
+            // Webkit bug: scroll freezing when header goes to fixed state right under cursor
             function bubbleWheel(e) {
                 try {
                     i = document.createEvent('WheelEvent'); // i - for extra byte
@@ -200,8 +204,8 @@
                 } catch (e) {};
             }
 
+            // var initialization
             scroller = this.scroller = gData.scroller;
-
             this.invalidateBar = invalidateBar;
 
             // Viewport (re)calculation
@@ -334,15 +338,19 @@
                 return;
             }
 
-            // Prevent double-init
+            // Prevent second initialization
             scroller.setAttribute('data-baron', 'inited');
 
+            // Choosing scroll direction
             dir = direction.vertical;
             if (gData.h) {
                 dir = direction.horizontal;
             }
 
+            // Capturing radius for headers when fixing
             fixRadius = gData.fixRadius || 0;
+
+            // CSS classname for fixed headers
             hFixCls = gData.hFixCls;
 
             // Events initialization
@@ -362,20 +370,22 @@
             };
 
             event(window, 'resize', resize);
-            event(scroller, 'sizeChange', resize);
+            event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
-            // Drag
+            // Bar drag
             event(bar, 'mousedown', function(e) {
                 e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
                 selection(); // Disable text selection in ie8
-                drag = 1; // Another one byte
+                drag = 1; // Save private byte
             });
 
+            // Cancelling drag when mouse key goes up and when window loose its focus
             event(document, 'mouseup blur', function() {
                 selection(1); // Enable text selection
                 drag = 0;
             });
 
+            // Starting drag when mouse key (LM) goes down at bar
             event(document, 'mousedown', function(e) { // document, not window, for ie8
                 if (e.button != 2) { // Not RM
                     scrollerY0 = e.clientY - barPos;
@@ -391,12 +401,14 @@
             return this;
         };
 
+        // Update method for one scroll group
         baron.init.prototype.update = function() {
             this.viewport(1);
             this.updateScrollBar();
             this.invalidateBar();
         };
 
+        // Initializing scroll group, or updating it if already
         for (var i = 0 ; i < scroller.length ; i++) {
             if (!scroller[i].getAttribute('data-baron')) {
                 data.scroller = scroller[i];
@@ -409,6 +421,7 @@
         return this;
     };
 
+    // Updating all known baron scroll groups on page
     constructor.prototype.u = function() {
         var i = -1;
 
@@ -417,9 +430,11 @@
         } 
     };
 
+    // Adding baron to jQuery as plugin
     if ($ && $.fn) {
         $.fn.baron = baron;
     }
 
+    // Use noConflict method if you need window.baron var for another purposes
     window.baron = baron;
 })(window);
