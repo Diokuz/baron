@@ -204,12 +204,8 @@
                 } catch (e) {};
             }
 
-            // var initialization
-            scroller = this.scroller = gData.scroller;
-            this.invalidateBar = invalidateBar;
-
             // Viewport (re)calculation
-            var viewport = this.viewport = function(force) {
+            function viewport(force) {
                 // Setting scrollbar width BEFORE all other work
                 dom(scroller).css(dir.crossSize, scroller.parentNode[dir.crossClient] + scroller[dir.crossOffset] - scroller[dir.crossClient] + 'px');
 
@@ -225,7 +221,7 @@
                 topHeights = [];
 
                 if (headers) {
-                    if (force) { // For instande: if headers length changed
+                    if (force) { // For instance: if headers length changed
                         // onMouseWheel bubbling in webkit
                         event(headers, 'mousewheel', bubbleWheel, 'off');
                         event(headers, 'mousewheel', bubbleWheel);
@@ -262,7 +258,7 @@
             }
 
             // Total positions data update, container size dependences included
-            var updateScrollBar = this.updateScrollBar = function() {
+            function updateScrollBar() {
                 var scrollerPos, // Scroller content position
                     oldBarSize, newBarSize,
                     hTop,
@@ -322,6 +318,12 @@
                 }
             }
 
+            // var initialization
+            scroller = gData.scroller;
+            this.invalidateBar = invalidateBar;
+            this.viewport = viewport;
+            this.updateScrollBar = updateScrollBar;
+
             // DOM initialization
             if (gData.bar) {
                 bar = selector(gData.bar, scroller)[0];
@@ -331,8 +333,6 @@
             }
             track = selector(gData.track, scroller)[0];
             track = track || bar.parentNode;
-            
-            // DOM data
             if (!(scroller && bar)) {
                 // console.error('acbar: no scroller or bar dectected');
                 return;
@@ -356,21 +356,6 @@
             // Events initialization
             // onScroll
             event(scroller, 'scroll', updateScrollBar);
-
-            // Reinit when resize
-            function resize() {
-                // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
-                clearTimeout(rTimer);
-                // И навешиваем новый
-                rTimer = setTimeout(function() {
-                    viewport();
-                    updateScrollBar();
-                    invalidateBar();
-                }, 200);
-            };
-
-            event(window, 'resize', resize);
-            event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
             // Bar drag
             event(bar, 'mousedown', function(e) {
@@ -397,6 +382,21 @@
                     scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                 }
             });
+
+            event(window, 'resize', resize);
+            event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
+
+            // Reinit when resize
+            function resize() {
+                // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
+                clearTimeout(rTimer);
+                // И навешиваем новый
+                rTimer = setTimeout(function() {
+                    viewport();
+                    updateScrollBar();
+                    invalidateBar();
+                }, 200);
+            };
 
             return this;
         };
@@ -427,7 +427,7 @@
 
         while (this[++i]) {
             this[i].update();
-        } 
+        }
     };
 
     // Adding baron to jQuery as plugin
