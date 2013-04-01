@@ -2,6 +2,8 @@
 (function(window, undefined) {
     'use strict';
 
+    if (typeof window == 'undefined') return; // Server side
+
     var scrolls = [],
         stored = window.baron, // Stored baron vaule for noConflict usage
         $ = window.jQuery, // Trying to use jQuery
@@ -435,6 +437,9 @@
         $.fn.baron = baron;
     }
 
-    // Use noConflict method if you need window.baron var for another purposes
-    window.baron = baron;
+    if (typeof module != 'undefined' && module.exports) {
+        module.exports = baron;
+    } else {
+        window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
+    }
 })(window);
