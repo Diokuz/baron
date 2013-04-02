@@ -68,6 +68,11 @@
             event(window, 'resize', resize);
             event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
+            event(bar, 'mousewheel', bubbleWheel);
+            if (track != scroller) {
+                event(track, 'mousewheel', bubbleWheel);
+            }
+
             // Reinit when resize
             function resize() {
                 // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут

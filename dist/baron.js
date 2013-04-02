@@ -181,7 +181,17 @@
                 event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
-
+            // Bubbling wheel event e to scroller (from headers and scrollbar)
+            // Works only in webkit, because of lack of standarts :(
+            function bubbleWheel(e) {
+                try {
+                    i = document.createEvent('WheelEvent'); // i - for extra byte
+                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                    scroller.dispatchEvent(i);
+                    e.preventDefault();
+                } catch (e) {};
+            }
             // fixing or unfixing headers[i]
             function fixHeader(i, pos) {
                 if (viewPortSize < (gData.viewMinSize || 0)) { // No headers fixing when no enought space for viewport
@@ -194,17 +204,6 @@
                 } else {
                     dom(headers[i]).css(dir.pos, '').removeClass(hFixCls);
                 }
-            }
-
-            // Webkit bug: scroll freezing when header goes to fixed state right under cursor
-            function bubbleWheel(e) {
-                try {
-                    i = document.createEvent('WheelEvent'); // i - for extra byte
-                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                    scroller.dispatchEvent(i);
-                    e.preventDefault();
-                } catch (e) {};
             }
             // Viewport (re)calculation
             function viewport(force) {
@@ -386,6 +385,11 @@
 
             event(window, 'resize', resize);
             event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
+
+            event(bar, 'mousewheel DOMMouseScroll', bubbleWheel);
+            if (track != scroller) {
+                event(track, 'mousewheel', bubbleWheel);
+            }
 
             // Reinit when resize
             function resize() {

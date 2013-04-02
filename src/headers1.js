@@ -11,14 +11,3 @@
                     dom(headers[i]).css(dir.pos, '').removeClass(hFixCls);
                 }
             }
-
-            // Webkit bug: scroll freezing when header goes to fixed state right under cursor
-            function bubbleWheel(e) {
-                try {
-                    i = document.createEvent('WheelEvent'); // i - for extra byte
-                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                    scroller.dispatchEvent(i);
-                    e.preventDefault();
-                } catch (e) {};
-            }

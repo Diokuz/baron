@@ -181,3 +181,14 @@
                 event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
+            // Bubbling wheel event e to scroller (from headers and scrollbar)
+            // Works only in webkit, because of lack of standarts :(
+            function bubbleWheel(e) {
+                try {
+                    i = document.createEvent('WheelEvent'); // i - for extra byte
+                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
+                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
+                    scroller.dispatchEvent(i);
+                    e.preventDefault();
+                } catch (e) {};
+            }
