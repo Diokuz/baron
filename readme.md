@@ -4,6 +4,10 @@ Baron - a small, fast and crossbrowser vertical custom scrollbar with native sys
 
 http://diokuz.github.com/baron/
 
+## Files
+
+You can find latest full baron version in /dist/ folder.
+
 ## Features
 
 - Do not replaces native system scroll mechanic.
@@ -69,7 +73,6 @@ You can specify some parameters at baron initialization:
 var scroll = $('.scroller').baron(params);
 
 // or
-// !!! root var removed 
 var scroll = baron(params);
 ```
 
@@ -83,24 +86,13 @@ params = {
     // Default: this (in jQuery mode).
     scroller: '.scroller',
 
-    // Selector for container element
-    // Default: 'scroller:first-child'
-    // container: '.container',
-    // !!! Removed
-
     // Selector for bar element
     // Default: 'scroller:last-child'
     bar: '.scroller__bar',
 
-    // CSS classname for ROOT (not bar) when its needed (when container height above scroller heights)
+    // CSS classname for scroller when its needed (when content height above scroller heights)
     // Default: ''
     barOnCls: 'baron',
-    // !!! Now applied to root element, not bar!
-
-    // Top limit position for bar in pixels.
-    // Default: 0
-    // barTop: 2,
-    // !!! Removed. Use bar wrapper and CSS instead. See /demo/ for details
 
     // CSS selector for fixable header
     // Must have parentNode with same height (see demo for details). Also see trackSmartLim parameter.
@@ -111,22 +103,18 @@ params = {
 
     // CSS class for lowest fixed header of top headers group
     hBeforeFixCls: 'header__title_position_top',
-    // !!! Remaned from hTopFixCls
 
     // CSS class for uppermost fixed header of bottom headers group
     hAfterFixCls: 'header__title_position_bottom',
-    // !!! Remaned from hBottomFixCls
 
     // true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
     trackSmartLim: true,
-    // !!! new
 
     // Div wich contains bar, bar.parentNode by default
     track: '.track'
 
     // Radius for header fixing in px. Default vaule is 0.
     fixRadius: 10
-    // !!! new
 
     // Selector engine
     // Default: window.jQuery
@@ -177,7 +165,6 @@ baron.u();
 or fire custom event 'sizeChange' to wrapper:
 
 ```js
-// !!! Changed from heightChange
 $('.scroller').trigger('sizeChange');
 ```
 
@@ -187,13 +174,27 @@ or repeat the initialization (not true-style, but will work).
 
 If you need window.baron for another purposes you can restore original value:
 ```js
-// !!! window.baron points to some other library
+// window.baron points to some other library
 ...
 // you include baron, it replaces the window.baron variable to baron namespace
 
 var babaron = baron.noConflict();
 // now window.baron points to that other library again, and you can use window.babaron.u() etc.
 ```
+
+## Custom build (Grunt)
+
+If you want exclude fixable headers functionality, type
+```js
+grunt core
+```
+in your console, and you will get dist/baron.js and dist/baron.min.js only with core functionality.
+
+Type
+```js
+grunt
+```
+to build full version of baron.
 
 ## Browsers support
 

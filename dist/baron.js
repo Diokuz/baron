@@ -156,20 +156,6 @@
                 dom(bar).css(dir.pos, pos + 'px');
             }
 
-            // fixing or unfixing headers[i]
-            function fixHeader(i, pos) {
-                if (viewPortSize < (gData.viewMinSize || 0)) { // No headers fixing when no enought space for viewport
-                    pos = undefined;
-                }
-
-                if (pos !== undefined) {
-                    pos += 'px';
-                    dom(headers[i]).css(dir.pos, pos).addClass(hFixCls);
-                } else {
-                    dom(headers[i]).css(dir.pos, '').removeClass(hFixCls);
-                }
-            }
-
             // Free path for bar
             function k() {
                 return track[dir.client] - bar[dir.offset];
@@ -195,23 +181,11 @@
                 event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
             }
 
-            // Webkit bug: scroll freezing when header goes to fixed state right under cursor
-            function bubbleWheel(e) {
-                try {
-                    i = document.createEvent('WheelEvent'); // i - for extra byte
-                    // evt.initWebKitWheelEvent(deltaX, deltaY, window, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey);
-                    i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
-                    scroller.dispatchEvent(i);
-                    e.preventDefault();
-                } catch (e) {};
-            }
 
             // Viewport (re)calculation
             function viewport(force) {
                 // Setting scrollbar width BEFORE all other work
                 dom(scroller).css(dir.crossSize, scroller.parentNode[dir.crossClient] + scroller[dir.crossOffset] - scroller[dir.crossClient] + 'px');
-
-                headers = selector(gData.header, scroller);
 
                 viewPortSize = scroller[dir.client];
 
@@ -222,41 +196,7 @@
                 hFixFlag = [];
                 topHeights = [];
 
-                if (headers) {
-                    if (force) { // For instance: if headers length changed
-                        // onMouseWheel bubbling in webkit
-                        event(headers, 'mousewheel', bubbleWheel, 'off');
-                        event(headers, 'mousewheel', bubbleWheel);
-                    }
-
-                    for (i = 0 ; i < headers.length ; i++) {
-                        // Summary headers height above current
-                        topHeights[i] = (topHeights[i - 1] || 0);
-
-                        if (headers[i - 1]) {
-                            topHeights[i] += headers[i - 1][dir.offset];
-                        }
-
-                        // Variable header heights
-                        pos = {};
-                        pos[dir.size] = headers[i][dir.offset];
-                        dom(headers[i].parentNode).css(pos);
-                        pos = {};
-                        pos[dir.crossSize] = headers[i].parentNode[dir.crossClient];
-                        dom(headers[i]).css(pos);
-
-                        // Between fixed headers
-                        viewPortSize -= headers[i][dir.offset];
-
-                        headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
-                    }
-                }
-
-                if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
-                    pos = {};
-                    pos[dir.pos] = headers[0].parentNode[dir.offset];
-                    dom(track).css(pos);
-                }
+                
             }
 
             // Total positions data update, container size dependences included
@@ -278,46 +218,6 @@
                 barPos = relToPos(- scrollerPos / (scroller[dir.scrollSize] - scroller[dir.client]));
 
                 posBar(barPos);
-
-                // Positioning headers
-                if (headers) {
-                    var change;
-                    for (i = 0 ; i < headers.length ; i++) {
-                        fixState = 0;
-                        if (headerTops[i] + scrollerPos < topHeights[i] + fixRadius) {
-                            // Header trying to go up
-                            fixState = 1;
-                            hTop = topHeights[i];
-                        } else if (headerTops[i] + scrollerPos > topHeights[i] + viewPortSize - fixRadius) {
-                            // Header trying to go down
-                            fixState = 2;
-                            hTop = topHeights[i] + viewPortSize;
-                        } else {
-                            // Header in viewport
-                            fixState = 3;
-                            hTop = undefined;
-                        }
-                        if (fixState != hFixFlag[i]) {
-                            fixHeader(i, hTop);
-                            hFixFlag[i] = fixState;
-                            change = true;
-                        }
-                    }
-
-                    // Adding positioning classes (on last top and first bottom header)
-                    if (change) { // At leats one change in headers flag structure occured
-                        for (i = 0 ; i < headers.length ; i++) {
-                            if (hFixFlag[i] != hFixFlag[i + 1] && hFixFlag[i] == 1 && gData.hBeforeFixCls) {
-                                dom(headers[i]).addClass(gData.hBeforeFixCls).removeClass(gData.hAfterFixCls + ''); // Last top fixed header
-                            } else if (hFixFlag[i] != hFixFlag[i - 1] && hFixFlag[i] == 2 && gData.hAfterFixCls) {
-                                dom(headers[i]).addClass(gData.hAfterFixCls).removeClass(gData.hBeforeFixCls + ''); // First bottom fixed header
-                            } else {
-                                dom(headers[i]).removeClass(gData.hBeforeFixCls + '').removeClass(gData.hAfterFixCls + '');
-                                // Emply string for bonzo, which does not handles removeClass(undefined)
-                            }
-                        }
-                    }
-                }
             }
 
             // var initialization
