@@ -31,10 +31,10 @@ To start using baron.js:
 
 ```html
 <div class="scroller">
-    <div class="container">
-        Your scrollable content here
+    Your scrollable content here
+    <div class="scroller__track"><!-- Optional -->
+        <div class="scroller__bar"></div>
     </div>
-    <div class="scroller__bar"></div>
 </div>
 ```
 
@@ -42,11 +42,18 @@ To start using baron.js:
 
 ```css
 .scroller {
-    height: 100%;
     overflow-y: scroll;
 }
 .scroller::-webkit-scrollbar { /* Preventing webkit horizontal scrolling bug */
     width: 0;
+}
+.scroller__track { /* You can make it invisible or even use scroller as track */
+    position: absolute;
+    right: 4px;
+    top: 10px;
+    bottom: 4px;
+    width: 10px;
+    background: rgba(0, 0, 0, .1);
 }
 .scroller__bar { /* The bar. You should define width, right position and background */
     position: absolute;    
@@ -65,7 +72,7 @@ Note: you can choose any class names, and slyle them as you want.
 $('.scroller').baron();
 ```
 
-##Advanced usage
+## Advanced usage
 
 You can specify some parameters at baron initialization:
 
@@ -111,10 +118,10 @@ params = {
     trackSmartLim: true,
 
     // Div wich contains bar, bar.parentNode by default
-    track: '.track'
+    track: '.track',
 
     // Radius for header fixing in px. Default vaule is 0.
-    fixRadius: 10
+    fixRadius: 10,
 
     // Selector engine
     // Default: window.jQuery
@@ -125,6 +132,9 @@ params = {
     event: function(elem, event, func, mode) { // Events manager
         if (!elem.length) {
             elem = [elem]; // bean not support arrays
+        }
+        if (mode == 'trigger') {
+            mode = 'fire';
         }
         for (var i = 0 ; i < elem.length ; i++) {
             bean[mode || 'on'](elem[i], event, func);

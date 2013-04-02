@@ -8,20 +8,20 @@ Improvements
 - trackSmartLim param added (if true bottom edge of first header uses as bar top limit)
 - fixRadius param added
 - Variable (tex-dependent) headers heights support added
+- noConflict method added
 
 Bugs
 
 - Right click drag bug fixed
-- Update method now invalidate bar presence
+- Update method now invalidate bar visibility
 - Margin collapse and positioned elements bug fixed
 
 Misc
 
 - heightChange custom event renamed to sizeChange
-- noConflict method added
 - container param removed
 - hTopFixCls param renamed to hBeforeFixCls
 - hBottomFixCls param renamed to hAfterFixCls
 - barTop param removed
-- "Require" support
-- Server-side "usage" handler
+- "require()" support added
+- Server-side "usage" handler added
