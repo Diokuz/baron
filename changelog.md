@@ -14,7 +14,6 @@ Bugs
 - Right click drag bug fixed
 - Update method now invalidate bar presence
 - Margin collapse and positioned elements bug fixed
-- 
 
 Misc
 
