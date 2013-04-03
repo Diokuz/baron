@@ -125,21 +125,16 @@
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname to scroller
-            function barOn(on) {
+            function barOn() {
                 if (gData.barOnCls) {
-                    if (on) {
+                    if (scroller[dir.client] < scroller[dir.scrollSize]) {
                         dom(scroller).addClass(gData.barOnCls);
                     } else {
                         dom(scroller).removeClass(gData.barOnCls);
                     }
                 }
             }
-
-            // Swinching bar on when scrollable content is too hight, and off when scroll is not possible because of lack on content
-            function invalidateBar() {
-                barOn(scroller[dir.client] < scroller[dir.scrollSize]);
-            }
-
+            
             // Updating height or width of bar
             function setBarSize(size) {
                 var barMinSize = gData.barMinSize || 20;

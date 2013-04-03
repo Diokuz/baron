@@ -125,21 +125,16 @@
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname to scroller
-            function barOn(on) {
+            function barOn() {
                 if (gData.barOnCls) {
-                    if (on) {
+                    if (scroller[dir.client] < scroller[dir.scrollSize]) {
                         dom(scroller).addClass(gData.barOnCls);
                     } else {
                         dom(scroller).removeClass(gData.barOnCls);
                     }
                 }
             }
-
-            // Swinching bar on when scrollable content is too hight, and off when scroll is not possible because of lack on content
-            function invalidateBar() {
-                barOn(scroller[dir.client] < scroller[dir.scrollSize]);
-            }
-
+            
             // Updating height or width of bar
             function setBarSize(size) {
                 var barMinSize = gData.barMinSize || 20;
@@ -206,7 +201,7 @@
                 }
             }
             // Viewport (re)calculation
-            function viewport(force) {
+            function uView(force) {
                 // Setting scrollbar width BEFORE all other work
                 dom(scroller).css(dir.crossSize, scroller.parentNode[dir.crossClient] + scroller[dir.crossOffset] - scroller[dir.crossClient] + 'px');
 
@@ -259,7 +254,7 @@
             }
 
             // Total positions data update, container size dependences included
-            function updateScrollBar() {
+            function uBar() {
                 var scrollerPos, // Scroller content position
                     oldBarSize, newBarSize,
                     hTop,
@@ -320,9 +315,9 @@
 
             // var initialization
             scroller = gData.scroller;
-            this.invalidateBar = invalidateBar;
-            this.viewport = viewport;
-            this.updateScrollBar = updateScrollBar;
+            this._barOn = barOn;
+            this._uView = uView;
+            this._uBar = uBar;
 
             // DOM initialization
             if (gData.bar) {
@@ -355,7 +350,7 @@
 
             // Events initialization
             // onScroll
-            event(scroller, 'scroll', updateScrollBar);
+            event(scroller, 'scroll', uBar);
 
             // Bar drag
             event(bar, 'mousedown', function(e) {
@@ -386,7 +381,7 @@
             event(window, 'resize', resize);
             event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
-            event(bar, 'mousewheel DOMMouseScroll', bubbleWheel);
+            event(bar, 'mousewheel', bubbleWheel);
             if (track != scroller) {
                 event(track, 'mousewheel', bubbleWheel);
             }
@@ -397,9 +392,9 @@
                 clearTimeout(rTimer);
                 // И навешиваем новый
                 rTimer = setTimeout(function() {
-                    viewport();
-                    updateScrollBar();
-                    invalidateBar();
+                    uView();
+                    uBar();
+                    barOn();
                 }, 200);
             };
 
@@ -408,9 +403,9 @@
 
         // Update method for one scroll group
         baron.init.prototype.update = function() {
-            this.viewport(1);
-            this.updateScrollBar();
-            this.invalidateBar();
+            this._uView(1);
+            this._uBar();
+            this._barOn();
         };
 
         // Initializing scroll group, or updating it if already

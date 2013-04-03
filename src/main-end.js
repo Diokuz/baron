@@ -2,9 +2,9 @@
 
             // var initialization
             scroller = gData.scroller;
-            this.invalidateBar = invalidateBar;
-            this.viewport = viewport;
-            this.updateScrollBar = updateScrollBar;
+            this._barOn = barOn;
+            this._uView = uView;
+            this._uBar = uBar;
 
             // DOM initialization
             if (gData.bar) {
@@ -37,7 +37,7 @@
 
             // Events initialization
             // onScroll
-            event(scroller, 'scroll', updateScrollBar);
+            event(scroller, 'scroll', uBar);
 
             // Bar drag
             event(bar, 'mousedown', function(e) {
@@ -79,9 +79,9 @@
                 clearTimeout(rTimer);
                 // И навешиваем новый
                 rTimer = setTimeout(function() {
-                    viewport();
-                    updateScrollBar();
-                    invalidateBar();
+                    uView();
+                    uBar();
+                    barOn();
                 }, 200);
             };
 
@@ -90,9 +90,9 @@
 
         // Update method for one scroll group
         baron.init.prototype.update = function() {
-            this.viewport(1);
-            this.updateScrollBar();
-            this.invalidateBar();
+            this._uView(1);
+            this._uBar();
+            this._barOn();
         };
 
         // Initializing scroll group, or updating it if already

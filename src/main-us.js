@@ -1,7 +1,7 @@
             }
 
             // Total positions data update, container size dependences included
-            function updateScrollBar() {
+            function uBar() {
                 var scrollerPos, // Scroller content position
                     oldBarSize, newBarSize,
                     hTop,

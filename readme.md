@@ -4,10 +4,6 @@ Baron - a small, fast and crossbrowser vertical custom scrollbar with native sys
 
 http://diokuz.github.com/baron/
 
-## Files
-
-You can find latest full baron version in /dist/ folder.
-
 ## Features
 
 - Do not replaces native system scroll mechanic.
@@ -17,7 +13,7 @@ You can find latest full baron version in /dist/ folder.
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system where the CSS property 'overflow: scroll' is applied.
 
-##Simple usage
+## Simple usage
 
 To start using baron.js:
 
@@ -202,9 +198,11 @@ in your console, and you will get dist/baron.js and dist/baron.min.js only with 
 
 Type
 ```js
-grunt
+grunt full
 ```
 to build full version of baron.
+
+Output files you can find in /dist/ folder.
 
 ## Browsers support
 
