@@ -7,7 +7,7 @@
                     hTop,
                     fixState;
 
-                newBarSize = track[dir.client] * scroller[dir.client] / scroller[dir.scrollSize];
+                newBarSize = (track[dir.client] - barTopLimit) * scroller[dir.client] / scroller[dir.scrollSize];
 
                 // Positioning bar
                 if (oldBarSize != newBarSize) {

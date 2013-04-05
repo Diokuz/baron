@@ -29,8 +29,12 @@
                     }
 
                     if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
-                        pos = {};
-                        pos[dir.pos] = headers[0].parentNode[dir.offset];
-                        dom(track).css(pos);
+                        if (track != scroller) {
+                            pos = {};
+                            pos[dir.pos] = headers[0].parentNode[dir.offset];
+                            dom(track).css(pos);
+                        } else {
+                            barTopLimit = headers[0].parentNode[dir.offset];
+                        }
                     }
                 }

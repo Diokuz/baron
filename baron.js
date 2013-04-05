@@ -122,6 +122,7 @@
                 scrollerY0,
                 pos,
                 fixRadius,
+                barTopLimit = 0,
                 i, j;
 
             // Switch on the bar by adding user-defined CSS classname to scroller
@@ -153,17 +154,17 @@
 
             // Free path for bar
             function k() {
-                return track[dir.client] - bar[dir.offset];
+                return track[dir.client] - barTopLimit - bar[dir.offset];
             }
 
             // Relative container top position to bar top position
             function relToPos(r) {
-                return r * k();
+                return r * k() + barTopLimit;
             }
 
             // Bar position to relative container position
             function posToRel(t) {
-                return t / k();
+                return (t - barTopLimit) / k();
             }
 
             // Text selection pos preventing
@@ -246,9 +247,13 @@
                     }
 
                     if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
-                        pos = {};
-                        pos[dir.pos] = headers[0].parentNode[dir.offset];
-                        dom(track).css(pos);
+                        if (track != scroller) {
+                            pos = {};
+                            pos[dir.pos] = headers[0].parentNode[dir.offset];
+                            dom(track).css(pos);
+                        } else {
+                            barTopLimit = headers[0].parentNode[dir.offset];
+                        }
                     }
                 }
             }
@@ -260,7 +265,7 @@
                     hTop,
                     fixState;
 
-                newBarSize = track[dir.client] * scroller[dir.client] / scroller[dir.scrollSize];
+                newBarSize = (track[dir.client] - barTopLimit) * scroller[dir.client] / scroller[dir.scrollSize];
 
                 // Positioning bar
                 if (oldBarSize != newBarSize) {
