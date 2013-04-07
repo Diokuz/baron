@@ -2,4 +2,4 @@
 (function(window, undefined) {
     'use strict';
 
-    function err() {};
+    function errGlobal() {};

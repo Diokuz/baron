@@ -114,4 +114,13 @@ window.onload = function() {
         hFixCls: 'header__title_state_fixed',
         h: true
     });
+
+    // Bidirectional scroll
+    $('.test_bidir .scroller').baron({
+        bar: '.scroller__bar',
+        hbar: '.scroller__bar_h',
+        barOnCls: 'baron',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed'
+    });
 };
