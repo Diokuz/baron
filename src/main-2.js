@@ -1,14 +1,8 @@
-/* https://github.com/Diokuz/baron */
-(function(window, undefined) {
-    'use strict';
-
-    if (typeof window == 'undefined') return; // Server side
-
     var scrolls = [],
         stored = window.baron, // Stored baron vaule for noConflict usage
         $ = window.jQuery, // Trying to use jQuery
         direction = {
-            vertical: {
+            'false': { // Vertical
                 x: 'Y',
                 pos: 'top',
                 crossPos: 'left',
@@ -23,7 +17,7 @@
                 scrollSize: 'scrollHeight'
             },
 
-            horizontal: {
+            'true': { // Horizontal
                 x: 'X',
                 pos: 'left',
                 crossPos: 'top',
@@ -37,17 +31,28 @@
                 scroll: 'scrollLeft',
                 scrollSize: 'scrollWidth'
             }
-        };
+        },
+        err;
 
-    var baron = function(params) {
+    if (!window) return; // Server side
+
+    function baron(params) {
         var scrollGroup;
 
-        params = params || {};
-        params.scroller = params.scroller || this; // jQuery plugin mode
+        err = function(message) {
+            errGlobal(message, params);
+        }
 
-        scrollGroup = new constructor(params);
-        scrollGroup.u();
-        scrolls.push(scrollGroup);
+        try {
+            params = params || {};
+            params.scroller = params.scroller || this; // jQuery plugin mode
+
+            scrollGroup = new constructor(params);
+            scrollGroup.u();
+            scrolls.push(scrollGroup);
+        } catch (e) {
+            debugger;
+        };
 
         return scrollGroup;
     };
@@ -65,7 +70,15 @@
         return baron; // Returning baron
     };
 
-    baron.version = '0.4';
+    baron.version = '0.4.x';
+
+    if ($ && $.fn) { // Adding baron to jQuery as plugin
+        $.fn.baron = baron;
+    }
+    window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
+    if (window['module'] && module.exports) {
+        module.exports = baron.noConflict();
+    }
 
     // Main constructor returning baron collection object with u() method in proto
     var constructor = function(data) {
@@ -77,31 +90,29 @@
         // Engines initialization
         selector = data.selector || $;
         if (!selector) {
-            // console.error('baron: no query selector engine found');
-            return;
+            err(1);
         }
 
         event = data.event || function(elem, event, func, mode) {
             $(elem)[mode || 'on'](event, func);
         };
         if (!data.event && !$) {
-            return;
+            err(2);
         }
 
         dom = data.dom || $;
         if (!dom) {
-            // console.error('baron: no DOM utility engine found');
-            return;
+            err(3);
         }
 
         scroller = selector(data.scroller);
-        if (!scroller) {
-            // console.error('baron: no scroller found');
-            return;
-        }
 
         if (!scroller[0]) {
             scroller = [scroller];
+        }
+
+        if (!scroller[0].nodeType) {
+            err(10);
         }
 
         // gData - user defined data, not changed during baron work
@@ -119,7 +130,7 @@
                 dir,
                 scroller,
                 drag,
-                scrollerY0,
+                scrollerPos0,
                 pos,
                 fixRadius,
                 barTopLimit = 0,

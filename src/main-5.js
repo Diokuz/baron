@@ -13,41 +13,32 @@
                 bar = selector('*', scroller);
                 bar = bar[bar.length - 1];
             }
+            if (!bar) {
+                err(11);
+            }
             track = selector(gData.track, scroller)[0];
             track = track || bar.parentNode;
-            if (!(scroller && bar)) {
-                // console.error('acbar: no scroller or bar dectected');
-                return;
-            }
 
             // Prevent second initialization
             scroller.setAttribute('data-baron', 'inited');
 
             // Choosing scroll direction
-            dir = direction.vertical;
-            if (gData.h) {
-                dir = direction.horizontal;
-            }
+            dir = direction[!!gData.h + '']; // 'true' - horizontal, 'false' - vertical
 
-            // Capturing radius for headers when fixing
-            fixRadius = gData.fixRadius || 0;
+            fixRadius = gData.fixRadius || 0; // Capturing radius for headers when fixing
 
-            // CSS classname for fixed headers
-            hFixCls = gData.hFixCls;
+            hFixCls = gData.hFixCls; // CSS classname for fixed headers
 
             // Events initialization
-            // onScroll
             event(scroller, 'scroll', uBar);
 
-            // Bar drag
-            event(bar, 'mousedown', function(e) {
+            event(bar, 'mousedown', function(e) { // Bar drag
                 e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
                 selection(); // Disable text selection in ie8
                 drag = 1; // Save private byte
             });
 
-            // Cancelling drag when mouse key goes up and when window loose its focus
-            event(document, 'mouseup blur', function() {
+            event(document, 'mouseup blur', function() { // Cancelling drag when mouse key goes up and when window loose its focus
                 selection(1); // Enable text selection
                 drag = 0;
             });
@@ -55,13 +46,13 @@
             // Starting drag when mouse key (LM) goes down at bar
             event(document, 'mousedown', function(e) { // document, not window, for ie8
                 if (e.button != 2) { // Not RM
-                    scrollerY0 = e.clientY - barPos;
+                    scrollerPos0 = e.clientY - barPos;
                 }
             });
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
                 if (drag) {
-                    scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (scroller[dir.scrollSize] - scroller[dir.client]);
+                    scroller.scrollTop = posToRel(e.clientY - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                 }
             });
 
@@ -116,15 +107,4 @@
             this[i].update();
         }
     };
-
-    // Adding baron to jQuery as plugin
-    if ($ && $.fn) {
-        $.fn.baron = baron;
-    }
-
-    if (typeof module != 'undefined' && module.exports) {
-        module.exports = baron;
-    } else {
-        window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
-    }
 })(window);

@@ -200,7 +200,7 @@ Type
 ```js
 grunt full
 ```
-to build full version of baron.
+to build full version of baron (including error messages).
 
 Output files you can find in /dist/ folder.
 

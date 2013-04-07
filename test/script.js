@@ -42,6 +42,9 @@ window.onload = function() {
         barOnCls: 'baron'
     });
 
+    // Not enought input params
+    //baron();
+
     var anotherBaron = babaron = baron.noConflict();
     console.log('Original baron value is: ', baron);
 
@@ -104,13 +107,11 @@ window.onload = function() {
     });
 
     // Horizontal scroll
-    // $('.test_horizontal').baron({
-    //     scroller: '.scroller',
-    //     container: '.container',
-    //     bar: '.scroller__bar',
-    //     barOnCls: 'baron',
-    //     header: '.header__title',
-    //     hFixCls: 'header__title_state_fixed',
-    //     h: true
-    // });
+    $('.test_horizontal .scroller').baron({
+        bar: '.scroller__bar',
+        barOnCls: 'baron',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed',
+        h: true
+    });
 };

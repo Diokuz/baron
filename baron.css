@@ -17,7 +17,9 @@
     width: 10px;
     background: #999;
 }
-.container { /* Data wrapper */
+.scroller__bar_h {
+    bottom: 2px;
+    height: 8px;
 }
 
 .header__title {

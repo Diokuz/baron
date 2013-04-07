@@ -8,34 +8,38 @@ module.exports = function(grunt) {
       },
       def: {
         src: [
-          'src/main1.js',
-          'src/headers1.js',
-          'src/main-vs.js',
+          'src/main-1.js',
+          'src/main-2.js',
+          'src/headers-1.js',
+          'src/main-3.js',
           'src/headers-ve.js',
-          'src/main-us.js',
+          'src/main-4.js',
           'src/headers-ue.js',
-          'src/main-end.js'
+          'src/main-5.js'
         ],
         dest: '<%= pkg.name %>.js'
       },
       core: {
         src: [
-          'src/main1.js',
-          'src/main-vs.js',
-          'src/main-us.js',
-          'src/main-end.js'
+          'src/main-1.js',
+          'src/main-2.js',
+          'src/main-3.js',
+          'src/main-4.js',
+          'src/main-5.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       },
       full: {
         src: [
-          'src/main1.js',
-          'src/headers1.js',
-          'src/main-vs.js',
+          'src/main-1.js',
+          'src/errors.js',
+          'src/main-2.js',
+          'src/headers-1.js',
+          'src/main-3.js',
           'src/headers-ve.js',
-          'src/main-us.js',
+          'src/main-4.js',
           'src/headers-ue.js',
-          'src/main-end.js'
+          'src/main-5.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }

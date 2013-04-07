@@ -2,13 +2,13 @@
 (function(window, undefined) {
     'use strict';
 
-    if (typeof window == 'undefined') return; // Server side
+    function err() {};
 
     var scrolls = [],
         stored = window.baron, // Stored baron vaule for noConflict usage
         $ = window.jQuery, // Trying to use jQuery
         direction = {
-            vertical: {
+            'false': { // Vertical
                 x: 'Y',
                 pos: 'top',
                 crossPos: 'left',
@@ -23,7 +23,7 @@
                 scrollSize: 'scrollHeight'
             },
 
-            horizontal: {
+            'true': { // Horizontal
                 x: 'X',
                 pos: 'left',
                 crossPos: 'top',
@@ -37,17 +37,28 @@
                 scroll: 'scrollLeft',
                 scrollSize: 'scrollWidth'
             }
-        };
+        },
+        err;
 
-    var baron = function(params) {
+    if (!window) return; // Server side
+
+    function baron(params) {
         var scrollGroup;
 
-        params = params || {};
-        params.scroller = params.scroller || this; // jQuery plugin mode
+        err = function(message) {
+            errGlobal(message, params);
+        }
 
-        scrollGroup = new constructor(params);
-        scrollGroup.u();
-        scrolls.push(scrollGroup);
+        try {
+            params = params || {};
+            params.scroller = params.scroller || this; // jQuery plugin mode
+
+            scrollGroup = new constructor(params);
+            scrollGroup.u();
+            scrolls.push(scrollGroup);
+        } catch (e) {
+            debugger;
+        };
 
         return scrollGroup;
     };
@@ -65,7 +76,15 @@
         return baron; // Returning baron
     };
 
-    baron.version = '0.4';
+    baron.version = '0.4.x';
+
+    if ($ && $.fn) { // Adding baron to jQuery as plugin
+        $.fn.baron = baron;
+    }
+    window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
+    if (window['module'] && module.exports) {
+        module.exports = baron.noConflict();
+    }
 
     // Main constructor returning baron collection object with u() method in proto
     var constructor = function(data) {
@@ -77,31 +96,29 @@
         // Engines initialization
         selector = data.selector || $;
         if (!selector) {
-            // console.error('baron: no query selector engine found');
-            return;
+            err(1);
         }
 
         event = data.event || function(elem, event, func, mode) {
             $(elem)[mode || 'on'](event, func);
         };
         if (!data.event && !$) {
-            return;
+            err(2);
         }
 
         dom = data.dom || $;
         if (!dom) {
-            // console.error('baron: no DOM utility engine found');
-            return;
+            err(3);
         }
 
         scroller = selector(data.scroller);
-        if (!scroller) {
-            // console.error('baron: no scroller found');
-            return;
-        }
 
         if (!scroller[0]) {
             scroller = [scroller];
+        }
+
+        if (!scroller[0].nodeType) {
+            err(10);
         }
 
         // gData - user defined data, not changed during baron work
@@ -119,7 +136,7 @@
                 dir,
                 scroller,
                 drag,
-                scrollerY0,
+                scrollerPos0,
                 pos,
                 fixRadius,
                 barTopLimit = 0,
@@ -331,41 +348,32 @@
                 bar = selector('*', scroller);
                 bar = bar[bar.length - 1];
             }
+            if (!bar) {
+                err(11);
+            }
             track = selector(gData.track, scroller)[0];
             track = track || bar.parentNode;
-            if (!(scroller && bar)) {
-                // console.error('acbar: no scroller or bar dectected');
-                return;
-            }
 
             // Prevent second initialization
             scroller.setAttribute('data-baron', 'inited');
 
             // Choosing scroll direction
-            dir = direction.vertical;
-            if (gData.h) {
-                dir = direction.horizontal;
-            }
+            dir = direction[!!gData.h + '']; // 'true' - horizontal, 'false' - vertical
 
-            // Capturing radius for headers when fixing
-            fixRadius = gData.fixRadius || 0;
+            fixRadius = gData.fixRadius || 0; // Capturing radius for headers when fixing
 
-            // CSS classname for fixed headers
-            hFixCls = gData.hFixCls;
+            hFixCls = gData.hFixCls; // CSS classname for fixed headers
 
             // Events initialization
-            // onScroll
             event(scroller, 'scroll', uBar);
 
-            // Bar drag
-            event(bar, 'mousedown', function(e) {
+            event(bar, 'mousedown', function(e) { // Bar drag
                 e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
                 selection(); // Disable text selection in ie8
                 drag = 1; // Save private byte
             });
 
-            // Cancelling drag when mouse key goes up and when window loose its focus
-            event(document, 'mouseup blur', function() {
+            event(document, 'mouseup blur', function() { // Cancelling drag when mouse key goes up and when window loose its focus
                 selection(1); // Enable text selection
                 drag = 0;
             });
@@ -373,13 +381,13 @@
             // Starting drag when mouse key (LM) goes down at bar
             event(document, 'mousedown', function(e) { // document, not window, for ie8
                 if (e.button != 2) { // Not RM
-                    scrollerY0 = e.clientY - barPos;
+                    scrollerPos0 = e.clientY - barPos;
                 }
             });
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
                 if (drag) {
-                    scroller.scrollTop = posToRel(e.clientY - scrollerY0) * (scroller[dir.scrollSize] - scroller[dir.client]);
+                    scroller.scrollTop = posToRel(e.clientY - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                 }
             });
 
@@ -434,15 +442,4 @@
             this[i].update();
         }
     };
-
-    // Adding baron to jQuery as plugin
-    if ($ && $.fn) {
-        $.fn.baron = baron;
-    }
-
-    if (typeof module != 'undefined' && module.exports) {
-        module.exports = baron;
-    } else {
-        window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
-    }
 })(window);
