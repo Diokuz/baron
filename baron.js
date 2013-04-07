@@ -381,13 +381,13 @@
             // Starting drag when mouse key (LM) goes down at bar
             event(document, 'mousedown', function(e) { // document, not window, for ie8
                 if (e.button != 2) { // Not RM
-                    scrollerPos0 = e.clientY - barPos;
+                    scrollerPos0 = e['client' + dir.x] - barPos;
                 }
             });
 
             event(document, 'mousemove', function(e) { // document, not window, for ie8
                 if (drag) {
-                    scroller.scrollTop = posToRel(e.clientY - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
+                    scroller[dir.scroll] = posToRel(e['client' + dir.x] - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                 }
             });
 
