@@ -56,6 +56,18 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     background: #ddf;
     background: rgba(0, 0, 255, .1);
 }
+.scroller__track {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 0;
+}
+.scroller__track_h {
+    left: 0;
+    bottom: auto;
+    width: auto;
+}
 .scroller__bar {
     position: absolute;
     z-index: 1;
@@ -135,4 +147,8 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 .test_horizontal .header__title {
     width: 20px;
     height: 100%;
+}
+
+.test_textarea .scroller__bar {
+    display: block;
 }

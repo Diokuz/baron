@@ -127,4 +127,16 @@ window.onload = function() {
         h: true,
         v: true
     });
+
+    // Textarea scroll
+    $('.test_textarea .scroller').baron({
+        bar: $('.test_textarea .scroller__bar'),
+        hbar: $('.test_textarea .scroller__bar_h'),
+        barOnCls: 'baron',
+        hbarOnCls: 'baron_h',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed',
+        h: true,
+        v: true
+    });
 };

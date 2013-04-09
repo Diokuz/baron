@@ -7,12 +7,18 @@
                 this._uBar = uBar;
 
                 // DOM initialization
-                if (gData.bar) {
-                    bar = selector(gData.bar, scroller)[0];
-                } else {
-                    bar = selector('*', scroller);
-                    bar = bar[bar.length - 1];
+                if (gData.bar && gData.bar[0].nodeType) {
+                    bar = gData.bar[0];
                 }
+                if (!bar) {
+                    if (gData.bar) {
+                        bar = selector(gData.bar, scroller)[0];
+                    } else {
+                        bar = selector('*', scroller);
+                        bar = bar[bar.length - 1];
+                    }
+                }
+
                 if (bar) {
                     track = selector(gData.track, scroller)[0];
                     track = track || bar.parentNode;

@@ -2,13 +2,14 @@ Baron - a small, fast and crossbrowser vertical custom scrollbar with native sys
 
 ## Demo
 
-http://diokuz.github.com/baron/
+http://diokuz.github.io/baron/
 
 ## Features
 
 - Do not replaces native system scroll mechanic.
 - Customizable scrollbar design with full CSS support.
 - Fixable headers.
+-- Sticky footer as a bonus (see demo page)
 - No strong dependences on jQuery.
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system where the CSS property 'overflow: scroll' is applied.
