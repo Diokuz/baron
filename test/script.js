@@ -112,7 +112,8 @@ window.onload = function() {
         barOnCls: 'baron',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
-        h: true
+        h: true,
+        v: false
     });
 
     // Bidirectional scroll
@@ -120,7 +121,10 @@ window.onload = function() {
         bar: '.scroller__bar',
         hbar: '.scroller__bar_h',
         barOnCls: 'baron',
+        hbarOnCls: 'baron_h',
         header: '.header__title',
-        hFixCls: 'header__title_state_fixed'
+        hFixCls: 'header__title_state_fixed',
+        h: true,
+        v: true
     });
 };

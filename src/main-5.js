@@ -13,11 +13,12 @@
                     bar = selector('*', scroller);
                     bar = bar[bar.length - 1];
                 }
-                if (!bar) {
-                    err(11);
+                if (bar) {
+                    track = selector(gData.track, scroller)[0];
+                    track = track || bar.parentNode;
+                } else {
+                    track = scroller;
                 }
-                track = selector(gData.track, scroller)[0];
-                track = track || bar.parentNode;
 
                 // Prevent second initialization
                 scroller.setAttribute('data-baron', 'inited');
@@ -60,7 +61,7 @@
                 event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
                 event(bar, 'mousewheel', bubbleWheel);
-                if (track != scroller) {
+                if (track && track != scroller) {
                     event(track, 'mousewheel', bubbleWheel);
                 }
 
@@ -91,14 +92,14 @@
             for (var i = 0 ; i < scroller.length ; i++) {
                 if (!scroller[i].getAttribute('data-baron')) {
                     data.scroller = scroller[i];
-                    if (scroller[i].scrollHeight > scroller[i].clientHeight) {
+                    if (data.v !== false) {
                         data.dir = direction.v;
                         data.bar = data.vbar || data.bar;
                         this[k++] = new baron.init(data);
                     }
-                    if (scroller[i].scrollWidth > scroller[i].clientWidth || data.direction == 'h' || data.direction == 'hv') {
+                    if (data.h) {
                         data.dir = direction.h;
-                        data.bar = data.hbar || data.bar;
+                        data.bar = data.hbar;
                         this[k++] = new baron.init(data);
                     }
                 } else {

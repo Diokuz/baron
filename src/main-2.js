@@ -119,12 +119,16 @@
                         size = barMinSize;
                     }
 
-                    dom(bar).css(dir.size, parseInt(size) + 'px');
+                    if (bar) {
+                        dom(bar).css(dir.size, parseInt(size) + 'px');
+                    }
                 }
 
                 // Updating top or left bar position
                 function posBar(pos) {
-                    dom(bar).css(dir.pos, parseInt(pos) + 'px');
+                    if (bar) {
+                        dom(bar).css(dir.pos, parseInt(pos) + 'px');
+                    }
                 }
 
                 // Free path for bar

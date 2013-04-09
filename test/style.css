@@ -76,6 +76,9 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 .baron .scroller__bar {
     display: block;
 }
+.hbaron .scroller__bar_h {
+    display: block;
+}
 .baron .scroller__bar-wrapper {
     display: block;
 }
@@ -123,7 +126,7 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 }
 .test_horizontal .container {
     height: 100%;
-    width: 500px;
+    width: 900px;
 }
 .test_horizontal .header {
     height: 100%;
