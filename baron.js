@@ -203,13 +203,11 @@
                     
                     headers = selector(gData.header, scroller);
                     if (headers) {
-                        if (force) { // For instance: if headers length changed
-                            // onMouseWheel bubbling in webkit
-                            event(headers, 'mousewheel', bubbleWheel, 'off');
-                            event(headers, 'mousewheel', bubbleWheel);
-                        }
-
                         for (i = 0 ; i < headers.length ; i++) {
+                            if (!(i == 0 && gData.trackSmartLim) && force) {
+                                event(headers[i], 'mousewheel', bubbleWheel, 'off');
+                                event(headers[i], 'mousewheel', bubbleWheel);
+                            }
                             // Summary headers height above current
                             topHeights[i] = (topHeights[i - 1] || 0);
 
