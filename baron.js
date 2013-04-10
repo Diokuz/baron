@@ -369,9 +369,9 @@
                 event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
                 event(bar, 'mousewheel', bubbleWheel);
-                if (track && track != scroller) {
-                    event(track, 'mousewheel', bubbleWheel);
-                }
+                // if (track && track != scroller) {
+                //     event(track, 'mousewheel', bubbleWheel);
+                // }
 
                 // Reinit when resize
                 function resize() {

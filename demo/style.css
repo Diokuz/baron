@@ -41,6 +41,7 @@ body {
     border-radius: 5px;
     background: #ddf;
     background: rgba(0, 0, 255, .1);
+    pointer-events: none;
 }
 .scroller__bar {
     position: absolute;
@@ -53,6 +54,7 @@ body {
     opacity: .6;
     -webkit-transition: width .2s linear;
     transition: width .2s linear;
+    pointer-events: auto;
 }
 .scroller__bar:hover {
     opacity: .8;
