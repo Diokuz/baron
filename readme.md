@@ -112,7 +112,8 @@ params = {
     hAfterFixCls: 'header__title_position_bottom',
 
     // true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
-    trackSmartLim: true,
+    // trackSmartLim: true,
+    // !!! removed, true by default. use !important in CSS to overwrite track position.
 
     // Div wich contains bar, bar.parentNode by default
     track: '.track',

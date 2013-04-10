@@ -204,10 +204,6 @@
                     headers = selector(gData.header, scroller);
                     if (headers) {
                         for (i = 0 ; i < headers.length ; i++) {
-                            if (!(i == 0 && gData.trackSmartLim) && force) {
-                                event(headers[i], 'mousewheel', bubbleWheel, 'off');
-                                event(headers[i], 'mousewheel', bubbleWheel);
-                            }
                             // Summary headers height above current
                             topHeights[i] = (topHeights[i - 1] || 0);
 
@@ -227,9 +223,14 @@
                             viewPortSize -= headers[i][dir.offset];
 
                             headerTops[i] = headers[i].parentNode[dir.offsetPos]; // No paddings for parentNode
+
+                            if ( !(i == 0 && headerTops[i] == 0) && force) {
+                                event(headers[i], 'mousewheel', bubbleWheel, 'off');
+                                event(headers[i], 'mousewheel', bubbleWheel);
+                            }
                         }
 
-                        if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
+                        if (headerTops[0] == 0) { // Bottom edge of first header as top limit for track
                             if (track != scroller) {
                                 pos = {};
                                 pos[dir.pos] = headers[0].parentNode[dir.offset];

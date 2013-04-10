@@ -34,7 +34,7 @@ body {
 .scroller__bar-wrapper {
     position: absolute;
     z-index: 1;
-    top: 10px;
+    top: 10px; /* use !important; to overwrite */
     bottom: 10px;
     right: 5px;
     width: 8px;
@@ -96,6 +96,7 @@ body {
     height: 30px;
     background: -webkit-linear-gradient(top, rgba(200, 200, 255, .4) 0%, rgba(200, 200, 255, 0) 100%);
     background: linear-gradient(to bottom, rgba(200, 200, 255, .4) 0%, rgba(200, 200, 255, 0) 100%);
+    pointer-events: none;
 }
 .header__title_position_bottom {
     background-color: rgba(240, 229, 250, .8);
@@ -109,6 +110,7 @@ body {
     height: 30px;
     background: -webkit-linear-gradient(top, rgba(100, 100, 255, 0) 0%, rgba(100, 100, 255, .4) 100%);
     background: linear-gradient(to bottom, rgba(100, 100, 255, 0) 0%, rgba(100, 100, 255, .4) 100%);
+    pointer-events: none;
 }
 
 .wrapper_2 .header__title {
