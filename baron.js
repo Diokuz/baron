@@ -159,7 +159,7 @@
 
                 // Text selection preventing on drag
                 function selection(enable) {
-                    event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
+                    event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
                 }
 
                 // Bubbling wheel event e to scroller (from headers and scrollbar)
@@ -230,7 +230,7 @@
                             }
                         }
 
-                        if (headerTops[0] == 0) { // Bottom edge of first header as top limit for track
+                        if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
                             if (track != scroller) {
                                 pos = {};
                                 pos[dir.pos] = headers[0].parentNode[dir.offset];
@@ -427,13 +427,9 @@
             }
         };
 
-        try {
-            scrollGroup = new constructor(params);
-            scrollGroup.u();
-            scrolls.push(scrollGroup);
-        } catch (e) {
-            debugger;
-        };
+        scrollGroup = new constructor(params);
+        scrollGroup.u();
+        scrolls.push(scrollGroup);
 
         return scrollGroup;
     };
@@ -451,7 +447,7 @@
         return baron; // Returning baron
     };
 
-    baron.version = '0.4.x';
+    baron.version = '0.5.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

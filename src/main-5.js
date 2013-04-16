@@ -125,13 +125,9 @@
             }
         };
 
-        try {
-            scrollGroup = new constructor(params);
-            scrollGroup.u();
-            scrolls.push(scrollGroup);
-        } catch (e) {
-            debugger;
-        };
+        scrollGroup = new constructor(params);
+        scrollGroup.u();
+        scrolls.push(scrollGroup);
 
         return scrollGroup;
     };
@@ -149,7 +145,7 @@
         return baron; // Returning baron
     };
 
-    baron.version = '0.4.x';
+    baron.version = '0.5.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

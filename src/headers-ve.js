@@ -27,7 +27,7 @@
                             }
                         }
 
-                        if (headerTops[0] == 0) { // Bottom edge of first header as top limit for track
+                        if (gData.trackSmartLim) { // Bottom edge of first header as top limit for track
                             if (track != scroller) {
                                 pos = {};
                                 pos[dir.pos] = headers[0].parentNode[dir.offset];

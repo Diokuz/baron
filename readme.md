@@ -111,14 +111,15 @@ params = {
     // CSS class for uppermost fixed header of bottom headers group
     hAfterFixCls: 'header__title_position_bottom',
 
-    // true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
-    // trackSmartLim: true,
-    // !!! removed, true by default. use !important in CSS to overwrite track position.
+    // if true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
+    // Default: false
+    trackSmartLim: true,
 
     // Div wich contains bar, bar.parentNode by default
     track: '.track',
 
-    // Radius for header fixing in px. Default vaule is 0.
+    // Radius for header fixing in px
+    // Default: 0
     fixRadius: 10,
 
     // Selector engine

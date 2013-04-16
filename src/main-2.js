@@ -153,7 +153,7 @@
 
                 // Text selection preventing on drag
                 function selection(enable) {
-                    event(document, 'selectpos', dontPosSelect, enable ? 'off' : 'on');
+                    event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
                 }
 
                 // Bubbling wheel event e to scroller (from headers and scrollbar)
