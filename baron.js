@@ -152,6 +152,11 @@
                     return (t - barTopLimit) / k();
                 }
 
+                // Cursor position in main direction in px // Now with iOs support
+                function getCursorPos(e) {
+                    return e['client' + dir.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + dir.x];
+                }
+
                 // Text selection pos preventing
                 function dontPosSelect() {
                     return false;
@@ -341,27 +346,27 @@
                 // Events initialization
                 event(scroller, 'scroll', uBar);
 
-                event(bar, 'mousedown', function(e) { // Bar drag
+                event(bar, 'touchstart mousedown', function(e) { // Bar drag
                     e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
                     selection(); // Disable text selection in ie8
                     drag = 1; // Save private byte
                 });
 
-                event(document, 'mouseup blur', function() { // Cancelling drag when mouse key goes up and when window loose its focus
+                event(document, 'mouseup blur touchend', function() { // Cancelling drag when mouse key goes up and when window loose its focus
                     selection(1); // Enable text selection
                     drag = 0;
                 });
 
                 // Starting drag when mouse key (LM) goes down at bar
-                event(document, 'mousedown', function(e) { // document, not window, for ie8
+                event(document, 'touchstart mousedown', function(e) { // document, not window, for ie8
                     if (e.button != 2) { // Not RM
-                        scrollerPos0 = e['client' + dir.x] - barPos;
+                        scrollerPos0 = getCursorPos(e) - barPos;
                     }
                 });
 
                 event(document, 'mousemove', function(e) { // document, not window, for ie8
                     if (drag) {
-                        scroller[dir.scroll] = posToRel(e['client' + dir.x] - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
+                        scroller[dir.scroll] = posToRel(getCursorPos(e) - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                     }
                 });
 
@@ -375,9 +380,8 @@
 
                 // Reinit when resize
                 function resize() {
-                    // Если новый ресайз произошёл быстро - отменяем предыдущий таймаут
+                    // Limit the resize frenquency
                     clearTimeout(rTimer);
-                    // И навешиваем новый
                     rTimer = setTimeout(function() {
                         uView();
                         uBar();
@@ -444,10 +448,10 @@
     baron.noConflict = function() {
         window.baron = stored; // Restoring original value of "baron" global var
 
-        return baron; // Returning baron
+        return baron;
     };
 
-    baron.version = '0.5.0';
+    baron.version = '0.5.1';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

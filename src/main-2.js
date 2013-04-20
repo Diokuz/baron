@@ -146,6 +146,11 @@
                     return (t - barTopLimit) / k();
                 }
 
+                // Cursor position in main direction in px // Now with iOs support
+                function getCursorPos(e) {
+                    return e['client' + dir.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + dir.x];
+                }
+
                 // Text selection pos preventing
                 function dontPosSelect() {
                     return false;

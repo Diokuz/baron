@@ -1,4 +1,4 @@
-Baron - a small, fast and crossbrowser vertical custom scrollbar with native system scroll mechanic.
+Baron - a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
 
 ## Demo
 
@@ -8,8 +8,7 @@ http://diokuz.github.io/baron/
 
 - Do not replaces native system scroll mechanic.
 - Customizable scrollbar design with full CSS support.
-- Fixable headers.
--- Sticky footer as a bonus (see demo page)
+- Fixable headers. Sticky footer as a bonus (see demo page).
 - No strong dependences on jQuery.
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system where the CSS property 'overflow: scroll' is applied.
@@ -40,8 +39,10 @@ To start using baron.js:
 ```css
 .scroller {
     overflow-y: scroll;
+    /* -webkit-overflow-scrolling: touch; */
+    /* uncomment to accelerate scrolling on iOs */
 }
-.scroller::-webkit-scrollbar { /* Preventing webkit horizontal scrolling bug */
+.scroller::-webkit-scrollbar { /* Preventing webkit cross-direction scrolling bug */
     width: 0;
 }
 .scroller__track { /* You can make it invisible or even use scroller as track */
@@ -111,12 +112,12 @@ params = {
     // CSS class for uppermost fixed header of bottom headers group
     hAfterFixCls: 'header__title_position_bottom',
 
+    // Div wich contains bar, bar.parentNode by default
+    track: '.track',
+
     // if true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
     // Default: false
     trackSmartLim: true,
-
-    // Div wich contains bar, bar.parentNode by default
-    track: '.track',
 
     // Radius for header fixing in px
     // Default: 0

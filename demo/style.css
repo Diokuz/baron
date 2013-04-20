@@ -26,7 +26,8 @@ body {
 .scroller {
     height: 100%;
     overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    /*-webkit-overflow-scrolling: touch;*/
+    /* uncomment to accelerate scrolling on iOs */
 }
 .scroller::-webkit-scrollbar {
     width: 0;
@@ -34,7 +35,7 @@ body {
 .scroller__bar-wrapper {
     position: absolute;
     z-index: 1;
-    top: 10px; /* use !important; to overwrite */
+    top: 10px;
     bottom: 10px;
     right: 5px;
     width: 8px;
