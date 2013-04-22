@@ -57,7 +57,7 @@
                     }
                 });
 
-                event(document, 'mousemove', function(e) { // document, not window, for ie8
+                event(document, 'mousemove touchmove', function(e) { // document, not window, for ie8
                     if (drag) {
                         scroller[dir.scroll] = posToRel(getCursorPos(e) - scrollerPos0) * (scroller[dir.scrollSize] - scroller[dir.client]);
                     }
