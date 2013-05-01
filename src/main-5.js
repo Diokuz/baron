@@ -13,10 +13,11 @@
                 if (!bar) {
                     if (gData.bar) {
                         bar = selector(gData.bar, scroller)[0];
-                    } else {
-                        bar = selector('*', scroller);
-                        bar = bar[bar.length - 1];
                     }
+                    //  else {
+                    //     bar = selector('*', scroller);
+                    //     bar = bar[bar.length - 1];
+                    // }
                 }
 
                 if (bar) {
@@ -39,11 +40,13 @@
                 // Events initialization
                 event(scroller, 'scroll', uBar);
 
-                event(bar, 'touchstart mousedown', function(e) { // Bar drag
-                    e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-                    selection(); // Disable text selection in ie8
-                    drag = 1; // Save private byte
-                });
+                if (bar) {
+                    event(bar, 'touchstart mousedown', function(e) { // Bar drag
+                        e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                        selection(); // Disable text selection in ie8
+                        drag = 1; // Save private byte
+                    });
+                }
 
                 event(document, 'mouseup blur touchend', function() { // Cancelling drag when mouse key goes up and when window loose its focus
                     selection(1); // Enable text selection
@@ -66,10 +69,12 @@
                 event(window, 'resize', resize);
                 event(scroller, 'sizeChange', resize); // Custon event for alternate baron update mechanism
 
-                event(bar, 'mousewheel', bubbleWheel);
-                // if (track && track != scroller) {
-                //     event(track, 'mousewheel', bubbleWheel);
-                // }
+                if (bar) {
+                    event(bar, 'mousewheel', bubbleWheel);
+                    // if (track && track != scroller) {
+                    //     event(track, 'mousewheel', bubbleWheel);
+                    // }
+                }
 
                 // Reinit when resize
                 function resize() {

@@ -11,7 +11,9 @@
                             // Variable header heights
                             pos = {};
                             pos[dir.size] = headers[i][dir.offset];
-                            dom(headers[i].parentNode).css(pos);
+                            if (headers[i].parentNode !== scroller) {
+                                dom(headers[i].parentNode).css(pos);
+                            }
                             pos = {};
                             pos[dir.crossSize] = headers[i].parentNode[dir.crossClient];
                             dom(headers[i]).css(pos);

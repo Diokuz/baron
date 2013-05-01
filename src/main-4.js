@@ -7,15 +7,17 @@
                         hTop,
                         fixState;
 
-                    newBarSize = (track[dir.client] - barTopLimit) * scroller[dir.client] / scroller[dir.scrollSize];
+                    if (bar) {
+                        newBarSize = (track[dir.client] - barTopLimit) * scroller[dir.client] / scroller[dir.scrollSize];
 
-                    // Positioning bar
-                    if (oldBarSize != newBarSize) {
-                        setBarSize(newBarSize);
-                        oldBarSize = newBarSize;
+                        // Positioning bar
+                        if (oldBarSize != newBarSize) {
+                            setBarSize(newBarSize);
+                            oldBarSize = newBarSize;
+                        }
+                        
+                        scrollerPos = -(scroller['page' + dir.x + 'Offset'] || scroller[dir.scroll]);
+                        barPos = relToPos(- scrollerPos / (scroller[dir.scrollSize] - scroller[dir.client]));
+
+                        posBar(barPos);
                     }
-                    
-                    scrollerPos = -(scroller['page' + dir.x + 'Offset'] || scroller[dir.scroll]);
-                    barPos = relToPos(- scrollerPos / (scroller[dir.scrollSize] - scroller[dir.client]));
-
-                    posBar(barPos);

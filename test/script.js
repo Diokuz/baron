@@ -1,4 +1,4 @@
-window.onload = function() {
+$(document).ready(function() {
     var root;
 
     $('.wrapper_very-simple .scroller').baron();
@@ -108,7 +108,7 @@ window.onload = function() {
 
     // Horizontal scroll
     $('.test_horizontal .scroller').baron({
-        bar: '.scroller__bar',
+        hbar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
@@ -139,4 +139,4 @@ window.onload = function() {
         h: true,
         v: true
     });
-};
+});
