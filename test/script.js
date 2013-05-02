@@ -29,7 +29,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     });
 
-    // Negative viewport
+    // // Negative viewport
     $('.test_negative-viewport .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron'
