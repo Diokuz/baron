@@ -18,9 +18,11 @@ $(document).ready(function() {
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron',
-        header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
-        hBeforeFixCls: 'header__title_position_top'
+    }).headers({
+        selector: '.header__title',
+        fixCls: 'header__title_state_fixed',
+        beforeFixCls: 'header__title_position_top',
+        afterFixCls: 'header__title_position_bottom'
     });
 
     // Init without headers
@@ -108,24 +110,24 @@ $(document).ready(function() {
 
     // Horizontal scroll
     $('.test_horizontal .scroller').baron({
-        hbar: '.scroller__bar',
+        bar: '.scroller__bar',
         barOnCls: 'baron',
         header: '.header__title',
         hFixCls: 'header__title_state_fixed',
-        h: true,
-        v: false
+        direction: 'h'
     });
 
     // Bidirectional scroll
     $('.test_bidir .scroller').baron({
         bar: '.scroller__bar',
-        hbar: '.scroller__bar_h',
         barOnCls: 'baron',
-        hbarOnCls: 'baron_h',
         header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
-        h: true,
-        v: true
+        hFixCls: 'header__title_state_fixed'
+    }).baron({
+        bar: '.scroller__bar_h',
+        barOnCls: 'baron_h',
+        header: '.header__title',
+        hFixCls: 'header__title_state_fixed'
     });
 
     // Textarea scroll
