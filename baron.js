@@ -38,41 +38,93 @@ var
             client: 'clientWidth', crossClient: 'clientHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
-    },
+    };
 
     baron = function(params) { // this - window or jQuery instance
-        var jQueryMode = (this && this[0] && this[0].nodeType);
+        
 
-        params = params || {};
-        params.direction = params.direction || 'v';
+        // params = params || {};
+        // params.direction = params.direction || 'v';
 
-        // Getting scroller html element
-        params.$ = params.$ || window.$;
-        if (jQueryMode) { // this === scroller
-            params.scroller = this[0];
-        } else {
-            params.scroller = (params.selector || params.$)(params.scroller)[0];
+        // // Getting scroller html element
+        // params.$ = params.$ || window.$;
+        // if (jQueryMode) { // this === scroller
+        //     params.scroller = this[0];
+        // } else {
+        //     params.scroller = (params.selector || params.$)(params.scroller)[0];
+        // }
+
+        // if (params.scroller.getAttribute('data-baron-' + params.direction)) return;
+
+        // var event = params.event || function(elem, event, func, mode) {
+        //     params.$(elem)[mode || 'on'](event, func);
+        // };
+
+        // var out = new baron.prototype.init(params); // __proto__ of returning object is baron.prototype
+
+        // event(params.scroller, 'scroll', function(e) {
+        //     out.scroll(e);
+        // });
+
+        // params.scroller.setAttribute('data-baron-' + params.direction, 'inited');
+        // out.update();
+
+        // return out;
+
+        return init.call(this, params);
+    };
+
+    function validate(input) {
+        var output = {},
+            jQueryMode = (this && this[0] && this[0].nodeType);
+
+        for (var key in input) {
+            if (input.hasOwnProperty(key)) {
+                output[key] = input[key];
+            }
         }
+
+        output.direction = output.direction || 'v';
+        output.$ = input.$ || window.$;
+
+        if (jQueryMode) { // this === scroller
+            output.scroller = this[0];
+        } else {
+            output.scroller = (params.selector || params.$)(params.scroller)[0];
+        }
+
+        output.event = output.event || function(elem, event, func, mode) {
+            output.$(elem)[mode || 'on'](event, func);
+        };
+
+        return output;
+    };
+
+    function init(input) {
+        var params = validate.call(this, input);
 
         if (params.scroller.getAttribute('data-baron-' + params.direction)) return;
 
-        var event = params.event || function(elem, event, func, mode) {
-            params.$(elem)[mode || 'on'](event, func);
-        };
-
         var out = new baron.prototype.init(params); // __proto__ of returning object is baron.prototype
 
-        (function(baron, scroller) {
-            event(scroller, 'scroll', function(e) {
-                baron.scroll(e);
-            });
-        })(out, params.scroller);
+        event(params.scroller, 'scroll', function(e) {
+            out.scroll(e);
+        });
 
-        params.scroller.setAttribute('data-baron-' + params.direction, 'inited');
+        params.scroller.setAttribute('data-baron-' + output.direction, 'inited');
+
         out.update();
 
         return out;
     };
+
+    function fire(eventName) {
+        if (this.events && this.events[eventName]) {
+            for (var i = 0 ; i < this.events[eventName].length ; i++) {
+                this.events[eventName][i].apply(this, Array.prototype.slice.call( arguments, 1 ));
+            }
+        }
+    }
 
     baron.prototype = {
         init: function(params) {
@@ -81,6 +133,7 @@ var
             this.event = params.event || function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);
             };
+            this.events = {};
 
             function getNode(sel, context) {
                 if (sel) {
@@ -173,10 +226,13 @@ var
             this.resize = function(force) {
                 this.dom(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient] + 'px');
 
-                for (var i = 0 ; i < this.plugins.length ; i++) {
-                    if (this.plugins[i].onResize)
-                        this.plugins[i].onResize.apply(this, arguments);
-                }
+                // for (var i = 0 ; i < this.plugins.length ; i++) {
+                //     if (this.plugins[i].onResize)
+                //         this.plugins[i].onResize.apply(this, arguments);
+                // }
+
+                Array.prototype.unshift.call( arguments, 'resize' );
+                fire.apply(this, arguments);
             }
 
             // Total positions data update, container size dependences included
@@ -200,13 +256,15 @@ var
                     this.posBar(barPos);
                 }
 
-                for (var i = 0 ; i < this.plugins.length ; i++) {
-                    if (this.plugins[i].onScroll)
-                        this.plugins[i].onScroll.apply(this, arguments);
-                }
-            }
+                // for (var i = 0 ; i < this.plugins.length ; i++) {
+                //     if (this.plugins[i].onScroll)
+                //         this.plugins[i].onScroll.apply(this, arguments);
+                // }
 
-            this.plugins = []; // Array of plugin functions
+                //fire.apply(this, 'onScroll', arguments);
+                Array.prototype.unshift.call( arguments, 'scroll' )
+                fire.apply(this, arguments);
+            }
 
             return this;
         },
@@ -224,6 +282,18 @@ var
             this.scroll();
 
             return this;
+        },
+
+        on: function(eventName, func, arg) {
+            if (eventName == 'init') {
+                func.call(this, arg);
+            } else {
+                this.events[eventName] = this.events[eventName] || [];
+
+                this.events[eventName].push(function() {
+                    func.call(this, arg);
+                });
+            }
         }
     };
 
@@ -247,26 +317,26 @@ var
     }
 })(window);
 
-baron.prototype.headers = function(params) {
-    var elements, fixCls, beforeFixCls, afterFixCls, elementSelector, fixRadius, viewPortSize, viewMinSize,
-        topHeights = [],
-        headerTops = [];
+(function(window, undefined) {
+    var fix = function(params) {
+        var elements, fixCls, beforeFixCls, afterFixCls, elementSelector, fixRadius, viewPortSize, viewMinSize,
+            topHeights = [],
+            headerTops = [];
 
-    function fix(i, pos) {
-        if (viewPortSize < (viewMinSize || 0)) { // No headers fixing when no enought space for viewport
-            pos = undefined;
+        function fixElement(i, pos) {
+            if (viewPortSize < (viewMinSize || 0)) { // No headers fixing when no enought space for viewport
+                pos = undefined;
+            }
+
+            if (pos !== undefined) {
+                pos += 'px';
+                this.dom(elements[i]).css(this.origin.pos, pos).addClass(fixCls);
+            } else {
+                this.dom(elements[i]).css(this.origin.pos, '').removeClass(fixCls);
+            }
         }
 
-        if (pos !== undefined) {
-            pos += 'px';
-            this.dom(elements[i]).css(this.origin.pos, pos).addClass(fixCls);
-        } else {
-            this.dom(elements[i]).css(this.origin.pos, '').removeClass(fixCls);
-        }
-    }
-
-    var plugin = {
-        init: function(params) {
+        function init(params) {
             var fixFlag = [],
                 pos;
 
@@ -278,7 +348,7 @@ baron.prototype.headers = function(params) {
                 fixRadius = params.fixRadius || 0;
             }
 
-            elements = this.elements = this.selector(elementSelector, this.root);
+            elements = this.selector(elementSelector, this.root);
 
             if (elements) {
                 viewPortSize = this.scroller[this.origin.client];
@@ -321,9 +391,11 @@ baron.prototype.headers = function(params) {
                     }
                 }
             }
-        },
+        }
 
-        onScroll: function() {
+        this.on('init', init, params);
+
+        this.on('scroll', function() {
             var fixState, hTop,
                 fixFlag = [];
 
@@ -345,7 +417,7 @@ baron.prototype.headers = function(params) {
                         hTop = undefined;
                     }
                     if (fixState != fixFlag[i]) {
-                        fix.call(this, i, hTop);
+                        fixElement.call(this, i, hTop);
                         fixFlag[i] = fixState;
                         change = true;
                     }
@@ -365,16 +437,15 @@ baron.prototype.headers = function(params) {
                     }
                 }
             }
-        },
+        });
 
-        onResize: function() {
-            plugin.init.call(this);
-        }
+        this.on('resize', function() {
+            init.call(this);
+            console.log('fix resize');
+        });
     };
 
-    this.plugins.push(plugin);
-
-    plugin.init.apply(this, arguments);
+    baron.prototype.fix = fix;
 
     return this;
-}
+})(window);

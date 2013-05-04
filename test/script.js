@@ -18,7 +18,7 @@ $(document).ready(function() {
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron',
-    }).headers({
+    }).fix({
         selector: '.header__title',
         fixCls: 'header__title_state_fixed',
         beforeFixCls: 'header__title_position_top',
@@ -54,9 +54,10 @@ $(document).ready(function() {
     anotherBaron({
         scroller: '.test_flex-headers .scroller',
         bar: '.scroller__bar',
-        barOnCls: 'baron',
-        header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
+        barOnCls: 'baron'
+    }).fix({
+        selector: '.header__title',
+        fixCls: 'header__title_state_fixed',
         viewMinSize: 100
     });
 
