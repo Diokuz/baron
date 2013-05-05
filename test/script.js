@@ -4,22 +4,23 @@ $(document).ready(function() {
     $('.wrapper_very-simple .scroller').baron();
 
     // Simple initialization with minimum parameters, but with headers
-    for (var i = 0 ; i < 100 ; i++) {
+    //for (var i = 0 ; i < 100 ; i++) {
         $('.wrapper_simple .scroller').baron({
-            barOnCls: 'baron',
-            header: '.header__title',
-            hFixCls: 'header__title_state_fixed',
-            fixRadius: 30,
-            trackSmartLim: true
+            barOnCls: 'baron'
+        }).fix({
+            elements: '.header__title',
+            fixCls: 'header__title_state_fixed'
+            // fixRadius: 30,
+            // trackSmartLim: true
         });
-    }
+    //}
 
     // Array initialization + barTopLimit + only before fix class
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
         barOnCls: 'baron',
     }).fix({
-        selector: '.header__title',
+        elements: '.header__title',
         fixCls: 'header__title_state_fixed',
         beforeFixCls: 'header__title_position_top',
         afterFixCls: 'header__title_position_bottom'
@@ -134,12 +135,11 @@ $(document).ready(function() {
     // Textarea scroll
     $('.test_textarea .scroller').baron({
         bar: $('.test_textarea .scroller__bar'),
-        hbar: $('.test_textarea .scroller__bar_h'),
         barOnCls: 'baron',
-        hbarOnCls: 'baron_h',
         header: '.header__title',
-        hFixCls: 'header__title_state_fixed',
-        h: true,
-        v: true
+        hFixCls: 'header__title_state_fixed'
+    }).baron({
+        bar: $('.test_textarea .scroller__bar_h'),
+        barOnCls: 'baron_h'
     });
 });
