@@ -42,7 +42,8 @@ $(document).ready(function() {
     baron({
         scroller: '.test_flex .scroller',
         bar: '.scroller__bar',
-        barOnCls: 'baron'
+        barOnCls: 'baron',
+        track: '.scroller__bar-wrapper'
     });
 
     // Not enought input params
