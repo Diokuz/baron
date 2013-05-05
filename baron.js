@@ -1,23 +1,3 @@
-/* https://github.com/Diokuz/baron */
-/*
-1. Расширение барона плагинами - все основные переменные и методы засовываются в прототип
-2. Плагины должны уметь получать доступ к объекту барон
-3. За 1 раз инициализируется 1 направление скролла (?)
-4. Отказ от скролл-групп (нах они были нужны?)
-
-Что возвращать?
-
-jQuery:
-
-- Сохраняется общепринятый принцип плагинов
-- Не ломается чейнинг
-- Плагины барона становятся плагинами jQuery, что более универсально
-
-Baron
-
-- Не надо обрабатывать случай когда нет jQuery
-- Есть прямой доступ к барон-объекту, что нужно для обновления состояния
-*/
 (function(window, undefined) {
     'use strict';
 
@@ -40,14 +20,24 @@ var
         }
     },
 
-    baron = function(params) { // this - window or jQuery instance
-        var jQueryMode = (this && this[0] && this[0].nodeType),
-            $,
-            scrollers;
+    each = function(obj, iterator) {
+        var i = 0;
 
-        $ = window.jQuery || function(selector, context) {
-            return params.dom(params.selector(selector, context));
-        };
+        if (!obj.length) obj = [obj];
+
+        while (obj[i]) {
+            iterator.call(this, obj[i], i);
+            i++;
+        }
+    },
+
+    baron = function(params) { // this - window or jQuery instance
+        var jQueryMode = (this && this[0] && this[0].nodeType && window.jQuery),
+            scrollers,
+            $;
+
+        params = params || {};
+        $ = params.$ || window.jQuery;
 
         if (jQueryMode) {
             scrollers = this;
@@ -60,34 +50,28 @@ var
 
     baron.prototype = {
         constructor: function(scrollers, input, $) {
-            var params = validate(input),
-                i = 0;
+            var params = validate(input);
 
             params.$ = $;
-            while (scrollers[i]) {
-                params.scroller = scrollers[i];
+            each.call(this, scrollers, function(scroller, i) {
+                params.scroller = scroller;
                 this[i] = init(params);
-                i++;
-            }
+                this.length = i + 1;
+            });
 
             this.params = params;
         },
 
         update: function() {
-            var i = 0;
-
-            while (this[i]) this[i++].update();
+            each(this, this.update);
         },
 
         baron: function(params) {
-            var i = 0;
-
             params.scroller = [];
-            while (this[i]) {
-                params.scroller.push(this[i].scroller);
-                i++;
-            }
-            //params.scroller = this;
+            window.dima = this;
+            each.call(this, window.dima, function(elem) {
+                params.scroller.push(elem.scroller);
+            });
             params.direction = (this.params.direction == 'v') ? 'h' : 'v';
 
             return baron(params);
@@ -157,10 +141,15 @@ var
         }
 
         output.direction = output.direction || 'v';
-        output.$ = input.$ || window.$;
 
-        output.event = output.event || function(elem, event, func, mode) {
+        var event = output.event || function(elem, event, func, mode) {
             output.$(elem)[mode || 'on'](event, func);
+        };
+
+        output.event = function(elems, e, func, mode) {
+            each(elems, function(elem) {
+                event(elem, e, func, mode);
+            })
         };
 
         return output;
@@ -178,19 +167,17 @@ var
 
     item.prototype = {
         constructor: function(params) {
-            var selector = this.selector = params.selector || params.$,
+            var $ = this.$ = params.$,
                 barPos,
                 scrollerPos0;
 
-            this.dom = params.dom || params.$;
-            this.event = params.event || function(elem, event, func, mode) {
-                params.$(elem)[mode || 'on'](event, func);
-            };
+            this.$ = params.$;
+            this.event = params.event;
             this.events = {};
 
             function getNode(sel, context) {
                 if (sel) {
-                    return selector(sel, context)[0] || selector(sel, context);
+                    return $(sel, context)[0] || $(sel, context);
                 }
             }
 
@@ -214,9 +201,9 @@ var
             this.barOn = function() {
                 if (this.barOnCls) {
                     if (this.scroller[this.origin.client] < this.scroller[this.origin.scrollSize]) {
-                        this.dom(this.scroller).addClass(this.barOnCls);
+                        this.$(this.scroller).addClass(this.barOnCls);
                     } else {
-                        this.dom(this.scroller).removeClass(this.barOnCls);
+                        this.$(this.scroller).removeClass(this.barOnCls);
                     }
                 }
             };
@@ -238,14 +225,14 @@ var
                 }
 
                 if (this.bar) {
-                    this.dom(this.bar).css(this.origin.size, parseInt(size) + 'px');
+                    this.$(this.bar).css(this.origin.size, parseInt(size) + 'px');
                 }
             };
 
             // Updating top or left bar position
             function posBar(pos) {
                 if (this.bar) {
-                    this.dom(this.bar).css(this.origin.pos, +pos + 'px');
+                    this.$(this.bar).css(this.origin.pos, +pos + 'px');
                 }
             }
 
@@ -285,7 +272,7 @@ var
 
             // Viewport (re)calculation
             this.resize = function(force) {
-                this.dom(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient] + 'px');
+                this.$(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient] + 'px');
 
                 Array.prototype.unshift.call( arguments, 'resize' );
                 fire.apply(this, arguments);
@@ -367,20 +354,20 @@ var
 
 (function(window, undefined) {
     var fix = function(params) {
-        var elements, fixCls, beforeFixCls, afterFixCls, elementSelector, fixRadius, viewPortSize, viewMinSize,
+        var elements, fixCls, beforeFixCls, afterFixCls, elementSelector, fixRadius, viewPortSize, minView,
             topHeights = [],
             headerTops = [];
 
         function fixElement(i, pos) {
-            if (viewPortSize < (viewMinSize || 0)) { // No headers fixing when no enought space for viewport
+            if (viewPortSize < (minView || 0)) { // No headers fixing when no enought space for viewport
                 pos = undefined;
             }
 
             if (pos !== undefined) {
                 pos += 'px';
-                this.dom(elements[i]).css(this.origin.pos, pos).addClass(fixCls);
+                this.$(elements[i]).css(this.origin.pos, pos).addClass(fixCls);
             } else {
-                this.dom(elements[i]).css(this.origin.pos, '').removeClass(fixCls);
+                this.$(elements[i]).css(this.origin.pos, '').removeClass(fixCls);
             }
         }
 
@@ -394,9 +381,10 @@ var
                 beforeFixCls = params.beforeFixCls;
                 afterFixCls = params.afterFixCls;
                 fixRadius = params.fixRadius || 0;
+                minView = params.minView || 0;
             }
 
-            elements = this.selector(elementSelector, this.scroller);
+            elements = this.$(elementSelector, this.scroller);
 
             if (elements) {
                 viewPortSize = this.scroller[this.origin.client];
@@ -412,11 +400,11 @@ var
                     pos = {};
                     pos[this.origin.size] = elements[i][this.origin.offset];
                     if (elements[i].parentNode !== this.scroller) {
-                        this.dom(elements[i].parentNode).css(pos);
+                        this.$(elements[i].parentNode).css(pos);
                     }
                     pos = {};
                     pos[this.origin.crossSize] = elements[i].parentNode[this.origin.crossClient];
-                    this.dom(elements[i]).css(pos);
+                    this.$(elements[i]).css(pos);
 
                     // Between fixed headers
                     viewPortSize -= elements[i][this.origin.offset];
@@ -433,7 +421,7 @@ var
                     if (this.track != this.scroller) {
                         pos = {};
                         pos[this.origin.pos] = elements[0].parentNode[this.origin.offset];
-                        this.dom(this.track).css(pos);
+                        this.$(this.track).css(pos);
                     } else {
                         this.barTopLimit = elements[0].parentNode[this.origin.offset];
                     }
@@ -475,11 +463,11 @@ var
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && beforeFixCls) {
-                            this.dom(elements[i]).addClass(beforeFixCls).removeClass(afterFixCls + ''); // Last top fixed header
+                            this.$(elements[i]).addClass(beforeFixCls).removeClass(afterFixCls + ''); // Last top fixed header
                         } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && afterFixCls) {
-                            this.dom(elements[i]).addClass(afterFixCls).removeClass(beforeFixCls + ''); // First bottom fixed header
+                            this.$(elements[i]).addClass(afterFixCls).removeClass(beforeFixCls + ''); // First bottom fixed header
                         } else {
-                            this.dom(elements[i]).removeClass(beforeFixCls + '').removeClass(afterFixCls + '');
+                            this.$(elements[i]).removeClass(beforeFixCls + '').removeClass(afterFixCls + '');
                             // Emply string for bonzo, which does not handles removeClass(undefined)
                         }
                     }
@@ -489,7 +477,6 @@ var
 
         this.on('resize', function() {
             init.call(this);
-            console.log('fix resize');
         });
     };
 
