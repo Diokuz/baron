@@ -7,11 +7,15 @@ module.exports = function(grunt) {
         //separator: ';'
       },
       def: {
-        src: [
-          'src/core.js',
-          'src/fix.js'
-        ],
-        dest: '<%= pkg.name %>.js'
+        // src: [
+        //   'src/core.js',
+        //   'src/fix.js'
+        // ],
+        files: {
+          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
+          '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
+        }
+        // dest: 'dist/<%= pkg.name %>.js'
       },
       core: {
         src: [
@@ -22,7 +26,8 @@ module.exports = function(grunt) {
       full: {
         src: [
           'src/core.js',
-          'src/fix.js'
+          'src/fix.js',
+          'src/test.js'
         ],
         dest: 'dist/<%= pkg.name %>.js'
       }
@@ -33,6 +38,7 @@ module.exports = function(grunt) {
       },
       def: {
         files: {
+          'dist/<%= pkg.name %>.min.js': ['<%= concat.def.dest %>'],
           '<%= pkg.name %>.min.js': ['<%= concat.def.dest %>']
         }
       },

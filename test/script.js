@@ -1,19 +1,19 @@
 $(document).ready(function() {
     var root;
 
-    $('.wrapper_very-simple .scroller').baron();
+    $('.wrapper_very-simple .scroller').baron().test();
 
     // Simple initialization with minimum parameters, but with headers
-    //for (var i = 0 ; i < 100 ; i++) {
+    for (var i = 0 ; i < 100 ; i++) {
         $('.wrapper_simple .scroller').baron({
             barOnCls: 'baron'
         }).fix({
             elements: '.header__title',
-            fixCls: 'header__title_state_fixed'
-            // fixRadius: 30,
-            // trackSmartLim: true
+            fixCls: 'header__title_state_fixed',
+            fixRadius: 30,
+            trackSmartLim: true
         });
-    //}
+    }
 
     // Array initialization + barTopLimit + only before fix class
     $('.test_arr .scroller').baron({
@@ -24,7 +24,7 @@ $(document).ready(function() {
         fixCls: 'header__title_state_fixed',
         beforeFixCls: 'header__title_position_top',
         afterFixCls: 'header__title_position_bottom'
-    });
+    }).test();
 
     // Init without headers
     $('.test_wo-headers .scroller').baron({
