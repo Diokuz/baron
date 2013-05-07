@@ -7,15 +7,15 @@ module.exports = function(grunt) {
         //separator: ';'
       },
       def: {
-        // src: [
-        //   'src/core.js',
-        //   'src/fix.js'
-        // ],
-        files: {
-          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
-          '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
-        }
-        // dest: 'dist/<%= pkg.name %>.js'
+        src: [
+          'src/core.js',
+          'src/fix.js'
+        ],
+        // files: {
+        //   'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
+        //   '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ]
+        // },
+        dest: '<%= pkg.name %>.js'
       },
       core: {
         src: [
@@ -44,12 +44,14 @@ module.exports = function(grunt) {
       },
       core: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.core.dest %>']
+          'dist/<%= pkg.name %>.min.js': ['<%= concat.core.dest %>'],
+          '<%= pkg.name %>.min.js': ['<%= concat.core.dest %>']
         }
       },
       full: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.full.dest %>']
+          'dist/<%= pkg.name %>.min.js': ['<%= concat.full.dest %>'],
+          '<%= pkg.name %>.min.js': ['<%= concat.full.dest %>']
         }
       }
     }

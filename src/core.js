@@ -63,7 +63,9 @@ var
         },
 
         update: function() {
-            each(this, this.update);
+            //each.call(this, this, this.update);
+            var i = 0;
+            while (this[i]) this[i++].update();
         },
 
         baron: function(params) {
@@ -166,12 +168,12 @@ var
 
     item.prototype = {
         constructor: function(params) {
-            var $ = this.$ = params.$,
+            var $,
                 barPos,
                 scrollerPos0,
                 track;
 
-            this.$ = params.$;
+            $ = this.$ = params.$;
             this.event = params.event;
             this.events = {};
 
@@ -206,14 +208,14 @@ var
                 }
 
                 if (this.bar) {
-                    this.$(this.bar).css(this.origin.size, parseInt(size) + 'px');
+                    $(this.bar).css(this.origin.size, parseInt(size) + 'px');
                 }
             };
 
             // Updating top or left bar position
             function posBar(pos) {
                 if (this.bar) {
-                    this.$(this.bar).css(this.origin.pos, +pos + 'px');
+                    $(this.bar).css(this.origin.pos, +pos + 'px');
                 }
             }
 
@@ -246,9 +248,9 @@ var
             this.barOn = function() {
                 if (this.barOnCls) {
                     if (this.scroller[this.origin.client] < this.scroller[this.origin.scrollSize]) {
-                        this.$(this.scroller).addClass(this.barOnCls);
+                        $(this.scroller).addClass(this.barOnCls);
                     } else {
-                        this.$(this.scroller).removeClass(this.barOnCls);
+                        $(this.scroller).removeClass(this.barOnCls);
                     }
                 }
             };
@@ -268,8 +270,13 @@ var
 
             // Viewport (re)calculation
             this.resize = function(force) {
-                this.$(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient] + 'px');
+                var delta = this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient];
 
+                if (params.freeze && !this.clipper.style[this.origin.crossSize]) { // Sould fire only once
+                    $(this.clipper).css(this.origin.crossSize, this.clipper[this.origin.crossClient] - delta + 'px');
+                }
+                $(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + delta + 'px');
+                
                 Array.prototype.unshift.call( arguments, 'resize' );
                 fire.apply(this, arguments);
             }
@@ -295,7 +302,7 @@ var
                     posBar.call(this, barPos);
                 }
 
-                Array.prototype.unshift.call( arguments, 'scroll' )
+                Array.prototype.unshift.call( arguments, 'scroll' );
                 fire.apply(this, arguments);
             }
 

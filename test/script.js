@@ -1,7 +1,9 @@
 $(document).ready(function() {
     var root;
 
-    $('.wrapper_very-simple .scroller').baron().test();
+    var b = $('.wrapper_very-simple .scroller').baron();
+
+    b.update();
 
     // Simple initialization with minimum parameters, but with headers
     for (var i = 0 ; i < 100 ; i++) {
@@ -9,7 +11,7 @@ $(document).ready(function() {
             barOnCls: 'baron'
         }).fix({
             elements: '.header__title',
-            fixCls: 'header__title_state_fixed',
+            fix: 'header__title_state_fixed',
             fixRadius: 30,
             trackSmartLim: true
         });
@@ -21,10 +23,10 @@ $(document).ready(function() {
         barOnCls: 'baron',
     }).fix({
         elements: '.header__title',
-        fixCls: 'header__title_state_fixed',
-        beforeFixCls: 'header__title_position_top',
-        afterFixCls: 'header__title_position_bottom'
-    }).test();
+        fix: 'header__title_state_fixed',
+        before: 'header__title_position_top',
+        after: 'header__title_position_bottom'
+    });
 
     // Init without headers
     $('.test_wo-headers .scroller').baron({
@@ -59,7 +61,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fixCls: 'header__title_state_fixed',
+        fix: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -83,7 +85,7 @@ $(document).ready(function() {
             }
         }).fix({
             elements: '.header__title',
-            fixCls: 'header__title_state_fixed',
+            fix: 'header__title_state_fixed',
         });
     }
 
@@ -94,7 +96,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fixCls: 'header__title_state_fixed',
+        fix: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -105,7 +107,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fixCls: 'header__title_state_fixed',
+        fix: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -116,7 +118,10 @@ $(document).ready(function() {
         direction: 'h'
     }).fix({
         elements: '.header__title',
-        fixCls: 'header__title_state_fixed',
+        fix: 'header__title_state_fixed',
+        before: 'before',
+        after: 'after',
+        trackSmartLim: true
     });
 
     // Bidirectional scroll

@@ -135,14 +135,23 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     height: 100%;
     width: auto;
     overflow-x: scroll;
+    white-space: nowrap;
 }
 .test_horizontal .container {
+    display: inline-block;
     height: 100%;
-    width: 900px;
 }
 .test_horizontal .header {
     height: 100%;
-    float: left;
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+}
+.test_horizontal .text {
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+    width: 800px;
 }
 .test_horizontal .header__title {
     width: 20px;
