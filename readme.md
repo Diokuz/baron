@@ -157,7 +157,7 @@ All parameters are optional (except scroller, if you not using baron as jQuery p
 scroll.update(); // Update scroller
 ```
 
-Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. Fir example, you couldnt do this:
+Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. For example, you couldnt do this:
 
 ```js
 $('.scroller').baron().css().animate();
