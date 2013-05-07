@@ -1,3 +1,29 @@
+## 0.6.0
+
+core:
+- Plugin system added (alpha version)
+- fixable headers moved to 'fix' plugin
+- 'grunt full' now includes test plugin to build
+- 'u' method renamed to 'update'
+- 0.2s delay for update on resize event removed
+
+params change
+- 'bar' default value now 'undefined' (!)
+- 'test' plugin added
+- '$' param added, default value: window.jQuery
+- 'dom' and 'selector' params removed
+- 'direction' ['v', ['h']] param added, default value: 'v'.
+- 'freeze' param added: size of scroller parent freezes at initialization, if true
+- all params for fixable headers moved to 'fix' plugin
+
+fix plugin:
+- 'header' param renamed to 'elements'
+- 'hFixCls' param renamed to 'outside'
+- 'hBeforeFixCls' param renamed to 'before'
+- 'hAfterFixCls' param renamed to 'after'
+- 'fixRadius' param renamed to 'radius'
+- 'trackSmartLim' param renamed to 'limiter'
+
 ## 0.5.0
 
 - Horizontal scroll support

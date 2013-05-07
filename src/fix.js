@@ -1,7 +1,7 @@
 /* Fixable headers plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
-        var elements, fix, before, after, elementSelector, fixRadius, viewPortSize, minView, trackSmartLim,
+        var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
             scroller = this.scroller;
@@ -13,9 +13,9 @@
 
             if (pos !== undefined) {
                 pos += 'px';
-                this.$(elements[i]).css(this.origin.pos, pos).addClass(fix);
+                this.$(elements[i]).css(this.origin.pos, pos).addClass(outside);
             } else {
-                this.$(elements[i]).css(this.origin.pos, '').removeClass(fix);
+                this.$(elements[i]).css(this.origin.pos, '').removeClass(outside);
             }
         }
 
@@ -35,12 +35,12 @@
 
             if (params) {
                 elementSelector = params.elements;
-                fix = params.fix;
+                outside = params.outside;
                 before = params.before;
                 after = params.after;
-                fixRadius = params.fixRadius || 0;
+                radius = params.radius || 0;
                 minView = params.minView || 0;
-                trackSmartLim = params.trackSmartLim;
+                limiter = params.limiter;
             }
 
             elements = this.$(elementSelector, this.scroller);
@@ -76,7 +76,7 @@
                     }
                 }
 
-                if (trackSmartLim) { // Bottom edge of first header as top limit for track
+                if (limiter) { // Bottom edge of first header as top limit for track
                     if (this.track && this.track != this.scroller) {
                         pos = {};
                         pos[this.origin.pos] = elements[0].parentNode[this.origin.offset];
@@ -100,11 +100,11 @@
                 var change;
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] + this.pos < topHeights[i] + fixRadius) {
+                    if (headerTops[i] + this.pos < topHeights[i] + radius) {
                         // Header trying to go up
                         fixState = 1;
                         hTop = topHeights[i];
-                    } else if (headerTops[i] + this.pos > topHeights[i] + viewPortSize - fixRadius) {
+                    } else if (headerTops[i] + this.pos > topHeights[i] + viewPortSize - radius) {
                         // Header trying to go down
                         fixState = 2;
                         hTop = topHeights[i] + viewPortSize;

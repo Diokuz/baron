@@ -12,15 +12,15 @@ $(document).ready(function() {
         }).fix({
             elements: '.header__title',
             fix: 'header__title_state_fixed',
-            fixRadius: 30,
-            trackSmartLim: true
+            radius: 30,
+            limiter: true
         });
     }
 
     // Array initialization + barTopLimit + only before fix class
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
-        barOnCls: 'baron',
+        barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
         fix: 'header__title_state_fixed',
@@ -85,7 +85,7 @@ $(document).ready(function() {
             }
         }).fix({
             elements: '.header__title',
-            fix: 'header__title_state_fixed',
+            fix: 'header__title_state_fixed'
         });
     }
 
@@ -121,7 +121,7 @@ $(document).ready(function() {
         fix: 'header__title_state_fixed',
         before: 'before',
         after: 'after',
-        trackSmartLim: true
+        limiter: true
     });
 
     // Bidirectional scroll

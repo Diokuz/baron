@@ -3,19 +3,11 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
-      options: {
-        //separator: ';'
-      },
       def: {
-        src: [
-          'src/core.js',
-          'src/fix.js'
-        ],
-        // files: {
-        //   'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
-        //   '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ]
-        // },
-        dest: '<%= pkg.name %>.js'
+        files: {
+          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
+          '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ]
+        }
       },
       core: {
         src: [
@@ -24,12 +16,16 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.js'
       },
       full: {
-        src: [
-          'src/core.js',
-          'src/fix.js',
-          'src/test.js'
-        ],
-        dest: 'dist/<%= pkg.name %>.js'
+        // src: [
+        //   'src/core.js',
+        //   'src/fix.js',
+        //   'src/test.js'
+        // ],
+        // dest: 'dist/<%= pkg.name %>.js'
+        files: {
+          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js', 'src/test.js' ],
+          'demo/<%= pkg.name %>.full.js': [ 'src/core.js', 'src/fix.js', 'src/test.js' ]
+        }
       }
     },
     uglify: {
@@ -38,8 +34,8 @@ module.exports = function(grunt) {
       },
       def: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.def.dest %>'],
-          '<%= pkg.name %>.min.js': ['<%= concat.def.dest %>']
+          'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
+          '<%= pkg.name %>.min.js': ['<%= pkg.name %>.js']
         }
       },
       core: {
@@ -50,8 +46,8 @@ module.exports = function(grunt) {
       },
       full: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.full.dest %>'],
-          '<%= pkg.name %>.min.js': ['<%= concat.full.dest %>']
+          'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
+          '<%= pkg.name %>.min.js': ['<%= pkg.name %>.js']
         }
       }
     }
