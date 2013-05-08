@@ -135,6 +135,7 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     height: 100%;
     width: auto;
     overflow-x: scroll;
+    overflow-y: hidden;
     white-space: nowrap;
 }
 .test_horizontal .container {

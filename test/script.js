@@ -12,8 +12,7 @@ $(document).ready(function() {
         }).fix({
             elements: '.header__title',
             fix: 'header__title_state_fixed',
-            radius: 30,
-            limiter: true
+            radius: 30
         });
     }
 
@@ -25,7 +24,8 @@ $(document).ready(function() {
         elements: '.header__title',
         fix: 'header__title_state_fixed',
         before: 'header__title_position_top',
-        after: 'header__title_position_bottom'
+        after: 'header__title_position_bottom',
+        limiter: true
     });
 
     // Init without headers

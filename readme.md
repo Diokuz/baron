@@ -134,7 +134,7 @@ params = {
     // Local copy of jQuery-like utility
     // Default: window.jQuery
     $: function(selector, context) {
-        return bonzo(query(selector, context));
+        return bonzo(qwery(selector, context));
     },
 
     // Event manager
@@ -181,7 +181,7 @@ Every baron plugin sould return baron object (this);
 
 ##Update baron
 
-When container size changed (for example: you load additional data to container by ajax), you should call u() method:
+When container size changed (for example: you load additional data to container by ajax), you should call update() method:
 
 ```js
 scroll.update();
@@ -224,7 +224,7 @@ var graf = baron.noConflict();
 
 ## Custom build (Grunt)
 
-If you want exclude fixa plugin functionality, type
+If you want exclude fix plugin functionality, type
 ```js
 grunt core
 ```
@@ -269,9 +269,9 @@ baron(baronParams).fix(params);
 
 where:
 ```js
-params = {}
+params = {
     // CSS selector for fixable elements
-    // Must have parentNode with same height (see demo for details). Also see trackSmartLim parameter.
+    // Must have parentNode with same height (see demo for details). Also see 'limiter' parameter.
     elements: '.header__title',
 
     // CSS class for elements which now are outside of viewport
