@@ -45,10 +45,10 @@ var
             scrollers = $(params.scroller);
         }
 
-        return new baron.prototype.constructor(scrollers, params, $);
+        return new baron.fn.constructor(scrollers, params, $);
     };
 
-    baron.prototype = {
+    baron.fn = {
         constructor: function(scrollers, input, $) {
             var params = validate(input);
 
@@ -334,7 +334,7 @@ var
         }
     };
 
-    baron.prototype.constructor.prototype = baron.prototype;
+    baron.fn.constructor.prototype = baron.fn;
     item.prototype.constructor.prototype = item.prototype;
 
     // Use when you need "baron" global var for another purposes

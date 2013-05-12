@@ -76,7 +76,7 @@
         log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
     };
 
-    baron.prototype.test = function(params) {
+    baron.fn.test = function(params) {
         var i = 0;
 
         while (this[i]) {

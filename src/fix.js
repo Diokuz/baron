@@ -35,9 +35,9 @@
 
             if (params) {
                 elementSelector = params.elements;
-                outside = params.outside;
-                before = params.before;
-                after = params.after;
+                outside = params.outside + '';
+                before = params.before + '';
+                after = params.after + '';
                 radius = params.radius || 0;
                 minView = params.minView || 0;
                 limiter = params.limiter;
@@ -141,7 +141,7 @@
         });
     };
 
-    baron.prototype.fix = function(params) {
+    baron.fn.fix = function(params) {
         var i = 0;
 
         while (this[i]) {

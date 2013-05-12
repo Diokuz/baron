@@ -11,7 +11,7 @@ $(document).ready(function() {
             barOnCls: 'baron'
         }).fix({
             elements: '.header__title',
-            fix: 'header__title_state_fixed',
+            outside: 'header__title_state_fixed',
             radius: 30
         });
     }
@@ -22,7 +22,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fix: 'header__title_state_fixed',
+        outside: 'header__title_state_fixed',
         before: 'header__title_position_top',
         after: 'header__title_position_bottom',
         limiter: true
@@ -61,7 +61,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fix: 'header__title_state_fixed',
+        outside: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -85,7 +85,7 @@ $(document).ready(function() {
             }
         }).fix({
             elements: '.header__title',
-            fix: 'header__title_state_fixed'
+            outside: 'header__title_state_fixed'
         });
     }
 
@@ -96,7 +96,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fix: 'header__title_state_fixed',
+        outside: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -107,7 +107,7 @@ $(document).ready(function() {
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
-        fix: 'header__title_state_fixed',
+        outside: 'header__title_state_fixed',
         minView: 100
     });
 
@@ -118,7 +118,7 @@ $(document).ready(function() {
         direction: 'h'
     }).fix({
         elements: '.header__title',
-        fix: 'header__title_state_fixed',
+        outside: 'header__title_state_fixed',
         before: 'before',
         after: 'after',
         limiter: true

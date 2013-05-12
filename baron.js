@@ -45,10 +45,10 @@ var
             scrollers = $(params.scroller);
         }
 
-        return new baron.prototype.constructor(scrollers, params, $);
+        return new baron.fn.constructor(scrollers, params, $);
     };
 
-    baron.prototype = {
+    baron.fn = {
         constructor: function(scrollers, input, $) {
             var params = validate(input);
 
@@ -334,7 +334,7 @@ var
         }
     };
 
-    baron.prototype.constructor.prototype = baron.prototype;
+    baron.fn.constructor.prototype = baron.fn;
     item.prototype.constructor.prototype = item.prototype;
 
     // Use when you need "baron" global var for another purposes
@@ -357,7 +357,7 @@ var
 /* Fixable headers plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
-        var elements, fix, before, after, elementSelector, radius, viewPortSize, minView, limiter,
+        var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
             scroller = this.scroller;
@@ -369,9 +369,9 @@ var
 
             if (pos !== undefined) {
                 pos += 'px';
-                this.$(elements[i]).css(this.origin.pos, pos).addClass(fix);
+                this.$(elements[i]).css(this.origin.pos, pos).addClass(outside);
             } else {
-                this.$(elements[i]).css(this.origin.pos, '').removeClass(fix);
+                this.$(elements[i]).css(this.origin.pos, '').removeClass(outside);
             }
         }
 
@@ -391,9 +391,9 @@ var
 
             if (params) {
                 elementSelector = params.elements;
-                fix = params.fix;
-                before = params.before;
-                after = params.after;
+                outside = params.outside + '';
+                before = params.before + '';
+                after = params.after + '';
                 radius = params.radius || 0;
                 minView = params.minView || 0;
                 limiter = params.limiter;
@@ -497,7 +497,7 @@ var
         });
     };
 
-    baron.prototype.fix = function(params) {
+    baron.fn.fix = function(params) {
         var i = 0;
 
         while (this[i]) {
