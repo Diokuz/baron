@@ -16,9 +16,10 @@ $(document).ready(function() {
         });
     }
 
-    // Array initialization + barTopLimit + only before fix class
+    // Array initialization + limiter
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
+        track: '.scroller__track',
         barOnCls: 'baron'
     }).fix({
         elements: '.header__title',
