@@ -124,11 +124,11 @@
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && before) {
-                            this.$(elements[i]).addClass(before).removeClass(after + ''); // Last top fixed header
+                            this.$(elements[i]).addClass(before).removeClass(after); // Last top fixed header
                         } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && after) {
-                            this.$(elements[i]).addClass(after).removeClass(before + ''); // First bottom fixed header
+                            this.$(elements[i]).addClass(after).removeClass(before); // First bottom fixed header
                         } else {
-                            this.$(elements[i]).removeClass(before + '').removeClass(after + '');
+                            this.$(elements[i]).removeClass(before).removeClass(after);
                             // Emply string for bonzo, which does not handles removeClass(undefined)
                         }
                     }
