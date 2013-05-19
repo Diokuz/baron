@@ -17,9 +17,9 @@
                 errCount++;
             }
 
-            console.log('%c ' + totalCount + '. ' + text, css);
+            //console.log('%c ' + totalCount + '. ' + text, css);
             if (obj !== undefined) {
-                console.log(obj);
+                //console.log(obj);
             }
         }
 
@@ -65,9 +65,11 @@
         }
 
         // Preformance test
-        var t1 = new Date().getTime();
-        for (var i = 0 ; i < 1000 ; i++) {
-            this.scroller[this.origin.scroll] = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+        var t1 = new Date().getTime(),
+            x;
+        for (var i = 0 ; i < 1000 ; i += 10) {
+            x = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+            this.pos(x);
             this.event(this.scroller, 'scroll', undefined, 'trigger');
         }
         var t2 = new Date().getTime();

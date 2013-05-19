@@ -174,3 +174,24 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 .test_textarea .scroller__bar {
     display: block;
 }
+
+/* Controls */
+.scroller__control {
+    position: absolute;
+    z-index: 4;
+    width: 20px;
+    height: 20px;
+    background: #fc9;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.scroller__up {
+    top: 0;
+    right: 0;
+}
+.scroller__down {
+    bottom: 0;
+    right: 0;
+}

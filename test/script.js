@@ -19,14 +19,23 @@ $(document).ready(function() {
     // Array initialization + limiter
     $('.test_arr .scroller').baron({
         bar: '.scroller__bar',
-        track: '.scroller__track',
-        barOnCls: 'baron'
+        //track: '.scroller__track',
+        barOnCls: 'baron',
+        //pause: .2
     }).fix({
         elements: '.header__title',
         outside: 'header__title_state_fixed',
         before: 'header__title_position_top',
         after: 'header__title_position_bottom',
         limiter: true
+    })
+    .test()
+    .controls({
+        track: '.scroller__track-visual',
+        forward: '.scroller__up',
+        backward: '.scroller__down',
+        screen: .5,
+        delta: 60
     });
 
     // Init without headers

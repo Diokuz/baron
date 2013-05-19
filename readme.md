@@ -135,6 +135,10 @@ params = {
     // Default: false
     freeze: true,
 
+    // Minimum time delay between two event fires in seconds
+    // Default: 0
+    pause: .2,
+
     // Local copy of jQuery-like utility
     // Default: window.jQuery
     $: function(selector, context) {

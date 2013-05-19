@@ -123,7 +123,7 @@ var
         // Starting drag when mouse key (LM) goes down at bar
         params.event(document, 'touchstart mousedown', function(e) { // document, not window, for ie8
             if (e.button != 2) { // Not RM
-                out.pos0(e);
+                out._pos0(e);
             }
         });
 
@@ -195,7 +195,11 @@ var
             var $,
                 barPos,
                 scrollerPos0,
-                track;
+                track,
+                pauseTimer,
+                pause,
+                newFire,
+                lastFire = new Date().getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -210,16 +214,17 @@ var
             this.scroller = getNode(params.scroller); // (params.scroller) ? getNode(params.scroller, this.root) : this.root;
             this.bar = getNode(params.bar, this.root);
             track = this.track = getNode(params.track, this.root);
+
             if (!this.track && this.bar) {
                 track = this.bar.parentNode;
             }
-            this.clipper = this.scroller.parentNode;
 
             // Parameters
             this.direction = params.direction;
             this.origin = origin[this.direction];
             this.barOnCls = params.barOnCls;
-            this.barTopLimit = params.barTopLimit || 0;
+            this.barTopLimit = 0;
+            pause = params.pause * 1000 || 0;
 
             // Updating height or width of bar
             function setBarSize(size) {
@@ -246,24 +251,43 @@ var
                 return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
             };
 
-            // Relative container top position to bar top position
+            // Relative content top position to bar top position
             function relToPos(r) {
                 return r * k.call(this) + this.barTopLimit;
             };
 
-            // Bar position to relative container position
+            // Bar position to relative content position
             function posToRel(t) {
                 return (t - this.barTopLimit) / k.call(this);
             };
 
             // Cursor position in main direction in px // Now with iOs support
-            function getCursorPos(e) {
+            this.cursor = function(e) {
                 return e['client' + this.origin.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
             };
 
             // Text selection pos preventing
             function dontPosSelect() {
                 return false;
+            };
+
+            this.pos = function(x) { // Absolute scroller position in px
+                var ie = 'page' + this.origin.x + 'Offset',
+                    key = (this.scroller[ie]) ? ie : this.origin.scroll;
+
+                if (x !== undefined) this.scroller[key] = x;
+
+                return this.scroller[key];
+            };
+
+            this.rpos = function(r) { // Relative scroller position (0..1)
+                var free = this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client],
+                    x;
+
+                if (r) x = this.pos(r * free);
+                else x = this.pos();
+
+                return x / (free || 1);
             };
 
             // Switch on the bar by adding user-defined CSS classname to scroller
@@ -277,12 +301,12 @@ var
                 }
             };
 
-            this.pos0 = function(e) {
-                scrollerPos0 = getCursorPos.call(this, e) - barPos;
+            this._pos0 = function(e) {
+                scrollerPos0 = this.cursor(e) - barPos;
             };
 
             this.drag = function(e) {
-                this.scroller[this.origin.scroll] = posToRel.call(this, getCursorPos.call(this, e) - scrollerPos0) * (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+                this.scroller[this.origin.scroll] = posToRel.call(this, this.cursor(e) - scrollerPos0) * (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
             };
 
             // Text selection preventing on drag
@@ -290,8 +314,11 @@ var
                 this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
             };
 
-            // Viewport (re)calculation
+            // onResize & DOM modified handler
             this.resize = function(force) {
+                newFire = new Date().getTime();
+                if (newFire - lastFire < pause) return;
+
                 var delta = this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient];
 
                 if (params.freeze && !this.clipper.style[this.origin.crossSize]) { // Sould fire only once
@@ -301,14 +328,17 @@ var
                 
                 Array.prototype.unshift.call( arguments, 'resize' );
                 fire.apply(this, arguments);
+
+                lastFire = new Date().getTime();
             }
 
-            // Total positions data update, container size dependences included
+            // onScroll handler
             this.scroll = function(e) {
-                var scrollDelta,
-                    oldBarSize, newBarSize;
+                newFire = new Date().getTime();
+                if (newFire - lastFire < pause) return;
 
-                this.pos = -(this.scroller['page' + this.origin.x + 'Offset'] || this.scroller[this.origin.scroll]);
+                var scrollDelta, oldBarSize, newBarSize;
+
                 if (this.bar) {
                     newBarSize = (track[this.origin.client] - this.barTopLimit) * this.scroller[this.origin.client] / this.scroller[this.origin.scrollSize];
 
@@ -318,14 +348,15 @@ var
                         oldBarSize = newBarSize;
                     }
                     
-                    scrollDelta = (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]) || 1;
-                    barPos = relToPos.call(this, -this.pos / scrollDelta);
+                    barPos = relToPos.call(this, this.rpos());
 
                     posBar.call(this, barPos);
                 }
 
                 Array.prototype.unshift.call( arguments, 'scroll' );
                 fire.apply(this, arguments);
+
+                lastFire = new Date().getTime();
             }
 
             return this;

@@ -5,8 +5,8 @@ module.exports = function(grunt) {
     concat: {
       def: {
         files: {
-          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ],
-          '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js' ]
+          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js', 'src/controls.js' ],
+          '<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js', 'src/controls.js' ]
         }
       },
       core: {
@@ -16,15 +16,9 @@ module.exports = function(grunt) {
         dest: 'dist/<%= pkg.name %>.js'
       },
       full: {
-        // src: [
-        //   'src/core.js',
-        //   'src/fix.js',
-        //   'src/test.js'
-        // ],
-        // dest: 'dist/<%= pkg.name %>.js'
         files: {
-          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js', 'src/test.js' ],
-          'demo/<%= pkg.name %>.full.js': [ 'src/core.js', 'src/fix.js', 'src/test.js' ]
+          'dist/<%= pkg.name %>.js': [ 'src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js' ],
+          'demo/<%= pkg.name %>.full.js': [ 'src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js' ]
         }
       }
     },
