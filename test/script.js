@@ -21,7 +21,7 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         //track: '.scroller__track',
         barOnCls: 'baron',
-        //pause: .2
+        pause: .1
     }).fix({
         elements: '.header__title',
         outside: 'header__title_state_fixed',
@@ -55,7 +55,8 @@ $(document).ready(function() {
         scroller: '.test_flex .scroller',
         bar: '.scroller__bar',
         barOnCls: 'baron',
-        track: '.scroller__bar-wrapper'
+        track: '.scroller__bar-wrapper',
+        pause: .2
     });
 
     // Not enought input params

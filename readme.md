@@ -135,7 +135,7 @@ params = {
     // Default: false
     freeze: true,
 
-    // Minimum time delay between two event fires in seconds
+    // Minimum time delay between two scroll or resize events fires in seconds
     // Default: 0
     pause: .2,
 

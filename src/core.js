@@ -196,10 +196,11 @@ var
                 barPos,
                 scrollerPos0,
                 track,
-                pauseTimer,
+                resizePauseTimer,
+                scrollPauseTimer,
                 pause,
-                newFire,
-                lastFire = new Date().getTime();
+                scrollLastFire = new Date().getTime(),
+                resizeLastFire = scrollLastFire;
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -315,48 +316,61 @@ var
             };
 
             // onResize & DOM modified handler
-            this.resize = function(force) {
-                newFire = new Date().getTime();
-                if (newFire - lastFire < pause) return;
+            this.resize = function() {
+                var self = this,
+                    delay = 0;
 
-                var delta = this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient];
-
-                if (params.freeze && !this.clipper.style[this.origin.crossSize]) { // Sould fire only once
-                    $(this.clipper).css(this.origin.crossSize, this.clipper[this.origin.crossClient] - delta + 'px');
+                if (new Date().getTime() - resizeLastFire < pause) {
+                    clearTimeout(resizePauseTimer);
+                    delay = pause;
                 }
-                $(this.scroller).css(this.origin.crossSize, this.clipper[this.origin.crossClient] + delta + 'px');
-                
-                Array.prototype.unshift.call( arguments, 'resize' );
-                fire.apply(this, arguments);
 
-                lastFire = new Date().getTime();
+                resizePauseTimer = setTimeout(function() {
+                    var delta = self.scroller[self.origin.crossOffset] - self.scroller[self.origin.crossClient];
+
+                    if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
+                        $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
+                    }
+                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
+                    
+                    Array.prototype.unshift.call( arguments, 'resize' );
+                    fire.apply(self, arguments);
+
+                    resizeLastFire = new Date().getTime();
+                }, delay);
             }
 
             // onScroll handler
             this.scroll = function(e) {
-                newFire = new Date().getTime();
-                if (newFire - lastFire < pause) return;
+                var scrollDelta, oldBarSize, newBarSize,
+                    delay = 0,
+                    self = this;
 
-                var scrollDelta, oldBarSize, newBarSize;
-
-                if (this.bar) {
-                    newBarSize = (track[this.origin.client] - this.barTopLimit) * this.scroller[this.origin.client] / this.scroller[this.origin.scrollSize];
-
-                    // Positioning bar
-                    if (oldBarSize != newBarSize) {
-                        setBarSize.call(this, newBarSize);
-                        oldBarSize = newBarSize;
-                    }
-                    
-                    barPos = relToPos.call(this, this.rpos());
-
-                    posBar.call(this, barPos);
+                if (new Date().getTime() - scrollLastFire < pause) {
+                    clearTimeout(scrollPauseTimer);
+                    delay = pause;
                 }
 
-                Array.prototype.unshift.call( arguments, 'scroll' );
-                fire.apply(this, arguments);
+                scrollPauseTimer = setTimeout(function() {
+                    if (self.bar) {
+                        newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
 
-                lastFire = new Date().getTime();
+                        // Positioning bar
+                        if (oldBarSize != newBarSize) {
+                            setBarSize.call(self, newBarSize);
+                            oldBarSize = newBarSize;
+                        }
+                        
+                        barPos = relToPos.call(self, self.rpos());
+
+                        posBar.call(self, barPos);
+                    }
+
+                    Array.prototype.unshift.call( arguments, 'scroll' );
+                    fire.apply(self, arguments);
+
+                    scrollLastFire = new Date().getTime();
+                }, delay);
             }
 
             return this;
