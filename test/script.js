@@ -135,11 +135,12 @@ $(document).ready(function() {
     });
 
     // Textarea scroll
-    $('.test_textarea .scroller').baron({
-        bar: $('.test_textarea .scroller__bar'),
+    $('.test_textarea').baron({
+        scroller: '.scroller',
+        bar: '.scroller__bar',
         barOnCls: 'baron'
     }).baron({
-        bar: $('.test_textarea .scroller__bar_h'),
+        bar: '.scroller__bar_h',
         barOnCls: 'baron_h'
     });
 
