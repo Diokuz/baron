@@ -10,7 +10,9 @@
             forward = this.$(params.forward, this.clipper);
 
             this.event(forward, 'click', function() {
-
+                var y = self.pos() - 30;
+                
+                self.pos(y);
             });
         }
 
@@ -18,7 +20,9 @@
             backward = this.$(params.backward, this.clipper);
 
             this.event(backward, 'click', function() {
-                
+                var y = self.pos() + 30;
+
+                self.pos(y);
             });
         }
 

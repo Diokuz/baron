@@ -21,7 +21,7 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         //track: '.scroller__track',
         barOnCls: 'baron',
-        pause: .2
+        //pause: .2
     }).fix({
         elements: '.header__title',
         outside: 'header__title_state_fixed',
@@ -32,6 +32,8 @@ $(document).ready(function() {
     .test()
     .controls({
         track: '.scroller__track-visual',
+        forward: '.scroller__up',
+        backward: '.scroller__down',
         screen: .5
     });
 
