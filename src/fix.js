@@ -1,4 +1,4 @@
-/* Fixable headers plugin for baron 0.6+ */
+/* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
         var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
@@ -100,11 +100,11 @@
                 var change;
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] + this.pos < topHeights[i] + radius) {
+                    if (headerTops[i] - this.pos() < topHeights[i] + radius) {
                         // Header trying to go up
                         fixState = 1;
                         hTop = topHeights[i];
-                    } else if (headerTops[i] + this.pos > topHeights[i] + viewPortSize - radius) {
+                    } else if (headerTops[i] - this.pos() > topHeights[i] + viewPortSize - radius) {
                         // Header trying to go down
                         fixState = 2;
                         hTop = topHeights[i] + viewPortSize;

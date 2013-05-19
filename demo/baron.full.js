@@ -45,10 +45,10 @@ var
             scrollers = $(params.scroller);
         }
 
-        return new baron.prototype.constructor(scrollers, params, $);
+        return new baron.fn.constructor(scrollers, params, $);
     };
 
-    baron.prototype = {
+    baron.fn = {
         constructor: function(scrollers, input, $) {
             var params = validate(input);
 
@@ -105,7 +105,7 @@ var
         // Starting drag when mouse key (LM) goes down at bar
         params.event(document, 'touchstart mousedown', function(e) { // document, not window, for ie8
             if (e.button != 2) { // Not RM
-                out.pos0(e);
+                out._pos0(e);
             }
         });
 
@@ -224,12 +224,12 @@ var
                 return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
             }
 
-            // Relative container top position to bar top position
+            // Relative content top position to bar top position
             function relToPos(r) {
                 return r * k.call(this) + this.barTopLimit;
             }
 
-            // Bar position to relative container position
+            // Bar position to relative content position
             function posToRel(t) {
                 return (t - this.barTopLimit) / k.call(this);
             }
@@ -244,6 +244,25 @@ var
                 return false;
             }
 
+            this.pos = function(x) { // Absolute scroller position in px
+                var ie = 'page' + this.origin.x + 'Offset',
+                    key = (this.scroller[ie]) ? ie : this.origin.scroll;
+
+                if (x) this.scroller[key] = x;
+
+                return this.scroller[key];
+            };
+
+            this.rpos = function(r) { // Relative scroller position (0..1)
+                var free = this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client],
+                    x;
+
+                if (r) x = this.pos(r * free);
+                else x = this.pos();
+
+                return x / (free || 1);
+            };
+
             // Switch on the bar by adding user-defined CSS classname to scroller
             this.barOn = function() {
                 if (this.barOnCls) {
@@ -255,7 +274,7 @@ var
                 }
             };
 
-            this.pos0 = function(e) {
+            this._pos0 = function(e) {
                 scrollerPos0 = getCursorPos.call(this, e) - barPos;
             };
 
@@ -268,7 +287,7 @@ var
                 this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
             };
 
-            // Viewport (re)calculation
+            // onResize & DOM modified handler
             this.resize = function(force) {
                 var delta = this.scroller[this.origin.crossOffset] - this.scroller[this.origin.crossClient];
 
@@ -281,12 +300,10 @@ var
                 fire.apply(this, arguments);
             }
 
-            // Total positions data update, container size dependences included
+            // onScroll handler
             this.scroll = function(e) {
-                var scrollDelta,
-                    oldBarSize, newBarSize;
+                var scrollDelta, oldBarSize, newBarSize;
 
-                this.pos = -(this.scroller['page' + this.origin.x + 'Offset'] || this.scroller[this.origin.scroll]);
                 if (this.bar) {
                     newBarSize = (track[this.origin.client] - this.barTopLimit) * this.scroller[this.origin.client] / this.scroller[this.origin.scrollSize];
 
@@ -296,8 +313,7 @@ var
                         oldBarSize = newBarSize;
                     }
                     
-                    scrollDelta = (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]) || 1;
-                    barPos = relToPos.call(this, -this.pos / scrollDelta);
+                    barPos = relToPos.call(this, this.rpos());
 
                     posBar.call(this, barPos);
                 }
@@ -334,7 +350,7 @@ var
         }
     };
 
-    baron.prototype.constructor.prototype = baron.prototype;
+    baron.fn.constructor.prototype = baron.fn;
     item.prototype.constructor.prototype = item.prototype;
 
     // Use when you need "baron" global var for another purposes
@@ -354,7 +370,7 @@ var
         module.exports = baron.noConflict();
     }
 })(window);
-/* Fixable headers plugin for baron 0.6+ */
+/* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
         var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
@@ -391,9 +407,9 @@ var
 
             if (params) {
                 elementSelector = params.elements;
-                outside = params.outside;
-                before = params.before;
-                after = params.after;
+                outside = params.outside + '';
+                before = params.before + '';
+                after = params.after + '';
                 radius = params.radius || 0;
                 minView = params.minView || 0;
                 limiter = params.limiter;
@@ -456,11 +472,11 @@ var
                 var change;
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] + this.pos < topHeights[i] + radius) {
+                    if (headerTops[i] - this.pos() < topHeights[i] + radius) {
                         // Header trying to go up
                         fixState = 1;
                         hTop = topHeights[i];
-                    } else if (headerTops[i] + this.pos > topHeights[i] + viewPortSize - radius) {
+                    } else if (headerTops[i] - this.pos() > topHeights[i] + viewPortSize - radius) {
                         // Header trying to go down
                         fixState = 2;
                         hTop = topHeights[i] + viewPortSize;
@@ -480,11 +496,11 @@ var
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && before) {
-                            this.$(elements[i]).addClass(before).removeClass(after + ''); // Last top fixed header
+                            this.$(elements[i]).addClass(before).removeClass(after); // Last top fixed header
                         } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && after) {
-                            this.$(elements[i]).addClass(after).removeClass(before + ''); // First bottom fixed header
+                            this.$(elements[i]).addClass(after).removeClass(before); // First bottom fixed header
                         } else {
-                            this.$(elements[i]).removeClass(before + '').removeClass(after + '');
+                            this.$(elements[i]).removeClass(before).removeClass(after);
                             // Emply string for bonzo, which does not handles removeClass(undefined)
                         }
                     }
@@ -497,7 +513,7 @@ var
         });
     };
 
-    baron.prototype.fix = function(params) {
+    baron.fn.fix = function(params) {
         var i = 0;
 
         while (this[i]) {
@@ -575,18 +591,31 @@ var
         }
 
         // Preformance test
-        var t1 = new Date().getTime();
+        var t1 = new Date().getTime(),
+            x,
+            success = true;
         for (var i = 0 ; i < 1000 ; i++) {
-            this.scroller[this.origin.scroll] = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+            x = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+            this.pos(x);
+            success = success && Math.abs(this.pos() - x) < 2;
+            //success = success && Math.abs(this.rpos() - x / (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client])) < .00001;
             this.event(this.scroller, 'scroll', undefined, 'trigger');
+            //console.log(this.pos(), x);
+            
         }
         var t2 = new Date().getTime();
         log('log', 'Preformance test: ' + (t2 - t1) / 1000 + ' milliseconds per scroll event');
+
+        if (success) {
+            log('log', 'Absolute and relative scroller position calculations were good');
+        } else {
+            log('warn', 'There was a problem with scroller position calculations');
+        }
         
         log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
     };
 
-    baron.prototype.test = function(params) {
+    baron.fn.test = function(params) {
         var i = 0;
 
         while (this[i]) {
