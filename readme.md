@@ -157,7 +157,7 @@ params = {
 }
 ```
 
-All parameters are optional (except scroller, if you not using baron as jQuery plugin).
+All parameters are optional (except scroller or root, if you not using baron as jQuery plugin).
 
 `scroll` methods:
 
@@ -298,6 +298,31 @@ params = {
     // Radius for element fixing in px
     // Default: 0
     radius: 10
+}
+```
+
+## Controls plugin
+
+```js
+baron().controls(params);
+
+params = {
+    // Element to be used as interactive track. Note: it could be different from 'track' param of baron.
+    track: '.visual-track',
+
+    // Element to be used as 'down' / 'right' button
+    forward: '.forward-btn',
+
+    // Element to be used as 'up' / 'left' button
+    backward: '.backward-btn',
+
+    // Multiplyer for page-down action. Use 1 to scroll preciesly one screen per track click.
+    // Default: .9
+    screen: .5
+
+    // Scroll distance per control button click in px
+    // Default: 30
+    delta: 40
 }
 ```
 
