@@ -34,7 +34,8 @@ $(document).ready(function() {
         track: '.scroller__track-visual',
         forward: '.scroller__up',
         backward: '.scroller__down',
-        screen: .5
+        screen: .5,
+        delta: 60
     });
 
     // Init without headers
