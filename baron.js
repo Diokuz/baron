@@ -214,10 +214,10 @@ var
             this.scroller = getNode(params.scroller); // (params.scroller) ? getNode(params.scroller, this.root) : this.root;
             this.bar = getNode(params.bar, this.root);
             track = this.track = getNode(params.track, this.root);
-
             if (!this.track && this.bar) {
                 track = this.bar.parentNode;
             }
+            this.clipper = this.scroller.parentNode;
 
             // Parameters
             this.direction = params.direction;
