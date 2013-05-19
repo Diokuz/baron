@@ -142,4 +142,14 @@ $(document).ready(function() {
         bar: $('.test_textarea .scroller__bar_h'),
         barOnCls: 'baron_h'
     });
+
+    // Bar outside
+    $('.test_bar-outside').baron({
+        scroller: '.scroller',
+        bar: '.scroller__bar',
+        barOnCls: 'baron'
+    }).baron({
+        bar: '.scroller__bar_h',
+        barOnCls: 'baron_h'
+    });
 });

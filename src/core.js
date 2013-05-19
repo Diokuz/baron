@@ -32,30 +32,48 @@ var
     },
 
     baron = function(params) { // this - window or jQuery instance
-        var jQueryMode = (this && this[0] && this[0].nodeType && window.jQuery),
-            scrollers,
+        var jQueryMode = (this && this[0] && this[0].nodeType),
+            roots,
             $;
 
         params = params || {};
         $ = params.$ || window.jQuery;
 
         if (jQueryMode) {
-            scrollers = this;
+            params.root = roots = this;
         } else {
-            scrollers = $(params.scroller);
+            roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(scrollers, params, $);
+        return new baron.fn.constructor(roots, params, $);
     };
 
     baron.fn = {
-        constructor: function(scrollers, input, $) {
+        constructor: function(roots, input, $) {
             var params = validate(input);
 
-            params.$ = $;
-            each.call(this, scrollers, function(scroller, i) {
-                params.scroller = scroller;
-                this[i] = init(params);
+            params.$ = $;    
+            each.call(this, roots, function(root, i) {
+                var localParams = clone(params);
+
+                if (params.root && params.scroller) {
+                    localParams.scroller = params.$(params.scroller, root);
+                }
+
+                if (!params.root && params.scroller) {
+                    localParams.scroller = params.$(params.scroller);
+                }
+
+                if (!params.root && !params.scroller) {
+                    localParams.scroller = root;
+                }
+
+                if (params.root && !params.scroller) {
+                    localParams.scroller = root;
+                }
+
+                localParams.root = root;
+                this[i] = init(localParams);
                 this.length = i + 1;
             });
 
@@ -63,16 +81,16 @@ var
         },
 
         update: function() {
-            //each.call(this, this, this.update);
             var i = 0;
             while (this[i]) this[i++].update();
         },
 
         baron: function(params) {
-            params.scroller = [];
+            params.root = [];
+            params.scroller = this.params.scroller;
 
             each.call(this, this, function(elem) {
-                params.scroller.push(elem.scroller);
+                params.root.push(elem.root);
             });
             params.direction = (this.params.direction == 'v') ? 'h' : 'v';
 
@@ -81,11 +99,11 @@ var
     };
 
     function init(params) {
-        if (params.scroller.getAttribute('data-baron-' + params.direction)) return;
+        if (params.root.getAttribute('data-baron-' + params.direction)) return;
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
-        params.event(params.scroller, 'scroll', function(e) {
+        params.event(out.scroller, 'scroll', function(e) {
             out.scroll(e);
         });
 
@@ -119,18 +137,18 @@ var
             out.update();
         });
 
-        params.event(out.scroller, 'sizeChange', function() {
+        params.event(out.root, 'sizeChange', function() {
             out.update();
         }); // Custon event for alternate baron update mechanism
 
-        params.scroller.setAttribute('data-baron-' + params.direction, 'inited');
+        params.root.setAttribute('data-baron-' + params.direction, 'inited');
 
         out.update();
 
         return out;
     };
 
-    function validate(input) {
+    function clone(input) {
         var output = {};
 
         input = input || {};
@@ -141,16 +159,22 @@ var
             }
         }
 
+        return output;
+    };
+
+    function validate(input) {
+        var output = clone(input);
+
         output.direction = output.direction || 'v';
 
-        var event = output.event || function(elem, event, func, mode) {
+        var event = input.event || function(elem, event, func, mode) {
             output.$(elem)[mode || 'on'](event, func);
         };
 
         output.event = function(elems, e, func, mode) {
             each(elems, function(elem) {
                 event(elem, e, func, mode);
-            })
+            });
         };
 
         return output;
@@ -178,14 +202,12 @@ var
             this.events = {};
 
             function getNode(sel, context) {
-                if (sel) {
-                    return $(sel, context)[0] || $(sel, context);
-                }
-            }
+                return $(sel, context)[0]; // Can be undefined
+            };
 
             // DOM elements
-            this.scroller = params.scroller;
-            this.root = this.scroller.parentNode;
+            this.root = params.root; // Always html node, not just selector
+            this.scroller = getNode(params.scroller); // (params.scroller) ? getNode(params.scroller, this.root) : this.root;
             this.bar = getNode(params.bar, this.root);
             track = this.track = getNode(params.track, this.root);
             if (!this.track && this.bar) {
@@ -217,40 +239,40 @@ var
                 if (this.bar) {
                     $(this.bar).css(this.origin.pos, +pos + 'px');
                 }
-            }
+            };
 
             // Free path for bar
             function k() {
                 return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
-            }
+            };
 
             // Relative container top position to bar top position
             function relToPos(r) {
                 return r * k.call(this) + this.barTopLimit;
-            }
+            };
 
             // Bar position to relative container position
             function posToRel(t) {
                 return (t - this.barTopLimit) / k.call(this);
-            }
+            };
 
             // Cursor position in main direction in px // Now with iOs support
             function getCursorPos(e) {
                 return e['client' + this.origin.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
-            }
+            };
 
             // Text selection pos preventing
             function dontPosSelect() {
                 return false;
-            }
+            };
 
             // Switch on the bar by adding user-defined CSS classname to scroller
             this.barOn = function() {
                 if (this.barOnCls) {
                     if (this.scroller[this.origin.client] < this.scroller[this.origin.scrollSize]) {
-                        $(this.scroller).addClass(this.barOnCls);
+                        $(this.root).addClass(this.barOnCls);
                     } else {
-                        $(this.scroller).removeClass(this.barOnCls);
+                        $(this.root).removeClass(this.barOnCls);
                     }
                 }
             };
@@ -344,7 +366,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.0';
+    baron.version = '0.6.1';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

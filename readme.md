@@ -110,6 +110,10 @@ params = {
     // Default: this (in jQuery mode).
     scroller: '.scroller',
 
+    // Root html element for baron. Use this param when your html-scrollbar content is outside scroller
+    // Default: scroller
+    root: $('.my_scroller'),
+
     // Selector for bar element
     // Default: 'undefined'
     bar: '.scroller__bar',
