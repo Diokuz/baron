@@ -1,4 +1,4 @@
-Baron - a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
+Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
 
 ## Demo
 
@@ -6,9 +6,9 @@ http://diokuz.github.io/baron/
 
 ## Features
 
-- Do not replaces native system scroll mechanic.
+- Doesn't replace native system scroll mechanic.
 - Customizable scrollbar design with full CSS support.
-- No strong dependences on jQuery.
+- No strong dependencies on jQuery.
 - Plugin system (fixable headers, sticky footer, autotests and more)
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system where the CSS property 'overflow: scroll' is applied.
@@ -36,9 +36,9 @@ If you want only to hide system scrollbar:
 ```css
 .scroller {
     overflow-y: scroll;
-    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOs */
+    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
 }
-.scroller::-webkit-scrollbar { /* Preventing webkit cross-direction scrolling bug */
+.scroller::-webkit-scrollbar { /* Prevents webkit cross-direction scrolling bug */
     width: 0;
 }
 ```
@@ -65,7 +65,7 @@ $('.scroller').baron();
 ```css
 .scroller {
     overflow-y: scroll;
-    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOs */
+    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
 }
 .scroller::-webkit-scrollbar { /* Preventing webkit cross-direction scrolling bug */
     width: 0;
@@ -80,7 +80,7 @@ $('.scroller').baron();
     background: rgba(0, 0, 0, .1);
 }
 .baron .scroller__track {
-    display: block; /* Visible when scroll is possible */
+    display: block; /* Visible when scrolling is possible */
 }
 .scroller__bar { /* The bar. You should define width, right position and background */
     position: absolute;    
@@ -91,7 +91,7 @@ $('.scroller').baron();
 }
 ```
 
-You can specify some parameters at baron initialization:
+You can specify some parameters on baron initialization:
 
 ```js
 var scroll = $('.scroller').baron(params);
@@ -157,7 +157,7 @@ params = {
 }
 ```
 
-All parameters are optional (except scroller or root, if you not using baron as jQuery plugin).
+All parameters are optional (except scroller or root, if you are not using baron as jQuery plugin).
 
 `scroll` methods:
 
@@ -165,7 +165,7 @@ All parameters are optional (except scroller or root, if you not using baron as 
 scroll.update(); // Update scroller
 ```
 
-Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. For example, you couldnt do this:
+Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. For example, you can't do this:
 
 ```js
 $('.scroller').baron().css().animate();
@@ -187,9 +187,9 @@ scroll.baron({direction: 'h'}).test().anotherBaronPlugin();
 
 Every baron plugin sould return baron object (this);
 
-##Update baron
+##Updating baron
 
-When container size changed (for example: you load additional data to container by ajax), you should call update() method:
+When container size changed (for example: you load additional data to the container using ajax), you should call update() method:
 
 ```js
 scroll.update();
