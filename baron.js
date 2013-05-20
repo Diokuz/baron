@@ -23,7 +23,7 @@ var
     each = function(obj, iterator) {
         var i = 0;
 
-        if (!obj.length) obj = [obj];
+        if (obj.length === undefined) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
