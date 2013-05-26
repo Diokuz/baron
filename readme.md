@@ -205,7 +205,7 @@ If you want to scroll in both directions (vertical and horizontal) you must init
 baron(vParams).baron(hParams);
 ```
 
-Note: think about horizontal baron as about second independent baron instance, or as about 'baron' plugin for 'baron' - both statements are true, actually. Unfortunately, in case above you only can manage last baron instance in chain (to update or dispose it). To manage both you have to initialize them independently:
+Note: think about horizontal baron as about second independent baron instance, or as about plugin for 'baron', which simply calls 'baron' with redefined default params - both statements are true, actually. Unfortunately, in case above you only can manage last baron instance in chain (to update or dispose it). To manage both you have to initialize them independently:
 
 ```js
 vScroll = baron(vParams);
