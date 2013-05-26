@@ -163,6 +163,7 @@ All parameters are optional (except scroller or root, if you are not using baron
 
 ```js
 scroll.update(); // Update scroller
+scroll.dispose(); // Remove baron instance and related event handlers
 ```
 
 Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. For example, you can't do this:
@@ -187,20 +188,6 @@ scroll.baron({direction: 'h'}).test().anotherBaronPlugin();
 
 Every baron plugin sould return baron object (this);
 
-##Updating baron
-
-When container size changed (for example: you load additional data to the container using ajax), you should call update() method:
-
-```js
-scroll.update();
-```
-
-or fire custom event 'sizeChange' to wrapper:
-
-```js
-$('.scroller').trigger('sizeChange');
-```
-
 ## Horizontal and bidirectional scroll
 
 To switch default vertical direction to horizontal direction just set 'direction' param to 'h' value:
@@ -218,6 +205,34 @@ If you want to scroll in both directions (vertical and horizontal) you must init
 baron(vParams).baron(hParams);
 ```
 
+Note: think about horizontal baron as about second independent baron instance, or as about 'baron' plugin for 'baron' - both statements are true, actually. Unfortunately, in case above you only can manage last baron instance in chain (to update or dispose it). To manage both you have to initialize them independently:
+
+```js
+vScroll = baron(vParams);
+hScroll = baron(hParams);
+...
+vScroll.dispose();
+hScroll.dispose();
+```
+
+##Updating baron
+
+When container size changed (for example: you load additional data to the container using ajax), you should call update() method:
+
+```js
+scroll.update();
+```
+
+or fire custom event 'sizeChange' to wrapper:
+
+```js
+$('.scroller').trigger('sizeChange');
+```
+
+##Disposing baron
+
+If you removed html-nodes, which used baron, from DOM, dont forget dispose related baron instance manually. Use 'dispose' method for that.
+
 ##noConflict mode
 
 If you need window.baron for another purposes you can restore original value:
@@ -232,7 +247,7 @@ var graf = baron.noConflict();
 
 ## Custom build (Grunt)
 
-If you want exclude fix plugin functionality, type
+If you want exclude plugins functionality, type
 ```js
 grunt core
 ```
@@ -250,9 +265,9 @@ Output files you can find in /dist/ folder.
 
 Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 9+ on Windows, OS X and iOS. Also, the best ever browser downloader - Internet Explorer - supported since version 7.
 
-Partial support: IE6 (without fixable headers).
+Partial (core) support: IE6.
 
-Not supported: Opera mini, old versions of Android browser, and other browsers which do not implement the `overflow: scroll` CSS property.
+Not supported: Opera mini, old versions of Android browser, and other browsers which does not implemented the `overflow: scroll` CSS property.
 
 ## fix plugin
 
@@ -279,7 +294,7 @@ where:
 ```js
 params = {
     // CSS selector for fixable elements
-    // Must have parentNode with same height (see demo for details). Also see 'limiter' parameter.
+    // Must have parentNode (no margin and padding allowed!) with same height (see demo for details). Also see 'limiter' parameter.
     elements: '.header__title',
 
     // CSS class for elements which now are outside of viewport
