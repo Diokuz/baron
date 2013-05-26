@@ -17,9 +17,9 @@
                 errCount++;
             }
 
-            //console.log('%c ' + totalCount + '. ' + text, css);
+            console.log('%c ' + totalCount + '. ' + text, css);
             if (obj !== undefined) {
-                //console.log(obj);
+                console.log(obj);
             }
         }
 

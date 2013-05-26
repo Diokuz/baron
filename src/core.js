@@ -82,8 +82,10 @@ var
 
         dispose: function() {
             each(this, function(item) {
-                //destruct(item);
+                manageEvents(item, item.event, 'off');
+                item = null;
             });
+            this.params = null;
         },
 
         update: function() {
@@ -104,45 +106,49 @@ var
         }
     };
 
-    function manageEvents(item, params, mode) {
-        function onScroll(e) {
-            item.scroll(e);
-        };
+    function manageEvents(item, event, mode) {
+        item._eventHandlers = item._eventHandlers || { // Creating new functions for one baron item only one time
+            onScroll: function(e) {
+                item.scroll(e);
+            },
 
-        function onMouseDown(e) {
-            e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-            item.selection(); // Disable text selection in ie8
-            item.drag.now = 1; // Save private byte
-        };
+            onMouseDown: function(e) {
+                e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                item.selection(); // Disable text selection in ie8
+                item.drag.now = 1; // Save private byte
+            },
 
-        function onMouseUp() {
-            item.selection(1); // Enable text selection
-            item.drag.now = 0;
-        };
+            onMouseUp: function() {
+                item.selection(1); // Enable text selection
+                item.drag.now = 0;
+            },
 
-        function onCoordinateReset(e) {
-            if (e.button != 2) { // Not RM
-                item._pos0(e);
+            onCoordinateReset: function(e) {
+                if (e.button != 2) { // Not RM
+                    item._pos0(e);
+                }
+            },
+
+            onMouseMove: function(e) {
+                if (item.drag.now) {
+                    item.drag(e);
+                }
+            },
+
+            onResize: function() {
+                item.update();
             }
         };
 
-        function onMouseMove(e) {
-            if (item.drag.now) {
-                item.drag(e);
-            }
-        };
-
-        function onResize() {
-            item.update();
-        };
-
-        params.event(item.scroller, 'scroll', onScroll, mode);
-        params.event(item.bar, 'touchstart mousedown', onMouseDown, mode);
-        params.event(document, 'mouseup blur touchend', onMouseUp, mode);
-        params.event(document, 'touchstart mousedown', onCoordinateReset, mode);
-        params.event(document, 'mousemove touchmove', onMouseMove, mode);
-        params.event(window, 'resize', onResize, mode);
-        params.event(item.root, 'sizeChange', onResize, mode); // Custon event for alternate baron update mechanism
+        event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        if (item.bar) {
+            event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
+        }
+        event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
+        event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
+        event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
+        event(window, 'resize', item._eventHandlers.onResize, mode);
+        event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
     };
 
     function init(params) {
@@ -150,9 +156,9 @@ var
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
-        manageEvents(out, params, 'on');
+        manageEvents(out, params.event, 'on');
 
-        params.root.setAttribute('data-baron-' + params.direction, 'inited');
+        out.root.setAttribute('data-baron-' + params.direction, 'inited');
 
         out.update();
 
@@ -336,7 +342,7 @@ var
                     delay = pause;
                 }
 
-                resizePauseTimer = setTimeout(function() {
+                function upd() {
                     var delta = self.scroller[self.origin.crossOffset] - self.scroller[self.origin.crossClient];
 
                     if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
@@ -348,7 +354,13 @@ var
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
-                }, delay);
+                };
+
+                if (delay) {
+                    resizePauseTimer = setTimeout(upd, delay);
+                } else {
+                    upd();
+                }
             }
 
             // onScroll handler
@@ -362,7 +374,7 @@ var
                     delay = pause;
                 }
 
-                scrollPauseTimer = setTimeout(function() {
+                function upd() {
                     if (self.bar) {
                         newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
 
@@ -381,7 +393,14 @@ var
                     fire.apply(self, arguments);
 
                     scrollLastFire = new Date().getTime();
-                }, delay);
+                };
+
+                if (delay) {
+                    scrollPauseTimer = setTimeout(upd, delay);
+                } else {
+                    upd();
+                }
+                
             }
 
             return this;
@@ -422,7 +441,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.1';
+    baron.version = '0.6.2';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

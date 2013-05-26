@@ -80,6 +80,14 @@ var
             this.params = params;
         },
 
+        dispose: function() {
+            each(this, function(item) {
+                manageEvents(item, item.event, 'off');
+                item = null;
+            });
+            this.params = null;
+        },
+
         update: function() {
             var i = 0;
             while (this[i]) this[i++].update();
@@ -98,50 +106,59 @@ var
         }
     };
 
+    function manageEvents(item, event, mode) {
+        item._eventHandlers = item._eventHandlers || { // Creating new functions for one baron item only one time
+            onScroll: function(e) {
+                item.scroll(e);
+            },
+
+            onMouseDown: function(e) {
+                e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                item.selection(); // Disable text selection in ie8
+                item.drag.now = 1; // Save private byte
+            },
+
+            onMouseUp: function() {
+                item.selection(1); // Enable text selection
+                item.drag.now = 0;
+            },
+
+            onCoordinateReset: function(e) {
+                if (e.button != 2) { // Not RM
+                    item._pos0(e);
+                }
+            },
+
+            onMouseMove: function(e) {
+                if (item.drag.now) {
+                    item.drag(e);
+                }
+            },
+
+            onResize: function() {
+                item.update();
+            }
+        };
+
+        event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        if (item.bar) {
+            event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
+        }
+        event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
+        event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
+        event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
+        event(window, 'resize', item._eventHandlers.onResize, mode);
+        event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+    };
+
     function init(params) {
         if (params.root.getAttribute('data-baron-' + params.direction)) return;
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
-        params.event(out.scroller, 'scroll', function(e) {
-            out.scroll(e);
-        });
+        manageEvents(out, params.event, 'on');
 
-        if (out.bar) {
-            params.event(out.bar, 'touchstart mousedown', function(e) { // Bar drag
-                e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-                out.selection(); // Disable text selection in ie8
-                out.drag.now = 1; // Save private byte
-            });
-        }
-
-        params.event(document, 'mouseup blur touchend', function() { // Cancelling drag when mouse key goes up and when window loose its focus
-            out.selection(1); // Enable text selection
-            out.drag.now = 0;
-        });
-
-        // Starting drag when mouse key (LM) goes down at bar
-        params.event(document, 'touchstart mousedown', function(e) { // document, not window, for ie8
-            if (e.button != 2) { // Not RM
-                out._pos0(e);
-            }
-        });
-
-        params.event(document, 'mousemove touchmove', function(e) { // document, not window, for ie8
-            if (out.drag.now) {
-                out.drag(e);
-            }
-        });
-
-        params.event(window, 'resize', function() {
-            out.update();
-        });
-
-        params.event(out.root, 'sizeChange', function() {
-            out.update();
-        }); // Custon event for alternate baron update mechanism
-
-        params.root.setAttribute('data-baron-' + params.direction, 'inited');
+        out.root.setAttribute('data-baron-' + params.direction, 'inited');
 
         out.update();
 
@@ -325,7 +342,7 @@ var
                     delay = pause;
                 }
 
-                resizePauseTimer = setTimeout(function() {
+                function upd() {
                     var delta = self.scroller[self.origin.crossOffset] - self.scroller[self.origin.crossClient];
 
                     if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
@@ -337,7 +354,13 @@ var
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
-                }, delay);
+                };
+
+                if (delay) {
+                    resizePauseTimer = setTimeout(upd, delay);
+                } else {
+                    upd();
+                }
             }
 
             // onScroll handler
@@ -351,7 +374,7 @@ var
                     delay = pause;
                 }
 
-                scrollPauseTimer = setTimeout(function() {
+                function upd() {
                     if (self.bar) {
                         newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
 
@@ -370,7 +393,14 @@ var
                     fire.apply(self, arguments);
 
                     scrollLastFire = new Date().getTime();
-                }, delay);
+                };
+
+                if (delay) {
+                    scrollPauseTimer = setTimeout(upd, delay);
+                } else {
+                    upd();
+                }
+                
             }
 
             return this;
@@ -411,7 +441,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.1';
+    baron.version = '0.6.2';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
