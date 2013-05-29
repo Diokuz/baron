@@ -61,7 +61,7 @@ var
                 }
 
                 if (!params.root && params.scroller) {
-                    localParams.scroller = params.$(params.scroller);
+                    localParams.scroller = root;
                 }
 
                 if (!params.root && !params.scroller) {
