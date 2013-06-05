@@ -5,7 +5,7 @@
 
 var
     scrolls = [],
-    _baron = window.baron, // Stored baron vaule for noConflict usage
+    _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
         v: { // Vertical
