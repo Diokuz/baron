@@ -147,3 +147,16 @@ body {
     position: absolute;
     bottom: 0;
 }
+
+.load {
+    background: yellow;
+    -webkit-transition: all .2s linear;
+    transition: all .2s linear;
+}
+.load__value {
+    background: green;
+    width: 0%;
+    height: 100%;
+    -webkit-transition: all .2s linear;
+    transition: all .2s linear;
+}

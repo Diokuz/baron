@@ -146,6 +146,16 @@ $(document).ready(function() {
         barOnCls: 'baron_h'
     });
 
+    // Bidirectional scroll root bug
+    anotherBaron({
+        scroller: '.test_bidir-2 .scroller',
+        bar: '.scroller__bar',
+        barOnCls: 'baron'
+    }).baron({
+        bar: '.scroller__bar_h',
+        barOnCls: 'baron_h'
+    });
+
     // Textarea scroll
     $('.test_textarea').baron({
         scroller: '.scroller',

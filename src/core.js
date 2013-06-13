@@ -58,19 +58,25 @@ var
 
                 if (params.root && params.scroller) {
                     localParams.scroller = params.$(params.scroller, root);
-                }
-
-                if (!params.root && params.scroller) {
+                    if (!localParams.scroller.length) {
+                        localParams.scroller = root;
+                    }
+                } else {
                     localParams.scroller = root;
                 }
+                
 
-                if (!params.root && !params.scroller) {
-                    localParams.scroller = root;
-                }
+                // if (!params.root && params.scroller) {
+                //     localParams.scroller = root;
+                // }
 
-                if (params.root && !params.scroller) {
-                    localParams.scroller = root;
-                }
+                // if (!params.root && !params.scroller) {
+                //     localParams.scroller = root;
+                // }
+
+                // if (params.root && !params.scroller) {
+                //     localParams.scroller = root;
+                // }
 
                 localParams.root = root;
                 this[i] = init(localParams);
@@ -101,6 +107,7 @@ var
                 params.root.push(elem.root);
             });
             params.direction = (this.params.direction == 'v') ? 'h' : 'v';
+            params._chain = true;
 
             return baron(params);
         }
@@ -140,7 +147,9 @@ var
             }
         };
 
-        event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        if (item.scroller) {
+            event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        }
         if (item.bar) {
             event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
         }
@@ -148,7 +157,9 @@ var
         event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
         event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
         event(window, 'resize', item._eventHandlers.onResize, mode);
-        event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+        if (item.root) {
+            event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+        }
     };
 
     function init(params) {
@@ -441,7 +452,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.2';
+    baron.version = '0.6.3';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
