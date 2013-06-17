@@ -5,7 +5,7 @@
 
 var
     scrolls = [],
-    _baron = window.baron, // Stored baron vaule for noConflict usage
+    _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
         v: { // Vertical
@@ -462,6 +462,7 @@ var
         module.exports = baron.noConflict();
     }
 })(window);
+
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
@@ -689,14 +690,18 @@ var
             block = this.$(params.block),
             size = params.size || this.origin.size,
             limit = params.limit || 80,
-            callback = params.callback,
+            onExpand = params.onExpand,
+            onCollapse = params.onCollapse,
             elements = params.elements || [],
+            inProgress = params.inProgress || '',
             self = this,
             _insistence = 0,
             _zeroXCount = 0,
             _interval,
+            _timer,
             _x = 0,
-            _t1 = 0,
+            _onExpandCalled,
+            _waiting = params.waiting || 500,
             _on;
 
         function getHeight() {
@@ -709,9 +714,7 @@ var
 
         function step(x, force) {
             var k = x * .0005;
-
-            //if (!force) k = k * 1.2;
-
+            
             return Math.floor(force - k * (x + 550));
         }
 
@@ -732,16 +735,18 @@ var
                 scrollHeight = getScrollHeight(),
                 dx,
                 op4,
-                t2 = new Date().getTime();
+                scrollInProgress = _insistence == 1;
 
             op4 = 0; // Возвращающая сила
             if (_insistence > 0) {
                 op4 = 40;
             }
-            if (_insistence) {
+            //if (_insistence > -1) {
                 dx = step(_x, op4);
-                if (height >= scrollHeight - dx - 100) {
-                    _x += dx;
+                if (height >= scrollHeight - _x && _insistence > -1) {
+                    if (scrollInProgress) {
+                        _x += dx;
+                    }
                 } else {
                     _x = 0;
                 }
@@ -753,22 +758,39 @@ var
 
                 for (var i = 0 ; i < elements.length ; i++) {
                     self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                    if (inProgress) {
+                        self.$(self.root).addClass(inProgress);
+                    }
                 }
 
-                _insistence = -1;
+                if (_x == 0) {
+                    if (params.onCollapse) {
+                        params.onCollapse();
+                    }
+                }
+
+                _insistence = 0;
+                _timer = setTimeout(function() {
+                    _insistence = -1;
+                }, _waiting);
+            //}
+
+            if (onExpand && _x > limit && !_onExpandCalled) {
+                onExpand();
+                _onExpandCalled = true;
             }
 
             if (_x == 0) {
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
+                if (inProgress) {
+                    self.$(self.root).removeClass(inProgress);
+                }
             }
-            if (_zeroXCount > 5) {
+            if (_zeroXCount > 1) {
                 toggle(false);
-            }
-
-            if (callback && _x > limit) {
-                callback();
+                _onExpandCalled = false;
             }
         }
 
@@ -782,6 +804,7 @@ var
 
         this.event(this.scroller, 'mousewheel DOMMouseScroll', function() {
             _insistence = 1;
+            clearTimeout(_timer);
             if (!_on && getHeight() >= getScrollHeight()) {
                 toggle(true);
             }

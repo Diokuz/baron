@@ -5,7 +5,7 @@
 
 var
     scrolls = [],
-    _baron = window.baron, // Stored baron vaule for noConflict usage
+    _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
         v: { // Vertical
@@ -56,11 +56,15 @@ var
             each.call(this, roots, function(root, i) {
                 var localParams = clone(params);
 
-                if (params.root && params.scroller && !params._chain) {
+                if (params.root && params.scroller) {
                     localParams.scroller = params.$(params.scroller, root);
+                    if (!localParams.scroller.length) {
+                        localParams.scroller = root;
+                    }
                 } else {
                     localParams.scroller = root;
                 }
+                
 
                 // if (!params.root && params.scroller) {
                 //     localParams.scroller = root;
@@ -458,6 +462,7 @@ var
         module.exports = baron.noConflict();
     }
 })(window);
+
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
@@ -778,12 +783,13 @@ var
             limit = params.limit || 80,
             callback = params.callback,
             elements = params.elements || [],
+            inProgress = params.inProgress || '',
             self = this,
             _insistence = 0,
             _zeroXCount = 0,
             _interval,
             _x = 0,
-            _t1 = 0,
+            _called,
             _on;
 
         function getHeight() {
@@ -796,9 +802,7 @@ var
 
         function step(x, force) {
             var k = x * .0005;
-
-            //if (!force) k = k * 1.2;
-
+            
             return Math.floor(force - k * (x + 550));
         }
 
@@ -827,7 +831,7 @@ var
             }
             if (_insistence) {
                 dx = step(_x, op4);
-                if (height >= scrollHeight - dx - 100) {
+                if (height >= scrollHeight - dx) {
                     _x += dx;
                 } else {
                     _x = 0;
@@ -840,9 +844,17 @@ var
 
                 for (var i = 0 ; i < elements.length ; i++) {
                     self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                    if (inProgress) {
+                        self.$(self.root).addClass(inProgress);
+                    }
                 }
 
                 _insistence = -1;
+            }
+
+            if (callback && _x > limit && !_called) {
+                callback();
+                _called = true;
             }
 
             if (_x == 0) {
@@ -852,10 +864,8 @@ var
             }
             if (_zeroXCount > 5) {
                 toggle(false);
-            }
-
-            if (callback && _x > limit) {
-                callback();
+                _called = false;
+                self.$(self.root).removeClass(inProgress);
             }
         }
 
