@@ -15,7 +15,7 @@ window.onload = function() {
             property: 'width'
         }],
         limit: 115,
-        callback: function() {
+        onExpand: function() {
             $('.load').css('background', 'red');
         }
     });

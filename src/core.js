@@ -89,7 +89,7 @@ var
         dispose: function() {
             each(this, function(item) {
                 manageEvents(item, item.event, 'off');
-                item = null;
+                fire.call(item, 'dispose');
             });
             this.params = null;
         },
@@ -361,7 +361,7 @@ var
                     }
                     $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
                     
-                    Array.prototype.unshift.call( arguments, 'resize' );
+                    Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();

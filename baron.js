@@ -89,7 +89,7 @@ var
         dispose: function() {
             each(this, function(item) {
                 manageEvents(item, item.event, 'off');
-                item = null;
+                fire.call(item, 'dispose');
             });
             this.params = null;
         },
@@ -361,7 +361,7 @@ var
                     }
                     $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
                     
-                    Array.prototype.unshift.call( arguments, 'resize' );
+                    Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
@@ -755,12 +755,12 @@ var
 
                 pos[size] = _x + 'px';
                 self.$(block).css(pos);
+                if (inProgress && _x) {
+                    self.$(self.root).addClass(inProgress);
+                }
 
                 for (var i = 0 ; i < elements.length ; i++) {
                     self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
-                    if (inProgress) {
-                        self.$(self.root).addClass(inProgress);
-                    }
                 }
 
                 if (_x == 0) {
@@ -784,13 +784,14 @@ var
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
-                if (inProgress) {
-                    self.$(self.root).removeClass(inProgress);
-                }
+                
             }
             if (_zeroXCount > 1) {
                 toggle(false);
                 _onExpandCalled = false;
+                if (inProgress) {
+                    self.$(self.root).removeClass(inProgress);
+                }
             }
         }
 
@@ -802,11 +803,15 @@ var
             toggle(false);
         });
 
-        this.event(this.scroller, 'mousewheel DOMMouseScroll', function() {
-            _insistence = 1;
-            clearTimeout(_timer);
-            if (!_on && getHeight() >= getScrollHeight()) {
-                toggle(true);
+        this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
+            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta) || e.detail > 0;
+
+            if (down) {
+                _insistence = 1;
+                clearTimeout(_timer);
+                if (!_on && getHeight() >= getScrollHeight()) {
+                    toggle(true);
+                }
             }
         });
     };

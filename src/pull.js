@@ -119,8 +119,7 @@
         });
 
         this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
-            //console.log('e', e, e.wheelDelta < 0 , e.detail > 0);
-            var down = e.wheelDelta < 0 || e.detail > 0;
+            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta) || e.detail > 0;
 
             if (down) {
                 _insistence = 1;
