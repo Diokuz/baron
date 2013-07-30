@@ -43,7 +43,7 @@ If you want only to hide system scrollbar:
 }
 ```
 
-Note: you can choose any class names, and slyle them as you want.
+Note: you can choose any class names, and style them as you want.
 
 * Initialize baron:
 
