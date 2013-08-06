@@ -4,7 +4,6 @@
     if (!window) return; // Server side
 
 var
-    scrolls = [],
     _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
@@ -52,7 +51,7 @@ var
         constructor: function(roots, input, $) {
             var params = validate(input);
 
-            params.$ = $;    
+            params.$ = $;
             each.call(this, roots, function(root, i) {
                 var localParams = clone(params);
 
@@ -64,7 +63,7 @@ var
                 } else {
                     localParams.scroller = root;
                 }
-                
+
 
                 // if (!params.root && params.scroller) {
                 //     localParams.scroller = root;
@@ -259,8 +258,8 @@ var
             function setBarSize(size) {
                 var barMinSize = this.barMinSize || 20;
 
-                if (size > 0 && size < this.barMinSize) {
-                    size = this.barMinSize;
+                if (size > 0 && size < barMinSize) {
+                    size = barMinSize;
                 }
 
                 if (this.bar) {
@@ -360,7 +359,7 @@ var
                         $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
                     }
                     $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
-                    
+
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
@@ -375,8 +374,8 @@ var
             }
 
             // onScroll handler
-            this.scroll = function(e) {
-                var scrollDelta, oldBarSize, newBarSize,
+            this.scroll = function() {
+                var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
 
@@ -394,7 +393,7 @@ var
                             setBarSize.call(self, newBarSize);
                             oldBarSize = newBarSize;
                         }
-                        
+
                         barPos = relToPos.call(self, self.rpos());
 
                         posBar.call(self, barPos);
@@ -411,7 +410,7 @@ var
                 } else {
                     upd();
                 }
-                
+
             }
 
             return this;

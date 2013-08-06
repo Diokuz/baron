@@ -4,7 +4,6 @@
     if (!window) return; // Server side
 
 var
-    scrolls = [],
     _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
@@ -52,7 +51,7 @@ var
         constructor: function(roots, input, $) {
             var params = validate(input);
 
-            params.$ = $;    
+            params.$ = $;
             each.call(this, roots, function(root, i) {
                 var localParams = clone(params);
 
@@ -64,7 +63,7 @@ var
                 } else {
                     localParams.scroller = root;
                 }
-                
+
 
                 // if (!params.root && params.scroller) {
                 //     localParams.scroller = root;
@@ -89,7 +88,7 @@ var
         dispose: function() {
             each(this, function(item) {
                 manageEvents(item, item.event, 'off');
-                item = null;
+                fire.call(item, 'dispose');
             });
             this.params = null;
         },
@@ -259,8 +258,8 @@ var
             function setBarSize(size) {
                 var barMinSize = this.barMinSize || 20;
 
-                if (size > 0 && size < this.barMinSize) {
-                    size = this.barMinSize;
+                if (size > 0 && size < barMinSize) {
+                    size = barMinSize;
                 }
 
                 if (this.bar) {
@@ -360,8 +359,8 @@ var
                         $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
                     }
                     $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
-                    
-                    Array.prototype.unshift.call( arguments, 'resize' );
+
+                    Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
@@ -375,8 +374,8 @@ var
             }
 
             // onScroll handler
-            this.scroll = function(e) {
-                var scrollDelta, oldBarSize, newBarSize,
+            this.scroll = function() {
+                var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
 
@@ -394,7 +393,7 @@ var
                             setBarSize.call(self, newBarSize);
                             oldBarSize = newBarSize;
                         }
-                        
+
                         barPos = relToPos.call(self, self.rpos());
 
                         posBar.call(self, barPos);
@@ -411,7 +410,7 @@ var
                 } else {
                     upd();
                 }
-                
+
             }
 
             return this;
@@ -495,8 +494,7 @@ var
         }
 
         function init(params) {
-            var fixFlag = [],
-                pos;
+            var pos;
 
             if (params) {
                 elementSelector = params.elements;
@@ -617,10 +615,11 @@ var
         return this;
     };
 })(window);
+
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
     var controls = function(params) {
-        var forward, backward, track, screen, timer,
+        var forward, backward, track, screen,
             self = this; // AAAAAA!!!!!11
 
         screen = params.screen || .9;
@@ -630,7 +629,7 @@ var
 
             this.event(forward, 'click', function() {
                 var y = self.pos() - params.delta || 30;
-                
+
                 self.pos(y);
             });
         }
@@ -683,6 +682,7 @@ var
         return this;
     };
 })(window);
+
 /* Autotests plugin for baron 0.6+ (for developers) */
 (function(window, undefined) {
     var test = function(params) {
@@ -777,19 +777,21 @@ var
 /* Pull to load plugin for baron 0.6+ */
 (function(window, undefined) {
     var pull = function(params) {
-        var prefix = params.prefix,
-            block = this.$(params.block),
+        var block = this.$(params.block),
             size = params.size || this.origin.size,
             limit = params.limit || 80,
-            callback = params.callback,
+            onExpand = params.onExpand,
+            onCollapse = params.onCollapse,
             elements = params.elements || [],
             inProgress = params.inProgress || '',
             self = this,
             _insistence = 0,
             _zeroXCount = 0,
             _interval,
+            _timer,
             _x = 0,
-            _called,
+            _onExpandCalled,
+            _waiting = params.waiting || 500,
             _on;
 
         function getHeight() {
@@ -802,7 +804,7 @@ var
 
         function step(x, force) {
             var k = x * .0005;
-            
+
             return Math.floor(force - k * (x + 550));
         }
 
@@ -823,16 +825,18 @@ var
                 scrollHeight = getScrollHeight(),
                 dx,
                 op4,
-                t2 = new Date().getTime();
+                scrollInProgress = _insistence == 1;
 
             op4 = 0; // Возвращающая сила
             if (_insistence > 0) {
                 op4 = 40;
             }
-            if (_insistence) {
+            //if (_insistence > -1) {
                 dx = step(_x, op4);
-                if (height >= scrollHeight - dx) {
-                    _x += dx;
+                if (height >= scrollHeight - _x && _insistence > -1) {
+                    if (scrollInProgress) {
+                        _x += dx;
+                    }
                 } else {
                     _x = 0;
                 }
@@ -841,31 +845,43 @@ var
 
                 pos[size] = _x + 'px';
                 self.$(block).css(pos);
+                if (inProgress && _x) {
+                    self.$(self.root).addClass(inProgress);
+                }
 
                 for (var i = 0 ; i < elements.length ; i++) {
                     self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
-                    if (inProgress) {
-                        self.$(self.root).addClass(inProgress);
+                }
+
+                if (_x == 0) {
+                    if (params.onCollapse) {
+                        params.onCollapse();
                     }
                 }
 
-                _insistence = -1;
-            }
+                _insistence = 0;
+                _timer = setTimeout(function() {
+                    _insistence = -1;
+                }, _waiting);
+            //}
 
-            if (callback && _x > limit && !_called) {
-                callback();
-                _called = true;
+            if (onExpand && _x > limit && !_onExpandCalled) {
+                onExpand();
+                _onExpandCalled = true;
             }
 
             if (_x == 0) {
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
+
             }
-            if (_zeroXCount > 5) {
+            if (_zeroXCount > 1) {
                 toggle(false);
-                _called = false;
-                self.$(self.root).removeClass(inProgress);
+                _onExpandCalled = false;
+                if (inProgress) {
+                    self.$(self.root).removeClass(inProgress);
+                }
             }
         }
 
@@ -877,10 +893,15 @@ var
             toggle(false);
         });
 
-        this.event(this.scroller, 'mousewheel DOMMouseScroll', function() {
-            _insistence = 1;
-            if (!_on && getHeight() >= getScrollHeight()) {
-                toggle(true);
+        this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
+            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta) || e.detail > 0;
+
+            if (down) {
+                _insistence = 1;
+                clearTimeout(_timer);
+                if (!_on && getHeight() >= getScrollHeight()) {
+                    toggle(true);
+                }
             }
         });
     };

@@ -1,8 +1,7 @@
 /* Pull to load plugin for baron 0.6+ */
 (function(window, undefined) {
     var pull = function(params) {
-        var prefix = params.prefix,
-            block = this.$(params.block),
+        var block = this.$(params.block),
             size = params.size || this.origin.size,
             limit = params.limit || 80,
             onExpand = params.onExpand,
@@ -29,7 +28,7 @@
 
         function step(x, force) {
             var k = x * .0005;
-            
+
             return Math.floor(force - k * (x + 550));
         }
 
@@ -99,7 +98,7 @@
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
-                
+
             }
             if (_zeroXCount > 1) {
                 toggle(false);

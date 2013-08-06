@@ -1,7 +1,7 @@
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
     var controls = function(params) {
-        var forward, backward, track, screen, timer,
+        var forward, backward, track, screen,
             self = this; // AAAAAA!!!!!11
 
         screen = params.screen || .9;
@@ -11,7 +11,7 @@
 
             this.event(forward, 'click', function() {
                 var y = self.pos() - params.delta || 30;
-                
+
                 self.pos(y);
             });
         }
