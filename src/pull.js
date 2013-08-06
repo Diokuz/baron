@@ -1,12 +1,10 @@
 /* Pull to load plugin for baron 0.6+ */
 (function(window, undefined) {
     var pull = function(params) {
-        var prefix = params.prefix,
-            block = this.$(params.block),
+        var block = this.$(params.block),
             size = params.size || this.origin.size,
             limit = params.limit || 80,
             onExpand = params.onExpand,
-            onCollapse = params.onCollapse,
             elements = params.elements || [],
             inProgress = params.inProgress || '',
             self = this,

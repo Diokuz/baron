@@ -1,8 +1,7 @@
 var b;
 
 $(document).ready(function() {
-    var root,
-        i;
+    var i;
 
     b = $('.wrapper_very-simple .scroller').baron();
 

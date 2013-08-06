@@ -5,7 +5,20 @@ module.exports = function (grunt) {
         jshint: {
             appjs: {
                 options: {
-                    jshintrc: '.jshintrc'
+                    "indent": 4,
+                    "node": true,
+                    "browser": true,
+                    "jquery": true,
+                    "eqnull": true,
+                    "eqeqeq": false,
+                    "devel": false,
+                    "boss": true,
+                    "trailing": true,
+                    "loopfunc": true,
+                    "-W041": true,
+                    "-W015": true,
+                    "sub": true,
+                    "unused": true
                 },
                 src: ['src/*.js', 'demo/*.js', 'test/*.js']
             }
@@ -70,5 +83,5 @@ module.exports = function (grunt) {
     grunt.registerTask('core', ['concat:core', 'uglify:core']);
     grunt.registerTask('full', ['concat:full', 'uglify:full']);
     grunt.registerTask('test', ['mocha-phantomjs']);
-    grunt.registerTask('t', ['jshint']);
+    grunt.registerTask('t', ['jshint', 'mocha-phantomjs']);
 };

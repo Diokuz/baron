@@ -30,8 +30,7 @@
         }
 
         function init(params) {
-            var fixFlag = [],
-                pos;
+            var pos;
 
             if (params) {
                 elementSelector = params.elements;

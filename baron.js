@@ -4,7 +4,6 @@
     if (!window) return; // Server side
 
 var
-    scrolls = [],
     _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
@@ -263,8 +262,8 @@ var
                 /* jshint validthis:true */
                 var barMinSize = this.barMinSize || 20;
 
-                if (size > 0 && size < this.barMinSize) {
-                    size = this.barMinSize;
+                if (size > 0 && size < barMinSize) {
+                    size = barMinSize;
                 }
 
                 if (this.bar) {
@@ -383,8 +382,8 @@ var
             };
 
             // onScroll handler
-            this.scroll = function(e) {
-                var scrollDelta, oldBarSize, newBarSize,
+            this.scroll = function( ) {
+                var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
 
@@ -510,8 +509,7 @@ var
         }
 
         function init(params) {
-            var fixFlag = [],
-                pos;
+            var pos;
 
             if (params) {
                 elementSelector = params.elements;
@@ -635,7 +633,7 @@ var
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
     var controls = function(params) {
-        var forward, backward, track, screen, timer,
+        var forward, backward, track, screen,
             self = this; // AAAAAA!!!!!11
 
         screen = params.screen || 0.9;
@@ -701,12 +699,10 @@ var
 /* Pull to load plugin for baron 0.6+ */
 (function(window, undefined) {
     var pull = function(params) {
-        var prefix = params.prefix,
-            block = this.$(params.block),
+        var block = this.$(params.block),
             size = params.size || this.origin.size,
             limit = params.limit || 80,
             onExpand = params.onExpand,
-            onCollapse = params.onCollapse,
             elements = params.elements || [],
             inProgress = params.inProgress || '',
             self = this,

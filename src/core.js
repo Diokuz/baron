@@ -4,7 +4,6 @@
     if (!window) return; // Server side
 
 var
-    scrolls = [],
     _baron = window.baron, // Stored baron value for noConflict usage
     $ = window.jQuery, // Trying to use jQuery
     origin = {
@@ -263,8 +262,8 @@ var
                 /* jshint validthis:true */
                 var barMinSize = this.barMinSize || 20;
 
-                if (size > 0 && size < this.barMinSize) {
-                    size = this.barMinSize;
+                if (size > 0 && size < barMinSize) {
+                    size = barMinSize;
                 }
 
                 if (this.bar) {
@@ -383,8 +382,8 @@ var
             };
 
             // onScroll handler
-            this.scroll = function(e) {
-                var scrollDelta, oldBarSize, newBarSize,
+            this.scroll = function( ) {
+                var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
 
