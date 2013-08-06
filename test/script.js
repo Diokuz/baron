@@ -1,14 +1,15 @@
 var b;
 
 $(document).ready(function() {
-    var root;
+    var root,
+        i;
 
     b = $('.wrapper_very-simple .scroller').baron();
 
     b.update();
 
     // Simple initialization with minimum parameters, but with headers
-    for (var i = 0 ; i < 100 ; i++) {
+    for (i = 0 ; i < 100 ; i++) {
         $('.wrapper_simple .scroller').baron({
             barOnCls: 'baron'
         }).fix({
@@ -23,7 +24,7 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         //track: '.scroller__track',
         barOnCls: 'baron',
-        pause: .1
+        pause: 0.1
     }).fix({
         elements: '.header__title',
         outside: 'header__title_state_fixed',
@@ -36,7 +37,7 @@ $(document).ready(function() {
         track: '.scroller__track-visual',
         forward: '.scroller__up',
         backward: '.scroller__down',
-        screen: .5,
+        screen: 0.5,
         delta: 60
     });
 
@@ -58,13 +59,14 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         barOnCls: 'baron',
         track: '.scroller__bar-wrapper',
-        pause: .2
+        pause: 0.2
     });
 
     // Not enought input params
     //baron();
 
-    var anotherBaron = babaron = baron.noConflict();
+    var babaron = baron.noConflict(),
+        anotherBaron = babaron;
     console.log('Original baron value is: ', baron);
 
     // Flexible height for bottom fixed headers -> they should change positions when window resize occurs.
@@ -81,7 +83,7 @@ $(document).ready(function() {
     // No js .test__no-js
 
     // Maximum variables
-    for (var i = 0 ; i < 10 ; i++) {
+    for (i = 0 ; i < 10 ; i++) {
         anotherBaron({
             scroller: '.test_advanced .scroller',
             bar: '.scroller__bar',
@@ -177,7 +179,7 @@ $(document).ready(function() {
     });
 
     var leak = [];
-    for (var i = 0 ; i < 1000 ; i++) {
+    for (i = 0 ; i < 1000 ; i++) {
         $('.test_mem-leak').attr('data-baron-v', '');
         var l = $('.test_mem-leak').baron({
             scroller: '.scroller',

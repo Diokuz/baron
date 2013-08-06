@@ -52,7 +52,7 @@ var
         constructor: function(roots, input, $) {
             var params = validate(input);
 
-            params.$ = $;    
+            params.$ = $;
             each.call(this, roots, function(root, i) {
                 var localParams = clone(params);
 
@@ -64,19 +64,6 @@ var
                 } else {
                     localParams.scroller = root;
                 }
-                
-
-                // if (!params.root && params.scroller) {
-                //     localParams.scroller = root;
-                // }
-
-                // if (!params.root && !params.scroller) {
-                //     localParams.scroller = root;
-                // }
-
-                // if (params.root && !params.scroller) {
-                //     localParams.scroller = root;
-                // }
 
                 localParams.root = root;
                 this[i] = init(localParams);
@@ -87,9 +74,10 @@ var
         },
 
         dispose: function() {
+            var params = this.params;
+
             each(this, function(item) {
-                manageEvents(item, item.event, 'off');
-                fire.call(item, 'dispose');
+                item.dispose(params);
             });
             this.params = null;
         },
@@ -160,21 +148,33 @@ var
         if (item.root) {
             event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
         }
-    };
+    }
+
+    function manageAttr(node, direction, mode) {
+        var attrName = 'data-baron-' + direction;
+
+        if (mode == 'on') {
+            node.setAttribute(attrName, 'inited');
+        } else if (mode == 'off') {
+            node.removeAttribute(attrName);
+        } else {
+            return node.getAttribute(attrName);
+        }
+    }
 
     function init(params) {
-        if (params.root.getAttribute('data-baron-' + params.direction)) return;
+        if (manageAttr(params.root, params.direction)) return;
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
         manageEvents(out, params.event, 'on');
 
-        out.root.setAttribute('data-baron-' + params.direction, 'inited');
+        manageAttr(out.root, params.direction, 'on');
 
         out.update();
 
         return out;
-    };
+    }
 
     function clone(input) {
         var output = {};
@@ -188,7 +188,7 @@ var
         }
 
         return output;
-    };
+    }
 
     function validate(input) {
         var output = clone(input);
@@ -206,15 +206,16 @@ var
         };
 
         return output;
-    };
+    }
 
     function fire(eventName) {
+        /* jshint validthis:true */
         if (this.events && this.events[eventName]) {
             for (var i = 0 ; i < this.events[eventName].length ; i++) {
                 this.events[eventName][i].apply(this, Array.prototype.slice.call( arguments, 1 ));
             }
         }
-    };
+    }
 
     var item = {};
 
@@ -227,8 +228,10 @@ var
                 resizePauseTimer,
                 scrollPauseTimer,
                 pause,
-                scrollLastFire = new Date().getTime(),
-                resizeLastFire = scrollLastFire;
+                scrollLastFire,
+                resizeLastFire;
+
+            resizeLastFire = scrollLastFire = new Date().getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -236,7 +239,7 @@ var
 
             function getNode(sel, context) {
                 return $(sel, context)[0]; // Can be undefined
-            };
+            }
 
             // DOM elements
             this.root = params.root; // Always html node, not just selector
@@ -257,6 +260,7 @@ var
 
             // Updating height or width of bar
             function setBarSize(size) {
+                /* jshint validthis:true */
                 var barMinSize = this.barMinSize || 20;
 
                 if (size > 0 && size < this.barMinSize) {
@@ -264,31 +268,35 @@ var
                 }
 
                 if (this.bar) {
-                    $(this.bar).css(this.origin.size, parseInt(size) + 'px');
+                    $(this.bar).css(this.origin.size, parseInt(size, 10) + 'px');
                 }
-            };
+            }
 
             // Updating top or left bar position
             function posBar(pos) {
+                /* jshint validthis:true */
                 if (this.bar) {
                     $(this.bar).css(this.origin.pos, +pos + 'px');
                 }
-            };
+            }
 
             // Free path for bar
             function k() {
+                /* jshint validthis:true */
                 return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
-            };
+            }
 
             // Relative content top position to bar top position
             function relToPos(r) {
+                /* jshint validthis:true */
                 return r * k.call(this) + this.barTopLimit;
-            };
+            }
 
             // Bar position to relative content position
             function posToRel(t) {
+                /* jshint validthis:true */
                 return (t - this.barTopLimit) / k.call(this);
-            };
+            }
 
             // Cursor position in main direction in px // Now with iOs support
             this.cursor = function(e) {
@@ -298,7 +306,7 @@ var
             // Text selection pos preventing
             function dontPosSelect() {
                 return false;
-            };
+            }
 
             this.pos = function(x) { // Absolute scroller position in px
                 var ie = 'page' + this.origin.x + 'Offset',
@@ -320,12 +328,12 @@ var
             };
 
             // Switch on the bar by adding user-defined CSS classname to scroller
-            this.barOn = function() {
+            this.barOn = function(dispose) {
                 if (this.barOnCls) {
-                    if (this.scroller[this.origin.client] < this.scroller[this.origin.scrollSize]) {
-                        $(this.root).addClass(this.barOnCls);
-                    } else {
+                    if (dispose || this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]) {
                         $(this.root).removeClass(this.barOnCls);
+                    } else {
+                        $(this.root).addClass(this.barOnCls);
                     }
                 }
             };
@@ -365,14 +373,14 @@ var
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
-                };
+                }
 
                 if (delay) {
                     resizePauseTimer = setTimeout(upd, delay);
                 } else {
                     upd();
                 }
-            }
+            };
 
             // onScroll handler
             this.scroll = function(e) {
@@ -404,7 +412,7 @@ var
                     fire.apply(self, arguments);
 
                     scrollLastFire = new Date().getTime();
-                };
+                }
 
                 if (delay) {
                     scrollPauseTimer = setTimeout(upd, delay);
@@ -412,7 +420,7 @@ var
                     upd();
                 }
                 
-            }
+            };
 
             return this;
         },
@@ -423,6 +431,14 @@ var
             this.scroll();
 
             return this;
+        },
+
+        dispose: function(params) {
+            manageEvents(this, this.event, 'off');
+            manageAttr(this.root, params.direction, 'off');
+            $(this.scroller).css(this.origin.crossSize, '');
+            this.barOn(true);
+            fire.call(this, 'dispose');
         },
 
         on: function(eventName, func, arg) {
@@ -452,7 +468,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.3';
+    baron.version = '0.6.4';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -462,7 +478,6 @@ var
         module.exports = baron.noConflict();
     }
 })(window);
-
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
@@ -491,7 +506,7 @@ var
                 i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
                 scroller.dispatchEvent(i);
                 e.preventDefault();
-            } catch (e) {};
+            } catch (e) {}
         }
 
         function init(params) {
@@ -623,7 +638,7 @@ var
         var forward, backward, track, screen, timer,
             self = this; // AAAAAA!!!!!11
 
-        screen = params.screen || .9;
+        screen = params.screen || 0.9;
 
         if (params.forward) {
             forward = this.$(params.forward, this.clipper);
@@ -713,7 +728,7 @@ var
         }
 
         function step(x, force) {
-            var k = x * .0005;
+            var k = x * 0.0005;
             
             return Math.floor(force - k * (x + 550));
         }

@@ -52,7 +52,7 @@ var
         constructor: function(roots, input, $) {
             var params = validate(input);
 
-            params.$ = $;    
+            params.$ = $;
             each.call(this, roots, function(root, i) {
                 var localParams = clone(params);
 
@@ -209,6 +209,7 @@ var
     }
 
     function fire(eventName) {
+        /* jshint validthis:true */
         if (this.events && this.events[eventName]) {
             for (var i = 0 ; i < this.events[eventName].length ; i++) {
                 this.events[eventName][i].apply(this, Array.prototype.slice.call( arguments, 1 ));
@@ -228,7 +229,9 @@ var
                 scrollPauseTimer,
                 pause,
                 scrollLastFire,
-                resizeLastFire = scrollLastFire = new Date().getTime();
+                resizeLastFire;
+
+            resizeLastFire = scrollLastFire = new Date().getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -257,6 +260,7 @@ var
 
             // Updating height or width of bar
             function setBarSize(size) {
+                /* jshint validthis:true */
                 var barMinSize = this.barMinSize || 20;
 
                 if (size > 0 && size < this.barMinSize) {
@@ -264,12 +268,13 @@ var
                 }
 
                 if (this.bar) {
-                    $(this.bar).css(this.origin.size, parseInt(size) + 'px');
+                    $(this.bar).css(this.origin.size, parseInt(size, 10) + 'px');
                 }
             }
 
             // Updating top or left bar position
             function posBar(pos) {
+                /* jshint validthis:true */
                 if (this.bar) {
                     $(this.bar).css(this.origin.pos, +pos + 'px');
                 }
@@ -277,23 +282,26 @@ var
 
             // Free path for bar
             function k() {
+                /* jshint validthis:true */
                 return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
             }
 
             // Relative content top position to bar top position
             function relToPos(r) {
+                /* jshint validthis:true */
                 return r * k.call(this) + this.barTopLimit;
             }
 
             // Bar position to relative content position
             function posToRel(t) {
+                /* jshint validthis:true */
                 return (t - this.barTopLimit) / k.call(this);
             }
 
             // Cursor position in main direction in px // Now with iOs support
             this.cursor = function(e) {
                 return e['client' + this.origin.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
-            }
+            };
 
             // Text selection pos preventing
             function dontPosSelect() {
@@ -365,7 +373,7 @@ var
                     fire.apply(self, arguments);
 
                     resizeLastFire = new Date().getTime();
-                };
+                }
 
                 if (delay) {
                     resizePauseTimer = setTimeout(upd, delay);
@@ -404,7 +412,7 @@ var
                     fire.apply(self, arguments);
 
                     scrollLastFire = new Date().getTime();
-                };
+                }
 
                 if (delay) {
                     scrollPauseTimer = setTimeout(upd, delay);

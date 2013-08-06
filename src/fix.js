@@ -26,7 +26,7 @@
                 i.initWebKitWheelEvent(e.originalEvent.wheelDeltaX, e.originalEvent.wheelDeltaY);
                 scroller.dispatchEvent(i);
                 e.preventDefault();
-            } catch (e) {};
+            } catch (e) {}
         }
 
         function init(params) {

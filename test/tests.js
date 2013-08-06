@@ -28,7 +28,7 @@ describe("Успешная инициализация барона по-умол
     });
 
     it("Находит bar и выставляет ему правильную высоту", function() {
-        var height = parseInt($(bar).css('height')),
+        var height = parseInt($(bar).css('height'), 10),
             expectedHeight = Math.round(scroller.clientHeight * scroller.clientHeight / scroller.scrollHeight);
 
         assert.ok(baron[0].bar === bar);

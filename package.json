@@ -1,28 +1,29 @@
 {
-  "name": "baron",
-  "description": "A small, fast and crossbrowser custom scrollbar with native system scroll mechanic.",
-  "version": "0.6.1",
-  "homepage": "https://github.com/Diokuz/baron",
-  "authors": [
-    "Dmitry Kuznecov <@Diokuz>"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Diokuz/baron.git"
-  },
-  "keywords": [
-    "scrollbar",
-    "custom",
-    "crossbrowser"
-  ],
-  "main": "./baron.js",
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-concat": "~0.1.3",
-    "grunt-contrib-uglify": "~0.2.0",
-    "mocha": "~1.9.0",
-    "mocha-phantomjs": "~3.0.0",
-    "grunt-mocha-phantomjs": "~0.3.0",
-    "chai": "~1.7.0"
-  }
+    "name": "baron",
+    "description": "A small, fast and crossbrowser custom scrollbar with native system scroll mechanic.",
+    "version": "0.6.2",
+    "homepage": "https://github.com/Diokuz/baron",
+    "authors": [
+        "Dmitry Kuznecov <@Diokuz>"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Diokuz/baron.git"
+    },
+    "keywords": [
+        "scrollbar",
+        "custom",
+        "crossbrowser"
+    ],
+    "main": "./baron.js",
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.6.0",
+        "grunt-contrib-concat": "~0.1.3",
+        "grunt-contrib-uglify": "~0.2.0",
+        "mocha": "~1.9.0",
+        "mocha-phantomjs": "~3.0.0",
+        "grunt-mocha-phantomjs": "~0.3.0",
+        "chai": "~1.7.0"
+    }
 }

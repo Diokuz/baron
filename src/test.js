@@ -21,7 +21,7 @@
             if (obj !== undefined) {
                 console.log(obj);
             }
-        }
+        };
 
         if (this.scroller && this.scroller.nodeType === 1) {
             log('log', 'Scroller defined and has proper nodeType value', this.scroller);

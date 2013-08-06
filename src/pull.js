@@ -28,7 +28,7 @@
         }
 
         function step(x, force) {
-            var k = x * .0005;
+            var k = x * 0.0005;
             
             return Math.floor(force - k * (x + 550));
         }

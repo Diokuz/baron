@@ -4,7 +4,7 @@
         var forward, backward, track, screen, timer,
             self = this; // AAAAAA!!!!!11
 
-        screen = params.screen || .9;
+        screen = params.screen || 0.9;
 
         if (params.forward) {
             forward = this.$(params.forward, this.clipper);

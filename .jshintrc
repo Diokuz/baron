@@ -1,0 +1,15 @@
+{
+    "indent": 4,
+    "node": true,
+    "browser": true,
+    "jquery": true,
+    "eqnull": true,
+    "eqeqeq": false,
+    "devel": false,
+    "boss": true,
+    "trailing": true,
+    "loopfunc": true,
+    "-W041": true,
+    "-W015": true,
+    "sub": true
+}
