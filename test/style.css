@@ -28,7 +28,7 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     position: relative;
     z-index: 1;
     overflow: hidden;
-    height: 70%;
+    height: 200px;
     margin: 1px auto;
     background: #fff;
     border: 1px solid #fc9;

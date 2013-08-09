@@ -100,53 +100,100 @@ var
         }
     };
 
-    function manageEvents(item, event, mode) {
-        item._eventHandlers = item._eventHandlers || { // Creating new functions for one baron item only one time
-            onScroll: function(e) {
-                item.scroll(e);
-            },
+    function manageEvents(item, eventManager, mode) {
+        item._eventHandlers = item._eventHandlers || [ // Creating new functions for one baron item only one time
+            {
+                // onScroll: 
+                element: item.scroller,
 
-            onMouseDown: function(e) {
-                e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-                item.selection(); // Disable text selection in ie8
-                item.drag.now = 1; // Save private byte
-            },
+                handler: function(e) {
+                    item.scroll(e);
+                },
 
-            onMouseUp: function() {
-                item.selection(1); // Enable text selection
-                item.drag.now = 0;
-            },
+                type: 'scroll'
+            }, {
+                // onMouseDown: 
+                element: item.bar,
 
-            onCoordinateReset: function(e) {
-                if (e.button != 2) { // Not RM
-                    item._pos0(e);
-                }
-            },
+                handler: function(e) {
+                    e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                    item.selection(); // Disable text selection in ie8
+                    item.drag.now = 1; // Save private byte
+                },
 
-            onMouseMove: function(e) {
-                if (item.drag.now) {
-                    item.drag(e);
-                }
-            },
+                type: 'touchstart mousedown'
+            }, {
+                // onMouseUp: 
+                element: document,
 
-            onResize: function() {
-                item.update();
+                handler: function() {
+                    item.selection(1); // Enable text selection
+                    item.drag.now = 0;
+                },
+
+                type: 'mouseup blur touchend'
+            }, {
+                // onCoordinateReset: 
+                element: document,
+
+                handler: function(e) {
+                    if (e.button != 2) { // Not RM
+                        item._pos0(e);
+                    }
+                },
+
+                type: 'touchstart mousedown'
+            }, {
+                // onMouseMove: 
+                element: document,
+
+                handler: function(e) {
+                    if (item.drag.now) {
+                        item.drag(e);
+                    }
+                },
+
+                type: 'mousemove touchmove'
+            }, {
+                // onResize: 
+                element: window,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'resize'
+            }, {
+                // sizeChange: 
+                element: item.root,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'sizeChange'
             }
-        };
+        ];
 
-        if (item.scroller) {
-            event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
-        }
-        if (item.bar) {
-            event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
-        }
-        event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
-        event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
-        event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
-        event(window, 'resize', item._eventHandlers.onResize, mode);
-        if (item.root) {
-            event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
-        }
+        each(item._eventHandlers, function(event) {
+            if (event.element) {
+                eventManager(event.element, event.type, event.handler, mode);
+            }
+        });
+
+        // if (item.scroller) {
+        //     event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        // }
+        // if (item.bar) {
+        //     event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
+        // }
+        // event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
+        // event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
+        // event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
+        // event(window, 'resize', item._eventHandlers.onResize, mode);
+        // if (item.root) {
+        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+        // }
     }
 
     function manageAttr(node, direction, mode) {
@@ -467,7 +514,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.4';
+    baron.version = '0.6.5';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

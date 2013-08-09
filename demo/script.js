@@ -8,7 +8,8 @@ window.onload = function() {
         elements: '.header__title',
         outside: 'header__title_state_fixed',
         before: 'header__title_position_top',
-        after: 'header__title_position_bottom'
+        after: 'header__title_position_bottom',
+        clickable: true
     }).pull({
         block: '.load',
         elements: [{

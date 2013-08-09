@@ -312,7 +312,10 @@ params = {
 
     // Radius for element fixing in px
     // Default: 0
-    radius: 10
+    radius: 10,
+
+    // Wether click on element should scroll to
+    clickable: false
 }
 ```
 

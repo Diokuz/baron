@@ -100,53 +100,100 @@ var
         }
     };
 
-    function manageEvents(item, event, mode) {
-        item._eventHandlers = item._eventHandlers || { // Creating new functions for one baron item only one time
-            onScroll: function(e) {
-                item.scroll(e);
-            },
+    function manageEvents(item, eventManager, mode) {
+        item._eventHandlers = item._eventHandlers || [ // Creating new functions for one baron item only one time
+            {
+                // onScroll: 
+                element: item.scroller,
 
-            onMouseDown: function(e) {
-                e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
-                item.selection(); // Disable text selection in ie8
-                item.drag.now = 1; // Save private byte
-            },
+                handler: function(e) {
+                    item.scroll(e);
+                },
 
-            onMouseUp: function() {
-                item.selection(1); // Enable text selection
-                item.drag.now = 0;
-            },
+                type: 'scroll'
+            }, {
+                // onMouseDown: 
+                element: item.bar,
 
-            onCoordinateReset: function(e) {
-                if (e.button != 2) { // Not RM
-                    item._pos0(e);
-                }
-            },
+                handler: function(e) {
+                    e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                    item.selection(); // Disable text selection in ie8
+                    item.drag.now = 1; // Save private byte
+                },
 
-            onMouseMove: function(e) {
-                if (item.drag.now) {
-                    item.drag(e);
-                }
-            },
+                type: 'touchstart mousedown'
+            }, {
+                // onMouseUp: 
+                element: document,
 
-            onResize: function() {
-                item.update();
+                handler: function() {
+                    item.selection(1); // Enable text selection
+                    item.drag.now = 0;
+                },
+
+                type: 'mouseup blur touchend'
+            }, {
+                // onCoordinateReset: 
+                element: document,
+
+                handler: function(e) {
+                    if (e.button != 2) { // Not RM
+                        item._pos0(e);
+                    }
+                },
+
+                type: 'touchstart mousedown'
+            }, {
+                // onMouseMove: 
+                element: document,
+
+                handler: function(e) {
+                    if (item.drag.now) {
+                        item.drag(e);
+                    }
+                },
+
+                type: 'mousemove touchmove'
+            }, {
+                // onResize: 
+                element: window,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'resize'
+            }, {
+                // sizeChange: 
+                element: item.root,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'sizeChange'
             }
-        };
+        ];
 
-        if (item.scroller) {
-            event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
-        }
-        if (item.bar) {
-            event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
-        }
-        event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
-        event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
-        event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
-        event(window, 'resize', item._eventHandlers.onResize, mode);
-        if (item.root) {
-            event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
-        }
+        each(item._eventHandlers, function(event) {
+            if (event.element) {
+                eventManager(event.element, event.type, event.handler, mode);
+            }
+        });
+
+        // if (item.scroller) {
+        //     event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        // }
+        // if (item.bar) {
+        //     event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
+        // }
+        // event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
+        // event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
+        // event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
+        // event(window, 'resize', item._eventHandlers.onResize, mode);
+        // if (item.root) {
+        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+        // }
     }
 
     function manageAttr(node, direction, mode) {
@@ -467,7 +514,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.4';
+    baron.version = '0.6.5';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -483,7 +530,10 @@ var
         var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
-            scroller = this.scroller;
+            scroller = this.scroller,
+            eventManager = this.event,
+            $ = this.$,
+            self = this;
 
         function fixElement(i, pos) {
             if (viewPortSize < (minView || 0)) { // No headers fixing when no enought space for viewport
@@ -508,17 +558,17 @@ var
             } catch (e) {}
         }
 
-        function init(params) {
+        function init(_params) {
             var pos;
 
-            if (params) {
-                elementSelector = params.elements;
-                outside = params.outside + '';
-                before = params.before + '';
-                after = params.after + '';
-                radius = params.radius || 0;
-                minView = params.minView || 0;
-                limiter = params.limiter;
+            if (_params) {
+                elementSelector = _params.elements;
+                outside = _params.outside + '';
+                before = _params.before + '';
+                after = _params.after + '';
+                radius = _params.radius || 0;
+                minView = _params.minView || 0;
+                limiter = _params.limiter;
             }
 
             elements = this.$(elementSelector, this.scroller);
@@ -565,6 +615,31 @@ var
                     // this.barTopLimit = elements[0].parentNode[this.origin.offset];
                     this.scroll();
                 }
+            }
+
+            var event = {
+                element: elements,
+                
+                handler: function() { // Extending baron _eventHandlers for fix plugin
+                    var parent = $(this)[0].parentNode,
+                        top = parent.offsetTop,
+                        num;
+
+                    // finding num -> elements[num] === this
+                    for (var i = 0 ; i < elements.length ; i++ ) {
+                        if (elements[i] === this) num = i;
+                    }
+
+                    self.scroller.scrollTop = top - topHeights[num];
+                },
+
+                type: 'click'
+            };
+
+            if (params.clickable) {
+                this._eventHandlers.push(event); // For auto-dispose
+                eventManager(event.element, event.type, event.handler, 'off');
+                eventManager(event.element, event.type, event.handler, 'on');
             }
         }
 

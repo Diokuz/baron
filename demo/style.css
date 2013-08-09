@@ -82,6 +82,7 @@ body {
     opacity: 1;
     -webkit-transition: background-color .2s;
     transition: background-color .2s;
+    cursor: pointer;
 }
 .header__title_state_fixed {
     position: absolute;

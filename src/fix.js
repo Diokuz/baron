@@ -4,7 +4,10 @@
         var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
-            scroller = this.scroller;
+            scroller = this.scroller,
+            eventManager = this.event,
+            $ = this.$,
+            self = this;
 
         function fixElement(i, pos) {
             if (viewPortSize < (minView || 0)) { // No headers fixing when no enought space for viewport
@@ -29,17 +32,17 @@
             } catch (e) {}
         }
 
-        function init(params) {
+        function init(_params) {
             var pos;
 
-            if (params) {
-                elementSelector = params.elements;
-                outside = params.outside + '';
-                before = params.before + '';
-                after = params.after + '';
-                radius = params.radius || 0;
-                minView = params.minView || 0;
-                limiter = params.limiter;
+            if (_params) {
+                elementSelector = _params.elements;
+                outside = _params.outside + '';
+                before = _params.before + '';
+                after = _params.after + '';
+                radius = _params.radius || 0;
+                minView = _params.minView || 0;
+                limiter = _params.limiter;
             }
 
             elements = this.$(elementSelector, this.scroller);
@@ -86,6 +89,31 @@
                     // this.barTopLimit = elements[0].parentNode[this.origin.offset];
                     this.scroll();
                 }
+            }
+
+            var event = {
+                element: elements,
+                
+                handler: function() { // Extending baron _eventHandlers for fix plugin
+                    var parent = $(this)[0].parentNode,
+                        top = parent.offsetTop,
+                        num;
+
+                    // finding num -> elements[num] === this
+                    for (var i = 0 ; i < elements.length ; i++ ) {
+                        if (elements[i] === this) num = i;
+                    }
+
+                    self.scroller.scrollTop = top - topHeights[num];
+                },
+
+                type: 'click'
+            };
+
+            if (params.clickable) {
+                this._eventHandlers.push(event); // For auto-dispose
+                eventManager(event.element, event.type, event.handler, 'off');
+                eventManager(event.element, event.type, event.handler, 'on');
             }
         }
 
