@@ -94,7 +94,7 @@
             var event = {
                 element: elements,
                 
-                handler: function() { // Extending baron _eventHandlers for fix plugin
+                handler: function() {
                     var parent = $(this)[0].parentNode,
                         top = parent.offsetTop,
                         num;
@@ -104,7 +104,16 @@
                         if (elements[i] === this) num = i;
                     }
 
-                    self.scroller.scrollTop = top - topHeights[num];
+                    var pos = top - topHeights[num];
+
+                    if (params.scroll) { // User defined callback
+                        params.scroll({
+                            x1: self.scroller.scrollTop,
+                            x2: pos
+                        });
+                    } else {
+                        self.scroller.scrollTop = pos;
+                    }
                 },
 
                 type: 'click'

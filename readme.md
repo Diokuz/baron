@@ -315,7 +315,10 @@ params = {
     radius: 10,
 
     // Wether click on element should scroll to
-    clickable: false
+    clickable: false,
+
+    // User defined callback on click (data == {x1: current scrollTop, x2: new scrollTop})
+    scroll: function(data) {}
 }
 ```
 

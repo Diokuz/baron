@@ -125,6 +125,47 @@ describe("Плагин fix.", function() {
             $(currentTitle).trigger(e);
             assert(scroller.scrollTop == top, 'Проскроллились до уровня ' + scroller.scrollTop + ' при ожидаемом ' + top);
         });
+
+        after(function() {
+            baron.dispose();
+        });
+    });
+
+    describe("clickable + scroll callback", function() {
+        var baron,
+            scroller,
+            scrollTop;
+
+        before(function() {
+            scroller = $('.scroller')[0];
+
+            baron = $('.scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            }).fix({
+                elements: '.header__title',
+                outside: 'header__title_state_fixed',
+                before: 'header__title_position_top',
+                after: 'header__title_position_bottom',
+                clickable: true,
+                scroll: function(data) {
+                    scrollTop = data.x2;
+                }
+            });
+
+            eachIt(baron);
+        });
+
+        it("Клики по второму заголовку вызывает callback с правильной координатой", function() {
+            var e = jQuery.Event('click'),
+                firstTitle = $('.header__title')[0],
+                secondTitle = $('.header__title')[1],
+                top = secondTitle.parentNode.offsetTop - firstTitle.parentNode.offsetHeight;
+
+            scroller.scrollTop = 0;
+            $(secondTitle).trigger(e);
+            assert(scrollTop == top, 'Попросили проскроллить до уровня ' + scrollTop + ' при ожидаемом ' + top);
+        });
     });
 });
 
