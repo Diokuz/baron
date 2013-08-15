@@ -78,7 +78,7 @@
                     }
                 }
 
-                if (limiter) { // Bottom edge of first header as top limit for track
+                if (limiter && elements[0]) { // Bottom edge of first header as top limit for track
                     if (this.track && this.track != this.scroller) {
                         pos = {};
                         pos[this.origin.pos] = elements[0].parentNode[this.origin.offset];

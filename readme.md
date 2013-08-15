@@ -57,7 +57,7 @@ $('.scroller').baron();
 <div class="scroller">
     Your scrollable content here
     <div class="scroller__track"><!-- Track is optional -->
-        <div class="scroller-bar"></div>
+        <div class="scroller__bar"></div>
     </div>
 </div>
 ```
