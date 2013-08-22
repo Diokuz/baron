@@ -17,12 +17,18 @@
             _waiting = params.waiting || 500,
             _on;
 
-        function getHeight() {
+        function getSize() {
             return self.scroller[self.origin.scroll] + self.scroller[self.origin.offset];
         }
 
-        function getScrollHeight() {
+        // Scroller content height
+        function getContentSize() {
             return self.scroller[self.origin.scrollSize];
+        }
+
+        // Scroller height
+        function getScrollerSize() {
+            return self.scroller[self.origin.client];
         }
 
         function step(x, force) {
@@ -44,8 +50,8 @@
 
         function update() {
             var pos = {},
-                height = getHeight(),
-                scrollHeight = getScrollHeight(),
+                height = getSize(),
+                scrollHeight = getContentSize(),
                 dx,
                 op4,
                 scrollInProgress = _insistence == 1;
@@ -67,13 +73,15 @@
                 if (_x < 0) _x = 0;
 
                 pos[size] = _x + 'px';
-                self.$(block).css(pos);
-                if (inProgress && _x) {
-                    self.$(self.root).addClass(inProgress);
+                if (getScrollerSize() <= getContentSize()) {
+                    self.$(block).css(pos);
+                    for (var i = 0 ; i < elements.length ; i++) {
+                        self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                    }
                 }
 
-                for (var i = 0 ; i < elements.length ; i++) {
-                    self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                if (inProgress && _x) {
+                    self.$(self.root).addClass(inProgress);
                 }
 
                 if (_x == 0) {
@@ -117,14 +125,16 @@
         });
 
         this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
-            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta) || e.detail > 0;
+            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta < 0) || e.detail > 0;
 
             if (down) {
                 _insistence = 1;
                 clearTimeout(_timer);
-                if (!_on && getHeight() >= getScrollHeight()) {
+                if (!_on && getSize() >= getContentSize()) {
                     toggle(true);
                 }
+            } else {
+                toggle(false);
             }
         });
     };
