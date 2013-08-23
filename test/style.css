@@ -1,4 +1,4 @@
-html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
+html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana; overflow: hidden;}
 
 .test {
     z-index: 0;
@@ -126,14 +126,24 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
     color: #222;
     font-size: 14px;
     opacity: 1;
-    -webkit-transition: background-color 2s;
-    transition: background-color 2s;
 }
 .header__title_state_fixed {
     position: absolute;
     z-index: 1;
     background-color: rgba(220, 229, 250, .6);
     text-shadow: 0 0 5px #fff;
+}
+.header__title_position_top {
+    background: rgba(255, 229, 250, .6);
+}
+.header__title_position_bottom {
+    background: rgba(220, 255, 250, .6);
+}
+.header__title_group_top {
+    color: red;
+}
+.header__title_group_bottom {
+    color: green;
 }
 
 .text {
@@ -194,4 +204,8 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 .scroller__down {
     bottom: 0;
     right: 0;
+}
+
+.scroller__pull {
+    background: red;
 }

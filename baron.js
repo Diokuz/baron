@@ -527,7 +527,7 @@ var
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
-        var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
+        var elements, outside, before, after, past, future, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
             scroller = this.scroller,
@@ -566,6 +566,8 @@ var
                 outside = _params.outside + '';
                 before = _params.before + '';
                 after = _params.after + '';
+                past = _params.past + '';
+                future = _params.future + '';
                 radius = _params.radius || 0;
                 minView = _params.minView || 0;
                 limiter = _params.limiter;
@@ -656,10 +658,11 @@ var
 
         this.on('init scroll', function() {
             var fixState, hTop,
-                fixFlag = [];
+                fixFlag = []; // 1 - past, 2 - future, 3 - current (not fixed)
 
             if (elements) {
                 var change;
+
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
                     if (headerTops[i] - this.pos() < topHeights[i] + radius) {
@@ -685,13 +688,24 @@ var
                 // Adding positioning classes (on last top and first bottom header)
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
+                        if (fixFlag[i] == 1 && past) {
+                            this.$(elements[i]).addClass(past).removeClass(future);
+                        }
+
+                        if (fixFlag[i] == 2 && future) {
+                            this.$(elements[i]).addClass(future).removeClass(past);
+                        }
+
+                        if (fixFlag[i] == 3 && (future || past)) {
+                            this.$(elements[i]).removeClass(past).removeClass(future);
+                        }
+
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && before) {
                             this.$(elements[i]).addClass(before).removeClass(after); // Last top fixed header
                         } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && after) {
                             this.$(elements[i]).addClass(after).removeClass(before); // First bottom fixed header
                         } else {
                             this.$(elements[i]).removeClass(before).removeClass(after);
-                            // Emply string for bonzo, which does not handles removeClass(undefined)
                         }
                     }
                 }
@@ -915,9 +929,10 @@ var
                 if (!_on && getSize() >= getContentSize()) {
                     toggle(true);
                 }
-            } else {
-                toggle(false);
             }
+            //  else {
+            //     toggle(false);
+            // }
         });
     };
 

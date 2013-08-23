@@ -133,9 +133,10 @@
                 if (!_on && getSize() >= getContentSize()) {
                     toggle(true);
                 }
-            } else {
-                toggle(false);
             }
+            //  else {
+            //     toggle(false);
+            // }
         });
     };
 

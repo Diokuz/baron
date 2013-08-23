@@ -527,7 +527,7 @@ var
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(params) {
-        var elements, outside, before, after, elementSelector, radius, viewPortSize, minView, limiter,
+        var elements, outside, before, after, past, future, elementSelector, radius, viewPortSize, minView, limiter,
             topHeights = [],
             headerTops = [],
             scroller = this.scroller,
@@ -566,6 +566,8 @@ var
                 outside = _params.outside + '';
                 before = _params.before + '';
                 after = _params.after + '';
+                past = _params.past + '';
+                future = _params.future + '';
                 radius = _params.radius || 0;
                 minView = _params.minView || 0;
                 limiter = _params.limiter;
@@ -604,7 +606,7 @@ var
                     }
                 }
 
-                if (limiter) { // Bottom edge of first header as top limit for track
+                if (limiter && elements[0]) { // Bottom edge of first header as top limit for track
                     if (this.track && this.track != this.scroller) {
                         pos = {};
                         pos[this.origin.pos] = elements[0].parentNode[this.origin.offset];
@@ -656,10 +658,11 @@ var
 
         this.on('init scroll', function() {
             var fixState, hTop,
-                fixFlag = [];
+                fixFlag = []; // 1 - past, 2 - future, 3 - current (not fixed)
 
             if (elements) {
                 var change;
+
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
                     if (headerTops[i] - this.pos() < topHeights[i] + radius) {
@@ -685,13 +688,20 @@ var
                 // Adding positioning classes (on last top and first bottom header)
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
+                        if (fixFlag[i] == 1 && past) {
+                            this.$(elements[i]).addClass(past).removeClass(future);
+                        }
+
+                        if (fixFlag[i] == 2 && future) {
+                            this.$(elements[i]).addClass(future).removeClass(past);
+                        }
+
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && before) {
                             this.$(elements[i]).addClass(before).removeClass(after); // Last top fixed header
                         } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && after) {
                             this.$(elements[i]).addClass(after).removeClass(before); // First bottom fixed header
                         } else {
-                            this.$(elements[i]).removeClass(before).removeClass(after);
-                            // Emply string for bonzo, which does not handles removeClass(undefined)
+                            this.$(elements[i]).removeClass(before).removeClass(after).removeClass(past).removeClass(future);
                         }
                     }
                 }
@@ -890,12 +900,18 @@ var
             _waiting = params.waiting || 500,
             _on;
 
-        function getHeight() {
+        function getSize() {
             return self.scroller[self.origin.scroll] + self.scroller[self.origin.offset];
         }
 
-        function getScrollHeight() {
+        // Scroller content height
+        function getContentSize() {
             return self.scroller[self.origin.scrollSize];
+        }
+
+        // Scroller height
+        function getScrollerSize() {
+            return self.scroller[self.origin.client];
         }
 
         function step(x, force) {
@@ -917,8 +933,8 @@ var
 
         function update() {
             var pos = {},
-                height = getHeight(),
-                scrollHeight = getScrollHeight(),
+                height = getSize(),
+                scrollHeight = getContentSize(),
                 dx,
                 op4,
                 scrollInProgress = _insistence == 1;
@@ -940,13 +956,15 @@ var
                 if (_x < 0) _x = 0;
 
                 pos[size] = _x + 'px';
-                self.$(block).css(pos);
-                if (inProgress && _x) {
-                    self.$(self.root).addClass(inProgress);
+                if (getScrollerSize() <= getContentSize()) {
+                    self.$(block).css(pos);
+                    for (var i = 0 ; i < elements.length ; i++) {
+                        self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                    }
                 }
 
-                for (var i = 0 ; i < elements.length ; i++) {
-                    self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%');
+                if (inProgress && _x) {
+                    self.$(self.root).addClass(inProgress);
                 }
 
                 if (_x == 0) {
@@ -990,14 +1008,16 @@ var
         });
 
         this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
-            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta) || e.detail > 0;
+            var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta < 0) || e.detail > 0;
 
             if (down) {
                 _insistence = 1;
                 clearTimeout(_timer);
-                if (!_on && getHeight() >= getScrollHeight()) {
+                if (!_on && getSize() >= getContentSize()) {
                     toggle(true);
                 }
+            } else {
+                toggle(false);
             }
         });
     };
