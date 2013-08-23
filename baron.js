@@ -578,13 +578,6 @@ var
             if (elements) {
                 viewPortSize = this.scroller[this.origin.client];
                 for (var i = 0 ; i < elements.length ; i++) {
-                    // Summary elements height above current
-                    topHeights[i] = (topHeights[i - 1] || 0);
-
-                    if (elements[i - 1]) {
-                        topHeights[i] += elements[i - 1][this.origin.offset];
-                    }
-
                     // Variable header heights
                     pos = {};
                     pos[this.origin.size] = elements[i][this.origin.offset];
@@ -599,6 +592,13 @@ var
                     viewPortSize -= elements[i][this.origin.offset];
 
                     headerTops[i] = elements[i].parentNode[this.origin.offsetPos]; // No paddings for parentNode
+
+                    // Summary elements height above current
+                    topHeights[i] = (topHeights[i - 1] || Math.min(headerTops[i], 0)); // Not zero because of negative margins
+
+                    if (elements[i - 1]) {
+                        topHeights[i] += elements[i - 1][this.origin.offset];
+                    }
 
                     if ( !(i == 0 && headerTops[i] == 0)/* && force */) {
                         this.event(elements[i], 'mousewheel', bubbleWheel, 'off');
@@ -663,6 +663,7 @@ var
             if (elements) {
                 var change;
 
+                // fixFlag update
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
                     if (headerTops[i] - this.pos() < topHeights[i] + radius) {

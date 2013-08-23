@@ -168,7 +168,7 @@ describe("Плагин fix.", function() {
 
         before(function() {
             $('.wrapper').html(originalHTML);
-            
+
             baron = $('.scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
@@ -273,7 +273,7 @@ describe("Плагин fix.", function() {
         });
     });
 
-    describe("+ pull", function() {
+    describe("Negative margins.", function() {
         var baron,
             scroller,
             scrollTop;
@@ -281,6 +281,7 @@ describe("Плагин fix.", function() {
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
             $('.wrapper').html(html);
+            $('.header__title').css({margin: '-1px 0 0'});
 
             scroller = $('.scroller')[0];
 
@@ -291,11 +292,7 @@ describe("Плагин fix.", function() {
                 elements: '.header__title',
                 outside: 'header__title_state_fixed',
                 before: 'header__title_position_top',
-                after: 'header__title_position_bottom',
-                clickable: true,
-                scroll: function(data) {
-                    scrollTop = data.x2;
-                }
+                after: 'header__title_position_bottom'
             }).pull({
                 block: ('.scroller__pull'),
                 limit: 115,
@@ -309,13 +306,15 @@ describe("Плагин fix.", function() {
             eachIt(baron);
         });
 
-        it("", function() {
-            
+        it("No fix classes on first header at start", function() {
+            assert(!$('.header__title').eq(0).hasClass('header__title_state_fixed'), 'no fix cls');
+            assert(!$('.header__title').eq(0).hasClass('header__title_position_top'), 'no before cls');
+            assert(!$('.header__title').eq(0).hasClass('header__title_position_bottom'), 'no after cls');
         });
 
-        after(function() {
-            baron.dispose();
-        });
+        // after(function() {
+        //     baron.dispose();
+        // });
     });
 });
 
