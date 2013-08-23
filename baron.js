@@ -528,7 +528,8 @@ var
 (function(window, undefined) {
     var fix = function(params) {
         var elements, outside, before, after, past, future, elementSelector, radius, viewPortSize, minView, limiter,
-            topHeights = [],
+            topFixHeights = [], // inline style for element
+            topRealHeights = [], // real offset position when not fixed
             headerTops = [],
             scroller = this.scroller,
             eventManager = this.event,
@@ -594,10 +595,12 @@ var
                     headerTops[i] = elements[i].parentNode[this.origin.offsetPos]; // No paddings for parentNode
 
                     // Summary elements height above current
-                    topHeights[i] = (topHeights[i - 1] || Math.min(headerTops[i], 0)); // Not zero because of negative margins
+                    topFixHeights[i] = (topFixHeights[i - 1] || 0); // Not zero because of negative margins
+                    topRealHeights[i] = (topRealHeights[i - 1] || Math.min(headerTops[i], 0));
 
                     if (elements[i - 1]) {
-                        topHeights[i] += elements[i - 1][this.origin.offset];
+                        topFixHeights[i] += elements[i - 1][this.origin.offset];
+                        topRealHeights[i] += elements[i - 1][this.origin.offset];
                     }
 
                     if ( !(i == 0 && headerTops[i] == 0)/* && force */) {
@@ -632,7 +635,7 @@ var
                         if (elements[i] === this) num = i;
                     }
 
-                    var pos = top - topHeights[num];
+                    var pos = top - topFixHeights[num];
 
                     if (params.scroll) { // User defined callback
                         params.scroll({
@@ -666,14 +669,14 @@ var
                 // fixFlag update
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] - this.pos() < topHeights[i] + radius) {
+                    if (headerTops[i] - this.pos() < topRealHeights[i] + radius) {
                         // Header trying to go up
                         fixState = 1;
-                        hTop = topHeights[i];
-                    } else if (headerTops[i] - this.pos() > topHeights[i] + viewPortSize - radius) {
+                        hTop = topFixHeights[i];
+                    } else if (headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize - radius) {
                         // Header trying to go down
                         fixState = 2;
-                        hTop = topHeights[i] + viewPortSize;
+                        hTop = topFixHeights[i] + viewPortSize;
                     } else {
                         // Header in viewport
                         fixState = 3;

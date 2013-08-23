@@ -275,13 +275,12 @@ describe("Плагин fix.", function() {
 
     describe("Negative margins.", function() {
         var baron,
-            scroller,
-            scrollTop;
+            scroller;
 
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
             $('.wrapper').html(html);
-            $('.header__title').css({margin: '-1px 0 0'});
+            $('.header__title').css({margin: '-7px 0 0'});
 
             scroller = $('.scroller')[0];
 
@@ -293,14 +292,6 @@ describe("Плагин fix.", function() {
                 outside: 'header__title_state_fixed',
                 before: 'header__title_position_top',
                 after: 'header__title_position_bottom'
-            }).pull({
-                block: ('.scroller__pull'),
-                limit: 115,
-                onExpand: function() {
-                },
-                onCollapse: function() {
-                },
-                inProgress: 'scroller_pull_true'
             });
 
             eachIt(baron);
@@ -310,6 +301,13 @@ describe("Плагин fix.", function() {
             assert(!$('.header__title').eq(0).hasClass('header__title_state_fixed'), 'no fix cls');
             assert(!$('.header__title').eq(0).hasClass('header__title_position_top'), 'no before cls');
             assert(!$('.header__title').eq(0).hasClass('header__title_position_bottom'), 'no after cls');
+        });
+
+        it("offsetTop", function() {
+            assert($('.header__title')[0].offsetTop == -7, 'offsetTop at start pos ' + $('.header__title')[0].offsetTop);
+            $('.scroller')[0].scrollTop = 1;
+            baron.update();
+            assert($('.header__title')[0].offsetTop == -7, 'offsetTop at 1px scroll ' + $('.header__title')[0].offsetTop);
         });
 
         // after(function() {
