@@ -83,7 +83,11 @@ var
 
         update: function() {
             var i = 0;
-            while (this[i]) this[i++].update();
+
+            while (this[i]) {
+                this[i].update.apply(this[i], arguments);
+                i++;
+            }
         },
 
         baron: function(params) {
@@ -258,7 +262,9 @@ var
         /* jshint validthis:true */
         if (this.events && this.events[eventName]) {
             for (var i = 0 ; i < this.events[eventName].length ; i++) {
-                this.events[eventName][i].apply(this, Array.prototype.slice.call( arguments, 1 ));
+                var args = Array.prototype.slice.call( arguments, 1 );
+
+                this.events[eventName][i].apply(this, args);
             }
         }
     }
@@ -429,7 +435,7 @@ var
             };
 
             // onScroll handler
-            this.scroll = function( ) {
+            this.scroll = function() {
                 var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
@@ -471,7 +477,9 @@ var
             return this;
         },
 
-        update: function() {
+        update: function(params) {
+            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+
             this.resize(1);
             this.barOn();
             this.scroll();
@@ -496,8 +504,8 @@ var
                 } else {
                     this.events[names[i]] = this.events[names[i]] || [];
 
-                    this.events[names[i]].push(function() {
-                        func.call(this, arg);
+                    this.events[names[i]].push(function(userArg) {
+                        func.call(this, userArg || arg);
                     });
                 }
             }
@@ -514,7 +522,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.5';
+    baron.version = '0.6.6';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
