@@ -83,7 +83,11 @@ var
 
         update: function() {
             var i = 0;
-            while (this[i]) this[i++].update();
+
+            while (this[i]) {
+                this[i].update.apply(this[i], arguments);
+                i++;
+            }
         },
 
         baron: function(params) {
@@ -258,7 +262,9 @@ var
         /* jshint validthis:true */
         if (this.events && this.events[eventName]) {
             for (var i = 0 ; i < this.events[eventName].length ; i++) {
-                this.events[eventName][i].apply(this, Array.prototype.slice.call( arguments, 1 ));
+                var args = Array.prototype.slice.call( arguments, 1 );
+
+                this.events[eventName][i].apply(this, args);
             }
         }
     }
@@ -429,7 +435,7 @@ var
             };
 
             // onScroll handler
-            this.scroll = function( ) {
+            this.scroll = function() {
                 var oldBarSize, newBarSize,
                     delay = 0,
                     self = this;
@@ -471,7 +477,9 @@ var
             return this;
         },
 
-        update: function() {
+        update: function(params) {
+            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+
             this.resize(1);
             this.barOn();
             this.scroll();
@@ -496,8 +504,8 @@ var
                 } else {
                     this.events[names[i]] = this.events[names[i]] || [];
 
-                    this.events[names[i]].push(function() {
-                        func.call(this, arg);
+                    this.events[names[i]].push(function(userArg) {
+                        func.call(this, userArg || arg);
                     });
                 }
             }
@@ -514,7 +522,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.5';
+    baron.version = '0.6.6';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -526,8 +534,17 @@ var
 })(window);
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
-    var fix = function(params) {
-        var elements, outside, before, after, past, future, elementSelector, radius, viewPortSize, minView, limiter,
+    var fix = function(userParams) {
+        var elements, viewPortSize,
+            params = { // Default params
+                outside: '',
+                before: '',
+                after: '',
+                past: '',
+                future: '',
+                radius: 0,
+                minView: 0
+            },
             topFixHeights = [], // inline style for element
             topRealHeights = [], // real offset position when not fixed
             headerTops = [],
@@ -537,15 +554,15 @@ var
             self = this;
 
         function fixElement(i, pos) {
-            if (viewPortSize < (minView || 0)) { // No headers fixing when no enought space for viewport
+            if (viewPortSize < (params.minView || 0)) { // No headers fixing when no enought space for viewport
                 pos = undefined;
             }
 
             if (pos !== undefined) {
                 pos += 'px';
-                this.$(elements[i]).css(this.origin.pos, pos).addClass(outside);
+                this.$(elements[i]).css(this.origin.pos, pos).addClass(params.outside);
             } else {
-                this.$(elements[i]).css(this.origin.pos, '').removeClass(outside);
+                this.$(elements[i]).css(this.origin.pos, '').removeClass(params.outside);
             }
         }
 
@@ -562,19 +579,11 @@ var
         function init(_params) {
             var pos;
 
-            if (_params) {
-                elementSelector = _params.elements;
-                outside = _params.outside + '';
-                before = _params.before + '';
-                after = _params.after + '';
-                past = _params.past + '';
-                future = _params.future + '';
-                radius = _params.radius || 0;
-                minView = _params.minView || 0;
-                limiter = _params.limiter;
+            for (var key in _params) {
+                params[key] = _params[key];
             }
 
-            elements = this.$(elementSelector, this.scroller);
+            elements = this.$(params.elements, this.scroller);
 
             if (elements) {
                 viewPortSize = this.scroller[this.origin.client];
@@ -609,7 +618,7 @@ var
                     }
                 }
 
-                if (limiter && elements[0]) { // Bottom edge of first header as top limit for track
+                if (params.limiter && elements[0]) { // Bottom edge of first header as top limit for track
                     if (this.track && this.track != this.scroller) {
                         pos = {};
                         pos[this.origin.pos] = elements[0].parentNode[this.origin.offset];
@@ -619,6 +628,10 @@ var
                     }
                     // this.barTopLimit = elements[0].parentNode[this.origin.offset];
                     this.scroll();
+                }
+
+                if (params.limiter === false) { // undefined (in second fix instance) should have no influence on bar limit
+                    this.barTopLimit = 0;
                 }
             }
 
@@ -657,7 +670,7 @@ var
             }
         }
 
-        this.on('init', init, params);
+        this.on('init', init, userParams);
 
         this.on('init scroll', function() {
             var fixState, hTop,
@@ -669,11 +682,11 @@ var
                 // fixFlag update
                 for (var i = 0 ; i < elements.length ; i++) {
                     fixState = 0;
-                    if (headerTops[i] - this.pos() < topRealHeights[i] + radius) {
+                    if (headerTops[i] - this.pos() < topRealHeights[i] + params.radius) {
                         // Header trying to go up
                         fixState = 1;
                         hTop = topFixHeights[i];
-                    } else if (headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize - radius) {
+                    } else if (headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize - params.radius) {
                         // Header trying to go down
                         fixState = 2;
                         hTop = topFixHeights[i] + viewPortSize;
@@ -692,32 +705,32 @@ var
                 // Adding positioning classes (on last top and first bottom header)
                 if (change) { // At leats one change in elements flag structure occured
                     for (i = 0 ; i < elements.length ; i++) {
-                        if (fixFlag[i] == 1 && past) {
-                            this.$(elements[i]).addClass(past).removeClass(future);
+                        if (fixFlag[i] == 1 && params.past) {
+                            this.$(elements[i]).addClass(params.past).removeClass(params.future);
                         }
 
-                        if (fixFlag[i] == 2 && future) {
-                            this.$(elements[i]).addClass(future).removeClass(past);
+                        if (fixFlag[i] == 2 && params.future) {
+                            this.$(elements[i]).addClass(params.future).removeClass(params.past);
                         }
 
-                        if (fixFlag[i] == 3 && (future || past)) {
-                            this.$(elements[i]).removeClass(past).removeClass(future);
+                        if (fixFlag[i] == 3 && (params.future || params.past)) {
+                            this.$(elements[i]).removeClass(params.past).removeClass(params.future);
                         }
 
-                        if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && before) {
-                            this.$(elements[i]).addClass(before).removeClass(after); // Last top fixed header
-                        } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && after) {
-                            this.$(elements[i]).addClass(after).removeClass(before); // First bottom fixed header
+                        if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && params.before) {
+                            this.$(elements[i]).addClass(params.before).removeClass(params.after); // Last top fixed header
+                        } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && params.after) {
+                            this.$(elements[i]).addClass(params.after).removeClass(params.before); // First bottom fixed header
                         } else {
-                            this.$(elements[i]).removeClass(before).removeClass(after);
+                            this.$(elements[i]).removeClass(params.before).removeClass(params.after);
                         }
                     }
                 }
             }
         });
 
-        this.on('resize', function() {
-            init.call(this);
+        this.on('resize upd', function(updParams) {
+            init.call(this, updParams && updParams.fix);
         });
     };
 

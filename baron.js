@@ -583,18 +583,6 @@ var
                 params[key] = _params[key];
             }
 
-            // if (_params) {
-            //     elementSelector = elementSelector || _params.elements;
-            //     outside = outside || _params.outside + '';
-            //     before = before || _params.before + '';
-            //     after = _params.after + '';
-            //     past = _params.past + '';
-            //     future = _params.future + '';
-            //     radius = _params.radius || 0;
-            //     minView = _params.minView || 0;
-            //     limiter = _params.limiter;
-            // }
-
             elements = this.$(params.elements, this.scroller);
 
             if (elements) {
@@ -642,7 +630,7 @@ var
                     this.scroll();
                 }
 
-                if (!params.limiter) {
+                if (params.limiter === false) { // undefined (in second fix instance) should have no influence on bar limit
                     this.barTopLimit = 0;
                 }
             }
