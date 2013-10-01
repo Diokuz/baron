@@ -62,6 +62,50 @@ describe("Барон.", function() {
             assert.ok(!size);
         });
     });
+
+    describe("Textarea.", function() {
+        var baron,
+            scroller;
+
+        before(function() {
+            var html = '<textarea class="scroller" style="font-size: 40px; line-height: 100px">-</textarea><div class="scroller__track"><div class="scroller__bar"></div></div></div>';
+            
+            $('.wrapper').html(html);
+
+            scroller = $('.scroller')[0];
+            $('.header__title').eq(1).css({height: '100px'});
+
+            baron = $('.wrapper').baron({
+                scroller: '.scroller',
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+
+            eachIt(baron);
+        });
+
+        it("Toggling barOnCls.", function() {
+            $('.scroller').text('sadkvbalsjdfasjdkhfakjsdhflaksdhflakjhsdafjh');
+
+            $('.scroller').each(function() {
+                $(this).trigger('scroll');
+            });
+
+            assert( $('.wrapper').hasClass(barOnCls), 'При большом количестве контента навешивается класс' );
+
+            $('.scroller').text('');
+
+            $('.scroller').each(function() {
+                $(this).trigger('scroll');
+            });
+
+            assert( !$('.wrapper').hasClass(barOnCls), 'В отсутствии текста класса нет' );
+        });
+
+        after(function() {
+            baron.dispose();
+        });
+    });
 });
 
 describe("Плагин fix.", function() {

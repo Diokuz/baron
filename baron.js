@@ -445,6 +445,8 @@ var
                     delay = pause;
                 }
 
+                this.barOn();
+
                 function upd() {
                     if (self.bar) {
                         newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
@@ -481,7 +483,6 @@ var
             fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
 
             this.resize(1);
-            this.barOn();
             this.scroll();
 
             return this;
