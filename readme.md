@@ -314,6 +314,9 @@ params = {
     // Default: 0
     radius: 10,
 
+    // Works identical to outside as if radius === 0
+    grad: 'header__title_state_grad',
+
     // Wether click on element should scroll to
     clickable: false,
 
