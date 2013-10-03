@@ -227,9 +227,15 @@ describe("Плагин fix.", function() {
             assert(!$('.wrapper_headers .scroller .header:first-of-type .header__title').hasClass('header__title_grad_true'), 'has no grad class on start');
 
             $('.scroller')[0].scrollTop = 1;
-            baron.update(); // Событие выстреливает позже
-
+            baron.update();
             assert($('.wrapper_headers .scroller .header:first-of-type .header__title').hasClass('header__title_grad_true'), 'has grad class after 1px scroll down');
+
+            $('.scroller')[0].scrollTop = $('.scroller')[0].scrollHeight - $('.scroller')[0].clientHeight;
+            baron.update();
+            assert(!$('.wrapper_headers .scroller .header:last-of-type .header__title').hasClass('header__title_grad_true'), 'has no grad class on end');
+            $('.scroller')[0].scrollTop = $('.scroller')[0].scrollHeight - $('.scroller')[0].clientHeight - 1;
+            baron.update();
+            assert($('.wrapper_headers .scroller .header:last-of-type .header__title').hasClass('header__title_grad_true'), 'has grad class after 1px scroll up');
 
             baron.dispose();
         });
