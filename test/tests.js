@@ -204,6 +204,35 @@ describe("Плагин fix.", function() {
 
             // $('.wrapper').html(originalHTML);
         });
+
+        it("grad param", function() {
+            $('.wrapper').html(originalHTML);
+
+            baron = $('.scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            }).fix({
+                elements: '.header__title',
+                outside: 'header__title_state_fixed',
+                before: 'header__title_position_top',
+                after: 'header__title_position_bottom',
+                past: 'header__title_group_top',
+                future: 'header__title_group_bottom',
+                grad: 'header__title_grad_true',
+                radius: 100
+            });
+
+            baron.update(); // Событие выстреливает позже
+
+            assert(!$('.wrapper_headers .scroller .header:first-of-type .header__title').hasClass('header__title_grad_true'), 'has no grad class on start');
+
+            $('.scroller')[0].scrollTop = 1;
+            baron.update(); // Событие выстреливает позже
+
+            assert($('.wrapper_headers .scroller .header:first-of-type .header__title').hasClass('header__title_grad_true'), 'has grad class after 1px scroll down');
+
+            baron.dispose();
+        });
     });
 
     describe("clickable", function() {

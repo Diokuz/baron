@@ -523,7 +523,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.6';
+    baron.version = '0.6.7';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -674,8 +674,9 @@ var
         this.on('init', init, userParams);
 
         this.on('init scroll', function() {
-            var fixState, hTop,
-                fixFlag = []; // 1 - past, 2 - future, 3 - current (not fixed)
+            var fixState, hTop, gradState,
+                fixFlag = [], // 1 - past, 2 - future, 3 - current (not fixed)
+                gradFlag = [];
 
             if (elements) {
                 var change;
@@ -696,9 +697,16 @@ var
                         fixState = 3;
                         hTop = undefined;
                     }
-                    if (fixState != fixFlag[i]) {
+
+                    gradState = false;
+                    if (headerTops[i] - this.pos() < topRealHeights[i] || headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize) {
+                        gradState = true;
+                    }
+
+                    if (fixState != fixFlag[i] || gradState != gradFlag[i]) {
                         fixElement.call(this, i, hTop);
                         fixFlag[i] = fixState;
+                        gradFlag[i] = gradState;
                         change = true;
                     }
                 }
@@ -724,6 +732,14 @@ var
                             this.$(elements[i]).addClass(params.after).removeClass(params.before); // First bottom fixed header
                         } else {
                             this.$(elements[i]).removeClass(params.before).removeClass(params.after);
+                        }
+
+                        if (params.grad) {
+                            if (gradFlag[i]) {
+                                this.$(elements[i]).addClass(params.grad);
+                            } else {
+                                this.$(elements[i]).removeClass(params.grad);
+                            }
                         }
                     }
                 }
