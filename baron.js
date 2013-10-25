@@ -9,12 +9,12 @@ var
     origin = {
         v: { // Vertical
             x: 'Y', pos: 'top', crossPos: 'left', size: 'height', crossSize: 'width',
-            client: 'clientHeight', crossClient: 'clientWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
+            client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
             x: 'X', pos: 'left', crossPos: 'top', size: 'width', crossSize: 'height',
-            client: 'clientWidth', crossClient: 'clientHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
+            client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
     },
@@ -414,7 +414,16 @@ var
                 }
 
                 function upd() {
-                    var delta = self.scroller[self.origin.crossOffset] - self.scroller[self.origin.crossClient];
+                    var delta,
+                        client;
+
+                    if (self.scroller.tagName == 'TEXTAREA') {
+                        client = self.scroller[self.origin.crossScroll];
+                    } else {
+                        client = self.scroller[self.origin.crossClient];
+                    }
+
+                    delta = self.scroller[self.origin.crossOffset] - client;
 
                     if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
                         $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
@@ -523,7 +532,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.7';
+    baron.version = '0.6.8';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
