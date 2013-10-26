@@ -12,23 +12,29 @@
                 minView: 0
             },
             topFixHeights = [], // inline style for element
-            topRealHeights = [], // real offset position when not fixed
-            headerTops = [],
+            topRealHeights = [], // ? something related to negative margins for fixable elements
+            headerTops = [], // offset positions when not fixed
             scroller = this.scroller,
             eventManager = this.event,
             $ = this.$,
             self = this;
 
-        function fixElement(i, pos) {
+        // i - number of fixing element, pos - fix-position in px, flag - 1: top, 2: bottom
+        // Invocation only in case when fix-state changed
+        function fixElement(i, pos, flag) {
+            var ori = flag == 1 ? 'pos' : 'oppos';
+
             if (viewPortSize < (params.minView || 0)) { // No headers fixing when no enought space for viewport
                 pos = undefined;
             }
 
+            // Removing all fixing stuff - we can do this because fixElement triggers only when fixState really changed
+            this.$(elements[i]).css(this.origin.pos, '').css(this.origin.oppos, '').removeClass(params.outside);
+
+            // Fixing if needed
             if (pos !== undefined) {
                 pos += 'px';
-                this.$(elements[i]).css(this.origin.pos, pos).addClass(params.outside);
-            } else {
-                this.$(elements[i]).css(this.origin.pos, '').removeClass(params.outside);
+                this.$(elements[i]).css(this.origin[ori], pos).addClass(params.outside);
             }
         }
 
@@ -156,7 +162,10 @@
                     } else if (headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize - params.radius) {
                         // Header trying to go down
                         fixState = 2;
-                        hTop = topFixHeights[i] + viewPortSize;
+                        // console.log('topFixHeights[i] + viewPortSize + topRealHeights[i]', topFixHeights[i], this.scroller[this.origin.client], topRealHeights[i]);
+                        hTop = this.scroller[this.origin.client] - elements[i][this.origin.offset] - topFixHeights[i] - viewPortSize;
+                        // console.log('hTop', hTop, viewPortSize, elements[this.origin.offset], topFixHeights[i]);
+                        //(topFixHeights[i] + viewPortSize + elements[this.origin.offset]) - this.scroller[this.origin.client];
                     } else {
                         // Header in viewport
                         fixState = 3;
@@ -169,7 +178,7 @@
                     }
 
                     if (fixState != fixFlag[i] || gradState != gradFlag[i]) {
-                        fixElement.call(this, i, hTop);
+                        fixElement.call(this, i, hTop, fixState);
                         fixFlag[i] = fixState;
                         gradFlag[i] = gradState;
                         change = true;

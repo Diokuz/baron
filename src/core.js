@@ -8,12 +8,12 @@ var
     $ = window.jQuery, // Trying to use jQuery
     origin = {
         v: { // Vertical
-            x: 'Y', pos: 'top', crossPos: 'left', size: 'height', crossSize: 'width',
+            x: 'Y', pos: 'top', oppos: 'bottom', crossPos: 'left', size: 'height', crossSize: 'width',
             client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
-            x: 'X', pos: 'left', crossPos: 'top', size: 'width', crossSize: 'height',
+            x: 'X', pos: 'left', oppos: 'right', crossPos: 'top', size: 'width', crossSize: 'height',
             client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
@@ -532,7 +532,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.8';
+    baron.version = '0.6.9';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
