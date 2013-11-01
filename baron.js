@@ -213,7 +213,7 @@ var
     }
 
     function init(params) {
-        if (manageAttr(params.root, params.direction)) return;
+        if (manageAttr(params.root, params.direction)) throw new Error('Second baron initialization');
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 

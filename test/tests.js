@@ -44,6 +44,17 @@ describe("Барон.", function() {
             assert.ok(Math.abs(height - expectedHeight) <= 1);
         });
 
+        it("Повторная инициализация бросает ошибку", function(done) {
+            try {
+                baron = $('.scroller').baron({
+                    bar: '.scroller__bar',
+                    barOnCls: barOnCls
+                });
+            } catch (e) {
+                done();
+            }
+        });
+
         it("После вызова метода dispose удаляет атрибуты и классы", function() {
             var sizeDim = baron[0].origin.crossSize;
 
