@@ -99,7 +99,8 @@ describe("Барон.", function() {
             $('.scroller').text('sadkvbalsjdfasjdkhfakjsdhflaksdhflakjhsdafjh');
 
             $('.scroller').each(function() {
-                $(this).trigger('scroll');
+                // $(this).trigger('scroll');
+                baron.update();
             });
 
             assert( $('.wrapper').hasClass(barOnCls), 'При большом количестве контента навешивается класс' );
@@ -107,7 +108,8 @@ describe("Барон.", function() {
             $('.scroller').text('');
 
             $('.scroller').each(function() {
-                $(this).trigger('scroll');
+                // $(this).trigger('scroll');
+                baron.update();
             });
 
             assert( !$('.wrapper').hasClass(barOnCls), 'В отсутствии текста класса нет' );

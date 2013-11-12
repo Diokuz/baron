@@ -41,6 +41,12 @@ module.exports = function (grunt) {
                     'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js'],
                     'demo/<%= pkg.name %>.full.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js']
                 }
+            },
+            online: {
+                files: {
+                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js'],
+                    '<%= pkg.name %>.js': ['src/core.js', 'src/fix.js']
+                }
             }
         },
         uglify: {
@@ -64,6 +70,12 @@ module.exports = function (grunt) {
                     'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
                     '<%= pkg.name %>.min.js': ['<%= pkg.name %>.js']
                 }
+            },
+            online: {
+                files: {
+                    'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
+                    '<%= pkg.name %>.min.js': ['<%= pkg.name %>.js']
+                }
             }
         },
         'mocha-phantomjs': {
@@ -82,6 +94,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['concat:def', 'uglify:def']);
     grunt.registerTask('core', ['concat:core', 'uglify:core']);
     grunt.registerTask('full', ['concat:full', 'uglify:full']);
+    grunt.registerTask('online', ['concat:online', 'uglify:online']);
     grunt.registerTask('test', ['mocha-phantomjs']);
     grunt.registerTask('t', ['jshint', 'mocha-phantomjs']);
 };

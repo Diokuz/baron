@@ -417,6 +417,8 @@ var
                     var delta,
                         client;
 
+                    self.barOn();
+
                     if (self.scroller.tagName == 'TEXTAREA') {
                         client = self.scroller[self.origin.crossScroll];
                     } else {
@@ -454,7 +456,7 @@ var
                     delay = pause;
                 }
 
-                this.barOn();
+                // this.barOn();
 
                 function upd() {
                     if (self.bar) {
