@@ -9,13 +9,15 @@ $(document).ready(function() {
 
     // Simple initialization with minimum parameters, but with headers
     for (i = 0 ; i < 100 ; i++) {
-        $('.wrapper_simple .scroller').baron({
-            barOnCls: 'baron'
-        }).fix({
-            elements: '.header__title',
-            outside: 'header__title_state_fixed',
-            radius: 30
-        });
+        try {
+            $('.wrapper_simple .scroller').baron({
+                barOnCls: 'baron'
+            }).fix({
+                elements: '.header__title',
+                outside: 'header__title_state_fixed',
+                radius: 30
+            });
+        } catch (e) {}
     }
 
     // Array initialization + limiter
@@ -83,24 +85,26 @@ $(document).ready(function() {
 
     // Maximum variables
     for (i = 0 ; i < 10 ; i++) {
-        anotherBaron({
-            scroller: '.test_advanced .scroller',
-            bar: '.scroller__bar',
-            barOnCls: 'baron',
-            $: function(selector, context) {
-                return bonzo(qwery(selector, context));
-            },
-            event: function(elem, event, func, mode) { // Events manager
-                if (mode == 'trigger') {
-                    mode = 'fire';
-                }
+        try {
+            anotherBaron({
+                scroller: '.test_advanced .scroller',
+                bar: '.scroller__bar',
+                barOnCls: 'baron',
+                $: function(selector, context) {
+                    return bonzo(qwery(selector, context));
+                },
+                event: function(elem, event, func, mode) { // Events manager
+                    if (mode == 'trigger') {
+                        mode = 'fire';
+                    }
 
-                bean[mode || 'on'](elem, event, func);
-            }
-        }).fix({
-            elements: '.header__title',
-            outside: 'header__title_state_fixed'
-        });
+                    bean[mode || 'on'](elem, event, func);
+                }
+            }).fix({
+                elements: '.header__title',
+                outside: 'header__title_state_fixed'
+            });
+        } catch (e) {}
     }
 
     // Variable header 

@@ -41,6 +41,10 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     padding: 0;
     display: block;
 }
+.scroller::-moz-focus-inner { 
+    border: 10px solid red;
+    padding: 10px;
+}
 .scroller:focus {
     outline: none;
 }
