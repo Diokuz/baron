@@ -27,7 +27,7 @@ $(document).ready(function() {
             $('.search-results__scroller').baron({
                 bar: '.search-results__scroll-bar',
                 barOnCls: 'search-results_scroll-bar_active'
-            })
+            });
             // .fix({
             //     elements: '.header__title',
             //     outside: 'header__title_state_fixed',
@@ -40,7 +40,7 @@ $(document).ready(function() {
                 test(function(result2) {
                     console.log('delta per scroll: ', (result2 - result1) / N);
                 });
-            }, 500);
+            }, 5000);
         });
-    }, 500);
+    }, 5000);
 });

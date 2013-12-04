@@ -187,15 +187,15 @@ $(document).ready(function() {
         barOnCls: 'baron_h'
     });
 
-    var leak = [];
-    for (i = 0 ; i < 1000 ; i++) {
-        $('.test_mem-leak').attr('data-baron-v', '');
-        var l = $('.test_mem-leak').baron({
-            scroller: '.scroller',
-            bar: '.scroller__bar',
-            barOnCls: 'baron'
-        });
-        leak.push(l);
-        l.dispose();
-    }
+    // var leak = [];
+    // for (i = 0 ; i < 1000 ; i++) {
+    //     $('.test_mem-leak').attr('data-baron-v', '');
+    //     var l = $('.test_mem-leak').baron({
+    //         scroller: '.scroller',
+    //         bar: '.scroller__bar',
+    //         barOnCls: 'baron'
+    //     });
+    //     leak.push(l);
+    //     l.dispose();
+    // }
 });

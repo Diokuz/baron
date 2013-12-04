@@ -10,12 +10,12 @@ var
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
-            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4], padding: 'paddingRight',
+            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4], padding: 'paddingRight', margin: 'marginRight',
             client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
-            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5], padding: 'paddingBottom',
+            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5], padding: 'paddingBottom', margin: 'marginBottom',
             client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
@@ -453,7 +453,11 @@ var
                     if (self._textarea()) { /* f Firefox (scrollbar inside content box) */
                         $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
                     } else {
-                        $(self.scroller).css(self.origin.padding, delta + 'px');
+                        if (window.opera) { // f opera 12
+                            $(self.scroller).css(self.origin.margin, -delta + 'px');
+                        } else {
+                            $(self.scroller).css(self.origin.padding, delta + 'px');
+                        }
                     }
                     
                     Array.prototype.unshift.call(arguments, 'resize');

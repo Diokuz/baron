@@ -450,7 +450,7 @@ var
                     if (!webkit) { /* f webkit bug  */
                         delta = delta || 16; /* f Firefox 23+ for Mac */
                     }
-                    if (self._textarea()) { /* f Firefox (scrollbar inside content box) */
+                    if (self._textarea() || window.opera) { /* f Firefox & f Opera (scrollbar inside content box) */
                         $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
                     } else {
                         $(self.scroller).css(self.origin.padding, delta + 'px');
