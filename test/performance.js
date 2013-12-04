@@ -28,18 +28,25 @@ $(document).ready(function() {
             test(function(result1) {
                 $('.search-results__scroller').baron({
                     bar: '.search-results__scroll-bar',
-                    barOnCls: 'search-results_scroll-bar_active'
+                    barOnCls: 'search-results_scroll-bar_active',
+                    scrollingCls: '_scrolling',
+                    pause: 0.03
                 })
-                // .fix({
-                //     elements: '.search-results__fade',
-                //     outside: 'search-results__fade_state_fixed',
-                //     before: 'search-results__fade_pos_top',
-                //     after: 'search-results__fade_pos_bottom',
-                //     past: 'search-results__fade_group_top',
-                //     future: 'search-results__fade_group_bottom',
-                //     clickable: true,
-                //     limiter: true // Ограничение скроллбара сверху
-                // });
+                .fix({
+                    elements: '.search-results__fade',
+                    outside: 'search-results__fade_state_fixed',
+                    before: 'search-results__fade_pos_top',
+                    after: 'search-results__fade_pos_bottom',
+                    past: 'search-results__fade_group_top',
+                    future: 'search-results__fade_group_bottom',
+                    clickable: true,
+                    limiter: true // Ограничение скроллбара сверху
+                });
+
+                // Без fix но зафиксированными
+                // $('.search-results__list-header').addClass('search-results__fade_group_top search-results__fade_state_fixed');
+                // $('.search-results__list-header').eq(0).css({top: '0px'});
+                // $('.search-results__list-header').eq(1).css({top: '38px'});
 
                 setTimeout(function() {
                     test(function(result2) {
@@ -49,4 +56,22 @@ $(document).ready(function() {
             });
         }, 300);
     }, 500);
+
+
+    // $('.search-results__scroller').baron({
+    //     bar: '.search-results__scroll-bar',
+    //     barOnCls: 'search-results_scroll-bar_active',
+    //     scrollingCls: '_scrolling',
+    //     // pause: .03
+    // })
+    // .fix({
+    //     elements: '.search-results__fade',
+    //     outside: 'search-results__fade_state_fixed',
+    //     before: 'search-results__fade_pos_top',
+    //     after: 'search-results__fade_pos_bottom',
+    //     past: 'search-results__fade_group_top',
+    //     future: 'search-results__fade_group_bottom',
+    //     clickable: true,
+    //     limiter: true // Ограничение скроллбара сверху
+    // });
 });

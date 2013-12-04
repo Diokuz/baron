@@ -144,10 +144,10 @@
 
         this.on('init', init, userParams);
 
+        var fixFlag = [], // 1 - past, 2 - future, 3 - current (not fixed)
+            gradFlag = [];
         this.on('init scroll', function() {
-            var fixState, hTop, gradState,
-                fixFlag = [], // 1 - past, 2 - future, 3 - current (not fixed)
-                gradFlag = [];
+            var fixState, hTop, gradState;
 
             if (elements) {
                 var change;
