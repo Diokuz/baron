@@ -122,6 +122,9 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
 .header {
     /*height: 20px;*/
 }
+.performance .header {
+    box-shadow: 0 0 4px rgba(255, 255, 255, 1);
+}
 .header__title {
     width: 100%;
     /*height: 20px;*/

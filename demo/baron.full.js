@@ -4,17 +4,19 @@
     if (!window) return; // Server side
 
 var
-    _baron = window.baron, // Stored baron value for noConflict usage
-    $ = window.jQuery, // Trying to use jQuery
+    _baron = baron, // Stored baron value for noConflict usage
+    $ = jQuery, // Trying to use jQuery
+    webkit = navigator.userAgent.indexOf('ebK') != -1,
+    pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
-            x: 'Y', pos: 'top', crossPos: 'left', size: 'height', crossSize: 'width',
-            client: 'clientHeight', crossClient: 'clientWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
+            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4], padding: 'paddingRight',
+            client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
-            x: 'X', pos: 'left', crossPos: 'top', size: 'width', crossSize: 'height',
-            client: 'clientWidth', crossClient: 'clientHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
+            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5], padding: 'paddingBottom',
+            client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
     },
@@ -116,6 +118,15 @@ var
 
                 type: 'scroll'
             }, {
+                // onKeyup (textarea): 
+                element: item.scroller,
+
+                handler: function() {
+                    item.barOn();
+                },
+
+                type: 'keyup'
+            }, {
                 // onMouseDown: 
                 element: item.bar,
 
@@ -213,7 +224,7 @@ var
     }
 
     function init(params) {
-        if (manageAttr(params.root, params.direction)) return;
+        if (manageAttr(params.root, params.direction)) throw new Error('Second baron initialization');
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
@@ -403,6 +414,11 @@ var
                 this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
             };
 
+            // Возвращает true если скроллер является текстарией
+            this._textarea = function() {
+                return this.scroller.tagName == 'TEXTAREA';
+            };
+
             // onResize & DOM modified handler
             this.resize = function() {
                 var self = this,
@@ -414,12 +430,31 @@ var
                 }
 
                 function upd() {
-                    var delta = self.scroller[self.origin.crossOffset] - self.scroller[self.origin.crossClient];
+                    var delta,
+                        client;
+
+                    self.barOn();
+
+                    // if (self._textarea()) {
+                    //     client = self.scroller[self.origin.crossScroll];
+                    // } else {
+                    client = self.scroller[self.origin.crossClient];
+                    // }
+
+                    delta = self.scroller[self.origin.crossOffset] - client;
 
                     if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
                         $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
                     }
-                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
+
+                    if (!webkit) { /* f webkit bug  */
+                        delta = delta || 16; /* f Firefox 23+ for Mac */
+                    }
+                    if (self._textarea()) { /* f Firefox (scrollbar inside content box) */
+                        $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
+                    } else {
+                        $(self.scroller).css(self.origin.padding, delta + 'px');
+                    }
                     
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
@@ -444,6 +479,8 @@ var
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
+
+                // this.barOn();
 
                 function upd() {
                     if (self.bar) {
@@ -481,7 +518,6 @@ var
             fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
 
             this.resize(1);
-            this.barOn();
             this.scroll();
 
             return this;
@@ -522,7 +558,7 @@ var
         return baron;
     };
 
-    baron.version = '0.6.6';
+    baron.version = '0.7.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -546,23 +582,29 @@ var
                 minView: 0
             },
             topFixHeights = [], // inline style for element
-            topRealHeights = [], // real offset position when not fixed
-            headerTops = [],
+            topRealHeights = [], // ? something related to negative margins for fixable elements
+            headerTops = [], // offset positions when not fixed
             scroller = this.scroller,
             eventManager = this.event,
             $ = this.$,
             self = this;
 
-        function fixElement(i, pos) {
+        // i - number of fixing element, pos - fix-position in px, flag - 1: top, 2: bottom
+        // Invocation only in case when fix-state changed
+        function fixElement(i, pos, flag) {
+            var ori = flag == 1 ? 'pos' : 'oppos';
+
             if (viewPortSize < (params.minView || 0)) { // No headers fixing when no enought space for viewport
                 pos = undefined;
             }
 
+            // Removing all fixing stuff - we can do this because fixElement triggers only when fixState really changed
+            this.$(elements[i]).css(this.origin.pos, '').css(this.origin.oppos, '').removeClass(params.outside);
+
+            // Fixing if needed
             if (pos !== undefined) {
                 pos += 'px';
-                this.$(elements[i]).css(this.origin.pos, pos).addClass(params.outside);
-            } else {
-                this.$(elements[i]).css(this.origin.pos, '').removeClass(params.outside);
+                this.$(elements[i]).css(this.origin[ori], pos).addClass(params.outside);
             }
         }
 
@@ -673,8 +715,9 @@ var
         this.on('init', init, userParams);
 
         this.on('init scroll', function() {
-            var fixState, hTop,
-                fixFlag = []; // 1 - past, 2 - future, 3 - current (not fixed)
+            var fixState, hTop, gradState,
+                fixFlag = [], // 1 - past, 2 - future, 3 - current (not fixed)
+                gradFlag = [];
 
             if (elements) {
                 var change;
@@ -689,15 +732,25 @@ var
                     } else if (headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize - params.radius) {
                         // Header trying to go down
                         fixState = 2;
-                        hTop = topFixHeights[i] + viewPortSize;
+                        // console.log('topFixHeights[i] + viewPortSize + topRealHeights[i]', topFixHeights[i], this.scroller[this.origin.client], topRealHeights[i]);
+                        hTop = this.scroller[this.origin.client] - elements[i][this.origin.offset] - topFixHeights[i] - viewPortSize;
+                        // console.log('hTop', hTop, viewPortSize, elements[this.origin.offset], topFixHeights[i]);
+                        //(topFixHeights[i] + viewPortSize + elements[this.origin.offset]) - this.scroller[this.origin.client];
                     } else {
                         // Header in viewport
                         fixState = 3;
                         hTop = undefined;
                     }
-                    if (fixState != fixFlag[i]) {
-                        fixElement.call(this, i, hTop);
+
+                    gradState = false;
+                    if (headerTops[i] - this.pos() < topRealHeights[i] || headerTops[i] - this.pos() > topRealHeights[i] + viewPortSize) {
+                        gradState = true;
+                    }
+
+                    if (fixState != fixFlag[i] || gradState != gradFlag[i]) {
+                        fixElement.call(this, i, hTop, fixState);
                         fixFlag[i] = fixState;
+                        gradFlag[i] = gradState;
                         change = true;
                     }
                 }
@@ -723,6 +776,14 @@ var
                             this.$(elements[i]).addClass(params.after).removeClass(params.before); // First bottom fixed header
                         } else {
                             this.$(elements[i]).removeClass(params.before).removeClass(params.after);
+                        }
+
+                        if (params.grad) {
+                            if (gradFlag[i]) {
+                                this.$(elements[i]).addClass(params.grad);
+                            } else {
+                                this.$(elements[i]).removeClass(params.grad);
+                            }
                         }
                     }
                 }
