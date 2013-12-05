@@ -24,6 +24,7 @@
         "mocha": "~1.9.0",
         "mocha-phantomjs": "~3.0.0",
         "grunt-mocha-phantomjs": "~0.3.0",
-        "chai": "~1.7.0"
+        "chai": "~1.7.0",
+        "phantomjs": "~1.9.2"
     }
 }
