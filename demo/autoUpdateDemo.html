@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <script src="../js/jquery-1.9.0.js"></script>
+
+    <script src="../baron.js"></script>
+    <script src="../src/autoUpdate.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../baron.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
+    <!-- Page specific script -->
+    <script>
+        window.onload = function() {
+            window.dima = baron({
+                root: '.wrapper_1',
+                scroller: '.scroller',
+                bar: '.scroller__bar',
+                barOnCls: 'baron'
+            }).autoUpdate();
+
+            baron({
+                scroller: '.wrapper_2 .scroller',
+                bar: '.scroller__bar',
+                barOnCls: 'baron'
+            }).fix({
+                elements: '.header__title',
+                outside: 'header__title_state_fixed',
+                before: 'header__title_position_top',
+                after: 'header__title_position_bottom'
+            }).baron({
+                barOnCls: 'baron_h',
+                bar: '.scroller__bar_h'
+            }).autoUpdate();
+
+            $("#add_section").on("click", function(){
+                $(".container .load").before($("#sample_template").text());
+                // window.dima.update(); //You gonna need this for IE < 11
+            })
+            $("#remove_section").on("click", function(){
+                $(".container .header:last").add(".container .header:last ~ .text").remove();
+                // window.dima.update(); //You gonna need this for IE < 11
+            });
+        };
+    </script>
+
+    <!--  Styles for add/remove buttons -->
+    <style>
+        .section-control{
+            margin-top: 20px;
+        }
+        .section-control__button{
+            border: none;
+            background: black;
+            color: white;
+        }
+    </style>
+
+    <!-- Template for adding new section -->
+    <script type="text/x-template" id="sample_template">
+        <div class="header">
+            <h1 class="header__title">Barons in the United Kingdom</h1>
+        </div>
+        <p class="text">In the Peerage of England, Peerage of Ireland, Peerage of Great Britain and the Peerage of the United Kingdom, barons form the lowest rank, placed immediately below viscounts. A female of baronial rank has the title baroness. Feudal baronies (or "baronies by tenure") are now obsolete in England and without any legal force but any such historical titles are held in gross, that is to say are deemed to be enveloped within a more modern extant peerage title also held by the holder, sometimes along with vestigial manorial rights and tenures by grand serjeanty.
+        <p class="text">William I introduced "baron" as a rank in England to distinguish the men who had pledged their loyalty to him under the feudal system. Previously, in the Anglo-Saxon kingdom of England, the king's companions held the title of earl and in Scotland, the title of thane. All who held their feudal barony "in-chief of the king", that is with the king as his immediate overlord, became alike barones regis ("barons of the king"), bound to perform a stipulated annual military service, and obliged to attend his council. Eventually the greatest of the nobles, especially those in the marches, such as the Earls of Chester or the Bishops of Durham, whose territories were often deemed palatinate, that is to say "worthy of a prince", might refer to their own tenants as "barons", where lesser magnates spoke simply of their "men" (homines).
+        <p class="text">Initially those who held land directly from the king by military service, from earls downwards, all bore alike the title of baron, which was thus the factor uniting all members of the ancient baronage as peers one of another. Under King Henry II, the Dialogus de Scaccario already distinguished between greater barons, who held per baroniam by knight's service, and lesser barons, who held manors. Technically, Lords of Manors are barons, or freemen, however they do not use the term as a title. John Selden in his esteemed work Titles of Honour writes, "The word Baro (Latin for Baron) hath been also so much communicated, that not only all Lords of Mannors have been from antient time, and are at this day called sometimes Barons (as in the stile of their Court Barons, which is Curia Baronis, &c. And I have read hors de son Barony in a barr to an Avowry for hors de son fee) But also the Judges of the Exchequer have it from antient time fixed on them."[4] Within a century of the Norman Conquest of 1066, as in the case of Thomas Becket in 1164, there arose the practice of sending to each greater baron a personal summons demanding his attendance at the King's Council, which evolved into the Parliament and later into the House of Lords, whilst as was stipulated in Magna Carta of 1215, the lesser barons of each county would receive a single summons as a group through the sheriff, and representatives only from their number would be elected to attend on behalf of the group. These representatives developed into the Knights of the Shire, elected by the County Court presided over by the sheriff, who themselves formed the precursor of the House of Commons. Thus appeared a definite distinction, which eventually had the effect of restricting to the greater barons alone the privileges and duties of peerage.
+        <p class="text">Later, the king started to create new baronies in one of two ways: by a writ of summons directing a chosen man to attend Parliament, and in an even later development by letters patent. Writs of summons became the normal method in medieval times, displacing the method of feudal barony, but creation of baronies by letters patent is the sole method adopted in modern times. Since the adoption of summons by writ, baronies thus no longer relate directly to land-holding, and thus no more feudal baronies needed thenceforth to be created. Following the Modus Tenendi Parliamenta of 1419, the Tenures Abolition Act 1660, the Feudal Tenure Act (1662), and the Fines and Recoveries Act of 1834, titles of feudal barony became obsolete and without legal force.
+        <p class="text">In the twentieth century Britain introduced the concept of non-hereditary life peers. All appointees to this distinction have been at the rank of baron. Life-peers are not counted as part of the aristocracy although in accordance with the tradition applied to hereditary peers they too are formally addressed in parliament by their peers as "The Noble Lord".
+        <p class="text">In addition, baronies are often used by their holders as subsidiary titles, for example as courtesy titles for the son and heir of an Earl or higher peer.
+    </script>
+    <title>Baron.js demo page</title>
+
+</head>
+
+<body>
+
+    <div class="wrapper wrapper_1">
+        <div class="scroller">
+            <div class="container">
+                <div class="header">
+                    <h1 class="header__title">Baron</h1>
+                </div>
+                <p class="text">Baron is a title of nobility. In the kingdom of England, the medieval Latin word baro, baronis was used originally to denote a tenant-in-chief of the early Norman kings who held his lands by the feudal tenure of "barony" (in Latin per baroniam), and who was entitled to attend the Great Council which by the 13th century had developed into the Parliament of England.
+                <p class="text">The title was quite common in most European countries often in a slightly modified form. In Italian, the word used was Barone. The corresponding title in the Holy Roman Empire was Freiherr.
+                <div class="header">
+                    <h1 class="header__title">Etymology and very long header, more than one line. I said more! ++++++++++++++</h1>
+                </div>
+                <p class="text">The word baron comes from the Old French baron, from a Late Latin baro "man; servant, soldier, mercenary" (so used in Salic Law; Alemannic Law has barus in the same sense). Isidore in the 7th century thought the word was from Greek βαρύς "heavy" (because of the "heavy work" done by mercenaries), but the word is presumably of Old Frankish origin, cognate with Old English beorn meaning "warrior, nobleman"). Cornutus in the first century already reports a word barones which he took to be of Gaulish origin. He glosses it as meaning servos militum and explains it as meaning "stupid", by reference to classical Latin bāro "simpleton, dunce"; because of this early reference, the word has also been suggested to derive from an otherwise unknown Celtic *bar, but OED takes this to be "a figment".
+
+                <div class="header">
+                    <h1 class="header__title">Barons in the United Kingdom</h1>
+                </div>
+                <p class="text">In the Peerage of England, Peerage of Ireland, Peerage of Great Britain and the Peerage of the United Kingdom, barons form the lowest rank, placed immediately below viscounts. A female of baronial rank has the title baroness. Feudal baronies (or "baronies by tenure") are now obsolete in England and without any legal force but any such historical titles are held in gross, that is to say are deemed to be enveloped within a more modern extant peerage title also held by the holder, sometimes along with vestigial manorial rights and tenures by grand serjeanty.
+                <p class="text">William I introduced "baron" as a rank in England to distinguish the men who had pledged their loyalty to him under the feudal system. Previously, in the Anglo-Saxon kingdom of England, the king's companions held the title of earl and in Scotland, the title of thane. All who held their feudal barony "in-chief of the king", that is with the king as his immediate overlord, became alike barones regis ("barons of the king"), bound to perform a stipulated annual military service, and obliged to attend his council. Eventually the greatest of the nobles, especially those in the marches, such as the Earls of Chester or the Bishops of Durham, whose territories were often deemed palatinate, that is to say "worthy of a prince", might refer to their own tenants as "barons", where lesser magnates spoke simply of their "men" (homines).
+                <p class="text">Initially those who held land directly from the king by military service, from earls downwards, all bore alike the title of baron, which was thus the factor uniting all members of the ancient baronage as peers one of another. Under King Henry II, the Dialogus de Scaccario already distinguished between greater barons, who held per baroniam by knight's service, and lesser barons, who held manors. Technically, Lords of Manors are barons, or freemen, however they do not use the term as a title. John Selden in his esteemed work Titles of Honour writes, "The word Baro (Latin for Baron) hath been also so much communicated, that not only all Lords of Mannors have been from antient time, and are at this day called sometimes Barons (as in the stile of their Court Barons, which is Curia Baronis, &c. And I have read hors de son Barony in a barr to an Avowry for hors de son fee) But also the Judges of the Exchequer have it from antient time fixed on them."[4] Within a century of the Norman Conquest of 1066, as in the case of Thomas Becket in 1164, there arose the practice of sending to each greater baron a personal summons demanding his attendance at the King's Council, which evolved into the Parliament and later into the House of Lords, whilst as was stipulated in Magna Carta of 1215, the lesser barons of each county would receive a single summons as a group through the sheriff, and representatives only from their number would be elected to attend on behalf of the group. These representatives developed into the Knights of the Shire, elected by the County Court presided over by the sheriff, who themselves formed the precursor of the House of Commons. Thus appeared a definite distinction, which eventually had the effect of restricting to the greater barons alone the privileges and duties of peerage.
+                <p class="text">Later, the king started to create new baronies in one of two ways: by a writ of summons directing a chosen man to attend Parliament, and in an even later development by letters patent. Writs of summons became the normal method in medieval times, displacing the method of feudal barony, but creation of baronies by letters patent is the sole method adopted in modern times. Since the adoption of summons by writ, baronies thus no longer relate directly to land-holding, and thus no more feudal baronies needed thenceforth to be created. Following the Modus Tenendi Parliamenta of 1419, the Tenures Abolition Act 1660, the Feudal Tenure Act (1662), and the Fines and Recoveries Act of 1834, titles of feudal barony became obsolete and without legal force.
+                <p class="text">In the twentieth century Britain introduced the concept of non-hereditary life peers. All appointees to this distinction have been at the rank of baron. Life-peers are not counted as part of the aristocracy although in accordance with the tradition applied to hereditary peers they too are formally addressed in parliament by their peers as "The Noble Lord".
+                <p class="text">In addition, baronies are often used by their holders as subsidiary titles, for example as courtesy titles for the son and heir of an Earl or higher peer.
+
+                <div class="header">
+                    <h1 class="header__title">Scotland</h1>
+                </div>
+                <p class="text">In Scotland, the rank of baron is a rank of the ancient feudal nobility of Scotland and refers to a holder of a feudal barony, formerly a feudal superiority over a proper territorial entity erected into a free barony by a Crown Charter, and is not usually considered a rank of Peerage; as such it can be transferred by either inheritance or conveyance.
+                <p class="text">The Scottish equivalent of an English baron is a Lord of Parliament.
+
+                <div class="header">
+                    <h1 class="header__title">Style of address</h1>
+                </div>
+                <p class="text">Normally one refers to or addresses Baron [X] as Lord [X] and his wife as Lady [X]. In the case of women who hold baronies in their own right, they can be referred to as Baroness [X] as well as Lady [X]. In direct address, they can also be referred to as My Lord, Your Lordship, or Your Ladyship, but never as My Lady (except in the case of a female judge). The husband of a Baroness in her own right does not receive any style in her right. Children of Barons and Baronesses in their own right, whether hereditary or for life, have the style The Honourable [Forename] [Surname]. After the death of the father or mother, the child may continue to use the style Honourable.
+                <p class="text">Scottish feudal barons style their surnames similarly to Clan Chiefs, with the name of their barony following their name, as in John Smith of Edinburgh or John Smith, Baron of Edinburgh.[5] Most formally, and in writing, they are styled as The Much Honoured Baron of Edinburgh. Their wives are styled Lady Edinburgh, or The Baroness of Edinburgh. The phrase Lady of Edinburgh is wrong, if the lady in question does not hold a Scottish barony in her own right. Orally, Scottish barons may be addressed with the name of their barony, as in Edinburgh or else as Baron without anything else following, which if present would suggest a peerage barony. Informally, when referring to a Scots feudal baron in the third person, the name Laird of [X] is used or simply [X].
+                <p class="text">Non-Scottish barons are styled The Right Honourable The Lord [Barony]. Barons' wives are styled The Right Honourable The Lady [Barony]. Baronesses in their own right are either titled The Right Honourable The Baroness [Barony] or The Right Honourable The Lady [Barony], mainly based on personal preference (e.g., Margaret, Lady Thatcher and Brenda, Baroness Hale, both created baronesses in their own right). Note the order of the names. 'Lady Margaret Thatcher' would denote that she was the daughter of an earl, marquess or duke. Right Honourable is frequently abbreviated to Rt Hon. When referred to by the Sovereign in public instruments, The Right Honourable is changed to Our right trusty and well-beloved, with counsellor attached if they are a Privy Counsellor.
+                <p class="text">Courtesy barons are styled simply Lord [Barony], and their wives are Lady [Barony]. The style of Right Honourable and/or the article "The" in front of the title is not used for them.
+
+                <div class="header">
+                    <h1 class="header__title">Coronet</h1>
+                </div>
+                <p class="text">A person holding a peerage in the rank of baron is entitled to a coronet bearing six silver balls (called pearls) around the rim, equally spaced and all of equal size and height. The rim itself is neither jeweled, nor "chased" (which is the case for the coronets of peers of higher degree).
+                <p class="text">The actual coronet is mostly worn on certain ceremonial occasions, such as the coronation of a new monarch, but a baron can bear his coronet of rank on his coat of arms above the shield. In heraldry, the baron's coronet is shown with four of the balls visible.
+                <p class="text">Scottish feudal barons were entitled to a red cap of maintenance (chapeau) turned up ermine if petitioning for a grant or matriculation of a coat of arms between the 1930s and 2004. This chapeau is identical to the red cap worn by an English baron, but without the silver balls or gilt. This is sometimes depicted in armorial paintings between the shield and the helmet. Additionally, if the baron is the head of a family he may include a chiefly coronet which is similar to a ducal coronet, but with four strawberry leaves. Because the chapeau was a relatively recent innovation, a number of ancient Arms of Scottish feudal barons do not display the chapeau. Now Scottish feudal barons are principally recognised by the baron's helm, which in Scotland is a steel helmet with grille of three grilles, garnished in gold. Occasionally the great tilting-helm garnished with gold is shown, or a helmet befitting a higher rank, if held.
+
+                <div class="load">
+                    <div class="load__value"></div>
+                </div>
+            </div>
+        </div>
+        <div class="scroller__bar-wrapper">
+            <div class="scroller__bar"></div>
+        </div>
+    </div>
+
+    <div class="wrapper wrapper_2">
+        <div class="scroller">
+            <p class="text">Baron is a title of nobility. In the kingdom of England, the medieval Latin word baro, baronis was used originally to denote a tenant-in-chief of the early Norman kings who held his lands by the feudal tenure of "barony" (in Latin per baroniam), and who was entitled to attend the Great Council which by the 13th century had developed into the Parliament of England.
+            <p class="text">The title was quite common in most European countries often in a slightly modified form. In Italian, the word used was Barone. The corresponding title in the Holy Roman Empire was Freiherr.
+            <div class="header">
+                <h1 class="header__title">Sticky footer</h1>
+            </div>
+            <div class="scroller__bar"></div>
+            <div class="scroller__bar scroller__bar_h"></div>
+        </div>
+    </div>
+
+    <div class="section-control">
+        <button class="section-control__button" id="add_section">Add section</button>
+        <button class="section-control__button" id="remove_section">Remove section</button>
+    </div>
+
+</body>
+
+</html>
