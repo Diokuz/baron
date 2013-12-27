@@ -26,8 +26,8 @@ module.exports = function (grunt) {
         concat: {
             def: {
                 files: {
-                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/pull.js'],
-                    '<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/pull.js']
+                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/pull.js', 'src/autoUpdate.js'],
+                    '<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/pull.js', 'src/autoUpdate.js']
                 }
             },
             core: {
@@ -38,8 +38,8 @@ module.exports = function (grunt) {
             },
             full: {
                 files: {
-                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js'],
-                    'demo/<%= pkg.name %>.full.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js']
+                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js', 'src/autoUpdate.js' ],
+                    'demo/<%= pkg.name %>.full.js': ['src/core.js', 'src/fix.js', 'src/controls.js', 'src/test.js', 'src/pull.js', 'src/autoUpdate.js']
                 }
             },
             online: {
