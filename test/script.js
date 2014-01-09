@@ -198,4 +198,11 @@ $(document).ready(function() {
     //     leak.push(l);
     //     l.dispose();
     // }
+
+    // Contenteditable
+    $('.test_contenteditable').baron({
+        scroller: '.scroller',
+        bar: '.scroller__bar',
+        barOnCls: 'baron'
+    });
 });

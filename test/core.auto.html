@@ -22,6 +22,7 @@
     <style>
         .wrapper {
             width: 200px;
+            display: inline-block;
         }
         .test {
             display: block;
@@ -47,7 +48,7 @@
         mocha.reporter('html');
     </script>
 
-    <div class="wrapper wrapper_headers">
+    <div class="wrapper _origin wrapper_headers">
         <div class="scroller">
             <div class="container">
                 <div class="header">
@@ -67,7 +68,7 @@
         </div>
     </div>
 
-    <div class="wrapper wrapper_">
+    <div class="wrapper _origin wrapper_">
         <div class="scroller">
             <div class="container">
                 <div class="header">
@@ -87,10 +88,22 @@
         </div>
     </div>
 
-    <div class="wrapper wrapper_">
+    <div class="wrapper _origin wrapper_">
         <textarea class="scroller" style="font-size: 40px; line-height: 100px">-</textarea>
         <div class="scroller__track">
             <div class="scroller__bar"></div>
+        </div>
+    </div>
+
+    <div class="wrapper _contenteditable">
+        <div class="scroller">
+            <div class="container" contenteditable style="min-height: 100%">
+                not work
+            </div>
+
+            <div class="scroller__track">
+                <div class="scroller__bar"></div>
+            </div>
         </div>
     </div>
 

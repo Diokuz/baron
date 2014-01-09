@@ -17,7 +17,7 @@ describe("Барон.", function() {
             bar;
 
         before(function() {
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             });
@@ -46,7 +46,7 @@ describe("Барон.", function() {
 
         it("Повторная инициализация бросает ошибку", function(done) {
             try {
-                baron = $('.scroller').baron({
+                baron = $('.wrapper._origin .scroller').baron({
                     bar: '.scroller__bar',
                     barOnCls: barOnCls
                 });
@@ -119,6 +119,35 @@ describe("Барон.", function() {
             baron.dispose();
         });
     });
+
+    describe("Contenteditable.", function() {
+        var baron;
+
+        before(function() {
+            var html = '<div class="scroller"><div class="container" contenteditable style="min-height: 100%"></div><div class="scroller__track"><div class="scroller__bar"></div></div></div>';
+            
+            $('.wrapper._contenteditable').html(html);
+
+            baron = $('.wrapper._contenteditable .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+
+            eachIt(baron);
+        });
+
+        it("Proper top position for bar at enter-keyup", function() {
+            $('.wrapper._contenteditable .container').html('w<br />w<br />w<br />w<br />w<br />w<br />w').trigger('keyup');
+
+            var barHeight = $('.wrapper._contenteditable .scroller__bar').height();
+
+            assert.equal(+barHeight, 190);
+        });
+
+        after(function() {
+            baron.dispose();
+        });
+    });
 });
 
 describe("Плагин fix.", function() {
@@ -134,7 +163,7 @@ describe("Плагин fix.", function() {
         it("No elements", function() {
             $(scroller).find('.header').empty();
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -148,11 +177,11 @@ describe("Плагин fix.", function() {
                 }
             });
 
-            $('.wrapper').html(originalHTML);
+            $('.wrapper._origin').html(originalHTML);
         });
 
         it("past and future params", function() {
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -191,9 +220,9 @@ describe("Плагин fix.", function() {
         });
 
         it("no future and after classes when bottom edge reached", function() {
-            $('.wrapper').html(originalHTML);
+            $('.wrapper._origin').html(originalHTML);
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -219,9 +248,9 @@ describe("Плагин fix.", function() {
         });
 
         it("grad param", function() {
-            $('.wrapper').html(originalHTML);
+            $('.wrapper._origin').html(originalHTML);
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -259,9 +288,9 @@ describe("Плагин fix.", function() {
             scroller;
 
         before(function() {
-            $('.wrapper').html(originalHTML);
+            $('.wrapper._origin').html(originalHTML);
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -332,7 +361,7 @@ describe("Плагин fix.", function() {
         before(function() {
             scroller = $('.scroller')[0];
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -371,12 +400,12 @@ describe("Плагин fix.", function() {
 
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
-            $('.wrapper').html(html);
+            $('.wrapper._origin').html(html);
             $('.header__title').css({margin: '-7px 0 0'});
 
             scroller = $('.scroller')[0];
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -413,12 +442,12 @@ describe("Плагин fix.", function() {
 
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
-            
-            $('.wrapper').html(html);
+
+            $('.wrapper._origin').html(html);
 
             scroller = $('.scroller')[0];
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
@@ -472,12 +501,12 @@ describe("Плагин fix.", function() {
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
             
-            $('.wrapper').html(html);
+            $('.wrapper._origin').html(html);
 
             scroller = $('.scroller')[0];
             $('.header__title').eq(1).css({height: '100px'});
 
-            baron = $('.scroller').baron({
+            baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({

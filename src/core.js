@@ -122,7 +122,7 @@ var
                 element: item.scroller,
 
                 handler: function() {
-                    item.barOn();
+                    item.update();
                 },
 
                 type: 'keyup'
@@ -573,7 +573,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.1';
+    baron.version = '0.7.2';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

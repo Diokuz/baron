@@ -2,11 +2,11 @@
 (function(window, undefined) {
     var mutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
-    var autoUpdate = function(){
+    var autoUpdate = function() {
         var self = this;
 
         this._observer = new MutationObserver(function() {
-          self.update();
+            self.update();
         });
 
         this.on('init', function() {
