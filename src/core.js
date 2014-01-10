@@ -10,12 +10,12 @@ var
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
-            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4], padding: 'paddingRight',
+            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4],
             client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
-            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5], padding: 'paddingBottom',
+            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5],
             client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
@@ -417,11 +417,6 @@ var
                 this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
             };
 
-            // Возвращает true если скроллер является текстарией
-            this._textarea = function() {
-                return this.scroller.tagName == 'TEXTAREA';
-            };
-
             // onResize & DOM modified handler
             this.resize = function() {
                 var self = this,
@@ -449,12 +444,8 @@ var
                     if (!webkit) { /* f webkit bug  */
                         delta = delta || 16; /* f Firefox 23+ for Mac */
                     }
-                    if (self._textarea() || window.opera) { /* f Firefox & f Opera (scrollbar inside content box) */
-                        $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
-                    } else {
-                        $(self.scroller).css(self.origin.padding, delta + 'px');
-                    }
-                    
+                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
+
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
@@ -573,7 +564,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.2';
+    baron.version = '0.7.3';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
