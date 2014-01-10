@@ -6,7 +6,6 @@
 var
     _baron = baron, // Stored baron value for noConflict usage
     $ = jQuery, // Trying to use jQuery
-    webkit = navigator.userAgent.indexOf('ebK') != -1,
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
@@ -441,9 +440,6 @@ var
                         $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
                     }
 
-                    if (!webkit) { /* f webkit bug  */
-                        delta = delta || 16; /* f Firefox 23+ for Mac */
-                    }
                     $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
 
                     Array.prototype.unshift.call(arguments, 'resize');
@@ -564,7 +560,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.3';
+    baron.version = '0.7.4';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
