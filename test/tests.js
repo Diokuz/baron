@@ -74,6 +74,25 @@ describe("Барон.", function() {
         });
     });
 
+    describe("Навешивание классов", function() {
+
+        it("После инициализации нет блокирующего класса _scrolling", function() {
+            $('.wrapper._origin').html(originalHTML);
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                scrollingCls: '_scrolling',
+            });
+
+            assert.ok(!$('.wrapper._origin .scroller').hasClass('_scrolling'));
+            baron.update();
+            assert.ok(!$('.wrapper._origin .scroller').hasClass('_scrolling'));
+        });
+
+        
+    });
+
     describe("Textarea.", function() {
         var baron,
             scroller;

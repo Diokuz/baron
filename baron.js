@@ -231,7 +231,9 @@ var
 
         manageAttr(out.root, params.direction, 'on');
 
-        out.update();
+        out.update({
+            initMode: true
+        });
 
         return out;
     }
@@ -455,10 +457,33 @@ var
                 }
             };
 
+            this.updatePositions = function() {
+                var newBarSize,
+                    self = this;
+
+                if (self.bar) {
+                    newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
+
+                    // Positioning bar
+                    if (parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {
+                        setBarSize.call(self, newBarSize);
+                        oldBarSize = newBarSize;
+                    }
+                    
+                    barPos = relToPos.call(self, self.rpos());
+
+                    posBar.call(self, barPos);
+                }
+
+                Array.prototype.unshift.call( arguments, 'scroll' );
+                fire.apply(self, arguments);
+
+                scrollLastFire = new Date().getTime();
+            };
+
             // onScroll handler
             this.scroll = function() {
-                var newBarSize,
-                    delay = 0,
+                var delay = 0,
                     self = this;
 
                 if (new Date().getTime() - scrollLastFire < pause) {
@@ -471,33 +496,12 @@ var
                     delay = pause;
                 }
 
-                // this.barOn();
-
-                function upd() {
-                    if (self.bar) {
-                        newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
-
-                        // Positioning bar
-                        if (parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {
-                            setBarSize.call(self, newBarSize);
-                            oldBarSize = newBarSize;
-                        }
-                        
-                        barPos = relToPos.call(self, self.rpos());
-
-                        posBar.call(self, barPos);
-                    }
-
-                    Array.prototype.unshift.call( arguments, 'scroll' );
-                    fire.apply(self, arguments);
-
-                    scrollLastFire = new Date().getTime();
-                }
-
                 if (delay) {
-                    scrollPauseTimer = setTimeout(upd, delay);
+                    scrollPauseTimer = setTimeout(function() {
+                        self.updatePositions();
+                    }, delay);
                 } else {
-                    upd();
+                    self.updatePositions();
                 }
 
                 if (self.scrollingCls) {
@@ -520,7 +524,7 @@ var
             fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
 
             this.resize(1);
-            this.scroll();
+            this.updatePositions();
 
             return this;
         },
@@ -560,7 +564,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.4';
+    baron.version = '0.7.5';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
