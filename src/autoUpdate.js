@@ -21,7 +21,7 @@
     };
 
     baron.fn.autoUpdate = function(params) {
-        if(!mutationObserver) return this;
+        if (!mutationObserver) return this;
 
         var i = 0;
 

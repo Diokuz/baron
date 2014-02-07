@@ -57,7 +57,7 @@
         } else {
             log('warn', 'Bar not defined or has wrong type (should be html node).', this.bar);
         }
-        
+
         if (this.barOnCls) {
             log('log', 'CSS classname barOnCls defined', this.barOnCls);
         } else {
@@ -74,7 +74,7 @@
         }
         var t2 = new Date().getTime();
         log('log', 'Preformance test: ' + (t2 - t1) / 1000 + ' milliseconds per scroll event');
-        
+
         log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
     };
 

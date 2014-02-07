@@ -89,8 +89,6 @@ describe("Барон.", function() {
             baron.update();
             assert.ok(!$('.wrapper._origin .scroller').hasClass('_scrolling'));
         });
-
-        
     });
 
     describe("Textarea.", function() {
@@ -99,7 +97,7 @@ describe("Барон.", function() {
 
         before(function() {
             var html = '<textarea class="scroller" style="font-size: 40px; line-height: 100px">-</textarea><div class="scroller__track"><div class="scroller__bar"></div></div></div>';
-            
+
             $('.wrapper').html(html);
 
             scroller = $('.scroller')[0];
@@ -144,7 +142,7 @@ describe("Барон.", function() {
 
         before(function() {
             var html = '<div class="scroller"><div class="container" contenteditable style="min-height: 100%"></div><div class="scroller__track"><div class="scroller__bar"></div></div></div>';
-            
+
             $('.wrapper._contenteditable').html(html);
 
             baron = $('.wrapper._contenteditable .scroller').baron({
@@ -323,7 +321,6 @@ describe("Плагин fix.", function() {
                 assert(hasInside || hasOutside, 'no inside or outside class');
             });
 
-            
             assert($('.wrapper_headers .scroller .header__title').eq(3).hasClass('insideClass'), 'no inside class');
         });
     });
@@ -523,7 +520,7 @@ describe("Плагин fix.", function() {
             });
             scroller.scrollTop = 1;
             scroller.scrollTop = 0;
-            
+
             assert(parseInt($('.scroller__bar').css('top'), 10) == 0, 'Самое высокое положение скроллбара снова неограничено высотой заголовка');
         });
 
@@ -545,7 +542,7 @@ describe("Плагин fix.", function() {
 
         before(function() {
             var html = '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><div class="scroller__pull"></div></div><div class="scroller__bar"></div></div>';
-            
+
             $('.wrapper._origin').html(html);
 
             scroller = $('.scroller')[0];
@@ -588,14 +585,3 @@ describe("Плагин fix.", function() {
         });
     });
 });
-
-
-
-
-
-
-
-
-
-
-

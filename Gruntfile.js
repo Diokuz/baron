@@ -2,27 +2,6 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        jshint: {
-            appjs: {
-                options: {
-                    "indent": 4,
-                    "node": true,
-                    "browser": true,
-                    "jquery": true,
-                    "eqnull": true,
-                    "eqeqeq": false,
-                    "devel": false,
-                    "boss": true,
-                    "trailing": true,
-                    "loopfunc": true,
-                    "-W041": true,
-                    "-W015": true,
-                    "sub": true,
-                    "unused": true
-                },
-                src: ['src/*.js', 'demo/*.js', 'test/*.js']
-            }
-        },
         concat: {
             def: {
                 files: {
@@ -78,6 +57,33 @@ module.exports = function (grunt) {
                 }
             }
         },
+        jshint: {
+            appjs: {
+                options: {
+                    "indent": 4,
+                    "node": true,
+                    "browser": true,
+                    "jquery": true,
+                    "eqnull": true,
+                    "eqeqeq": false,
+                    "devel": false,
+                    "boss": true,
+                    "trailing": true,
+                    "loopfunc": true,
+                    "-W041": true,
+                    "-W015": true,
+                    "sub": true,
+                    "unused": true
+                },
+                src: ['src/*.js', 'demo/*.js', 'test/*.js']
+            }
+        },
+        jscs: {
+            src: ['src/*.js', 'test/*.js'],
+            options: {
+                config: ".jscs.json"
+            }
+        },
         'mocha-phantomjs': {
             options: {
                 view: '1024x768'
@@ -90,11 +96,13 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks("grunt-jscs-checker");
 
     grunt.registerTask('default', ['concat:def', 'uglify:def']);
     grunt.registerTask('core', ['concat:core', 'uglify:core']);
     grunt.registerTask('full', ['concat:full', 'uglify:full']);
     grunt.registerTask('online', ['concat:online', 'uglify:online']);
     grunt.registerTask('test', ['mocha-phantomjs']);
-    grunt.registerTask('t', ['jshint', 'mocha-phantomjs']);
+    grunt.registerTask('t', ['jshint', 'jscs', 'mocha-phantomjs']);
 };

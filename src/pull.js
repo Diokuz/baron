@@ -33,7 +33,7 @@
 
         function step(x, force) {
             var k = x * 0.0005;
-            
+
             return Math.floor(force - k * (x + 550));
         }
 
@@ -105,7 +105,6 @@
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
-                
             }
             if (_zeroXCount > 1) {
                 toggle(false);

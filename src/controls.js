@@ -11,7 +11,7 @@
 
             this.event(forward, 'click', function() {
                 var y = self.pos() - params.delta || 30;
-                
+
                 self.pos(y);
             });
         }

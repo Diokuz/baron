@@ -107,7 +107,7 @@ $(document).ready(function() {
         } catch (e) {}
     }
 
-    // Variable header 
+    // Variable header
     anotherBaron({
         scroller: '.test_varheights .scroller',
         bar: '.scroller__bar',

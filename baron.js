@@ -108,7 +108,7 @@ var
     function manageEvents(item, eventManager, mode) {
         item._eventHandlers = item._eventHandlers || [ // Creating new functions for one baron item only one time
             {
-                // onScroll: 
+                // onScroll:
                 element: item.scroller,
 
                 handler: function(e) {
@@ -117,7 +117,7 @@ var
 
                 type: 'scroll'
             }, {
-                // onKeyup (textarea): 
+                // onKeyup (textarea):
                 element: item.scroller,
 
                 handler: function() {
@@ -126,7 +126,7 @@ var
 
                 type: 'keyup'
             }, {
-                // onMouseDown: 
+                // onMouseDown:
                 element: item.bar,
 
                 handler: function(e) {
@@ -137,7 +137,7 @@ var
 
                 type: 'touchstart mousedown'
             }, {
-                // onMouseUp: 
+                // onMouseUp:
                 element: document,
 
                 handler: function() {
@@ -147,7 +147,7 @@ var
 
                 type: 'mouseup blur touchend'
             }, {
-                // onCoordinateReset: 
+                // onCoordinateReset:
                 element: document,
 
                 handler: function(e) {
@@ -158,7 +158,7 @@ var
 
                 type: 'touchstart mousedown'
             }, {
-                // onMouseMove: 
+                // onMouseMove:
                 element: document,
 
                 handler: function(e) {
@@ -169,7 +169,7 @@ var
 
                 type: 'mousemove touchmove'
             }, {
-                // onResize: 
+                // onResize:
                 element: window,
 
                 handler: function() {
@@ -178,7 +178,7 @@ var
 
                 type: 'resize'
             }, {
-                // sizeChange: 
+                // sizeChange:
                 element: item.root,
 
                 handler: function() {
@@ -388,8 +388,11 @@ var
                 var free = this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client],
                     x;
 
-                if (r) x = this.pos(r * free);
-                else x = this.pos();
+                if (r) {
+                    x = this.pos(r * free);
+                } else {
+                    x = this.pos();
+                }
 
                 return x / (free || 1);
             };
@@ -469,7 +472,7 @@ var
                         setBarSize.call(self, newBarSize);
                         oldBarSize = newBarSize;
                     }
-                    
+
                     barPos = relToPos.call(self, self.rpos());
 
                     posBar.call(self, barPos);
@@ -514,7 +517,7 @@ var
                         scrollingTimer = undefined;
                     }, 300);
                 }
-                
+
             };
 
             return this;
@@ -686,7 +689,7 @@ var
 
             var event = {
                 element: elements,
-                
+
                 handler: function() {
                     var parent = $(this)[0].parentNode,
                         top = parent.offsetTop,
@@ -829,7 +832,7 @@ var
 
             this.event(forward, 'click', function() {
                 var y = self.pos() - params.delta || 30;
-                
+
                 self.pos(y);
             });
         }
@@ -917,7 +920,7 @@ var
 
         function step(x, force) {
             var k = x * 0.0005;
-            
+
             return Math.floor(force - k * (x + 550));
         }
 
@@ -989,7 +992,6 @@ var
                 _zeroXCount++;
             } else {
                 _zeroXCount = 0;
-                
             }
             if (_zeroXCount > 1) {
                 toggle(false);
@@ -1058,7 +1060,7 @@ var
     };
 
     baron.fn.autoUpdate = function(params) {
-        if(!mutationObserver) return this;
+        if (!mutationObserver) return this;
 
         var i = 0;
 

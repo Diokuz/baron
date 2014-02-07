@@ -110,7 +110,7 @@
 
             var event = {
                 element: elements,
-                
+
                 handler: function() {
                     var parent = $(this)[0].parentNode,
                         top = parent.offsetTop,
