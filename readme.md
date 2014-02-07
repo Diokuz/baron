@@ -300,6 +300,9 @@ params = {
     // CSS class for elements which now are outside of viewport
     outside: 'header__title_state_fixed',
 
+    // CSS class for elements which now are in viewport
+    inside: 'header__title_state_unfixed',
+
     // CSS class for closest outsite element wrapper from top (left)
     before: 'header__title_position_top',
 

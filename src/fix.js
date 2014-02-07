@@ -4,6 +4,7 @@
         var elements, viewPortSize,
             params = { // Default params
                 outside: '',
+                inside: '',
                 before: '',
                 after: '',
                 past: '',
@@ -196,8 +197,11 @@
                             this.$(elements[i]).addClass(params.future).removeClass(params.past);
                         }
 
-                        if (fixFlag[i] == 3 && (params.future || params.past)) {
-                            this.$(elements[i]).removeClass(params.past).removeClass(params.future);
+                        if (fixFlag[i] == 3) {
+                            if (params.future || params.past) this.$(elements[i]).removeClass(params.past).removeClass(params.future);
+                            if (params.inside) this.$(elements[i]).addClass(params.inside);
+                        } else if (params.inside) {
+                            this.$(elements[i]).removeClass(params.inside);
                         }
 
                         if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && params.before) {

@@ -300,6 +300,32 @@ describe("Плагин fix.", function() {
 
             baron.dispose();
         });
+
+        it("header hav either inside or outside class", function() {
+            $('.wrapper._origin').html(originalHTML);
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            }).fix({
+                elements: '.header__title',
+                inside: 'insideClass',
+                outside: 'outsideClass'
+            });
+
+            $('.scroller')[0].scrollTop = 99999;
+            baron.update(); // Событие выстреливает позже
+
+            $('.wrapper_headers .scroller .header__title').each(function() {
+                var hasInside = $(this).hasClass('insideClass'),
+                    hasOutside = $(this).hasClass('outsideClass');
+
+                assert(hasInside || hasOutside, 'no inside or outside class');
+            });
+
+            
+            assert($('.wrapper_headers .scroller .header__title').eq(3).hasClass('insideClass'), 'no inside class');
+        });
     });
 
     describe("clickable", function() {
