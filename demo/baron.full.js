@@ -31,13 +31,14 @@ var
         }
     },
 
-    baron = function(params) { // this - window or jQuery instance
-        var jQueryMode = (this && this[0] && this[0].nodeType),
+    baron = function(params) {
+        var jQueryMode,
             roots,
             $;
 
         params = params || {};
         $ = params.$ || window.jQuery;
+        jQueryMode = this instanceof $;  // this - window or jQuery instance
 
         if (jQueryMode) {
             params.root = roots = this;
@@ -577,6 +578,7 @@ var
         module.exports = baron.noConflict();
     }
 })(window);
+
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
     var fix = function(userParams) {
