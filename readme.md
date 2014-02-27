@@ -19,7 +19,7 @@ If you want only to hide system scrollbar:
 
 * Include either the development or minified version of baron.js:
 
-```js
+```html
 <script src="baron.js"></script>
 ```
 
