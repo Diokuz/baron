@@ -5,7 +5,6 @@
 
 var
     _baron = baron, // Stored baron value for noConflict usage
-    $ = jQuery, // Trying to use jQuery
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
@@ -568,7 +567,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.6';
+    baron.version = '0.7.7';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
