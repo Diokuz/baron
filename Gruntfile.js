@@ -29,9 +29,6 @@ module.exports = function (grunt) {
             }
         },
         uglify: {
-            options: {
-                banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
-            },
             def: {
                 files: {
                     'dist/<%= pkg.name %>.min.js': ['dist/<%= pkg.name %>.js'],
