@@ -2,28 +2,47 @@
 (function(window, undefined) {
     var controls = function(params) {
         var forward, backward, track, screen,
-            self = this; // AAAAAA!!!!!11
+            self = this, // AAAAAA!!!!!11
+            event;
 
         screen = params.screen || 0.9;
 
         if (params.forward) {
             forward = this.$(params.forward, this.clipper);
 
-            this.event(forward, 'click', function() {
-                var y = self.pos() - params.delta || 30;
+            event = {
+                element: forward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() - params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.backward) {
             backward = this.$(params.backward, this.clipper);
 
-            this.event(backward, 'click', function() {
-                var y = self.pos() + params.delta || 30;
+            event = {
+                element: backward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() + params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.track) {
@@ -34,23 +53,31 @@
             }
 
             if (track) {
-                this.event(track, 'mousedown', function(e) {
-                    var x = e['offset' + self.origin.x],
-                        xBar = self.bar[self.origin.offsetPos],
-                        sign = 0;
+                event = {
+                    element: track,
 
-                    if (x < xBar) {
-                        sign = -1;
-                    } else if (x > xBar + self.bar[self.origin.offset]) {
-                        sign = 1;
-                    }
+                    handler: function(e) {
+                        var x = e['offset' + self.origin.x],
+                            xBar = self.bar[self.origin.offsetPos],
+                            sign = 0;
 
-                    var y = self.pos() + sign * screen * self.scroller[self.origin.client];
-                    self.pos(y);
-                });
+                        if (x < xBar) {
+                            sign = -1;
+                        } else if (x > xBar + self.bar[self.origin.offset]) {
+                            sign = 1;
+                        }
+
+                        var y = self.pos() + sign * screen * self.scroller[self.origin.client];
+                        self.pos(y);
+                    },
+
+                    type: 'mousedown'
+                };
+
+                this._eventHandlers.push(event); // For auto-dispose
+                this.event(event.element, event.type, event.handler, 'on');
             }
         }
-
     };
 
     baron.fn.controls = function(params) {

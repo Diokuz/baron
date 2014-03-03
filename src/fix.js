@@ -138,7 +138,7 @@
 
             if (params.clickable) {
                 this._eventHandlers.push(event); // For auto-dispose
-                eventManager(event.element, event.type, event.handler, 'off');
+                // eventManager(event.element, event.type, event.handler, 'off');
                 eventManager(event.element, event.type, event.handler, 'on');
             }
         }
