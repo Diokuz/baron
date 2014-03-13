@@ -105,7 +105,7 @@ and store baron scrollbar object to `scroll` variable.
 where:
 
 ```js
-params = {
+var params = {
     // Selector for scroller element.
     // Default: this (in jQuery mode).
     scroller: '.scroller',
@@ -154,7 +154,7 @@ params = {
 
         bean[mode || 'on'](elem, event, func);
     }
-}
+};
 ```
 
 All parameters are optional (except scroller or root, if you are not using baron as jQuery plugin).
@@ -292,7 +292,7 @@ baron(baronParams).fix(params);
 
 where:
 ```js
-params = {
+var params = {
     // CSS selector for fixable elements
     // Must have parentNode (no margin and padding allowed!) with same height (see demo for details). Also see 'limiter' parameter.
     elements: '.header__title',
@@ -325,7 +325,7 @@ params = {
 
     // User defined callback on click (data == {x1: current scrollTop, x2: new scrollTop})
     scroll: function(data) {}
-}
+};
 ```
 
 ## Controls plugin
@@ -333,7 +333,7 @@ params = {
 ```js
 baron().controls(params);
 
-params = {
+var params = {
     // Element to be used as interactive track. Note: it could be different from 'track' param of baron.
     track: '.visual-track',
 
@@ -350,7 +350,7 @@ params = {
     // Scroll distance per control button click in px
     // Default: 30
     delta: 40
-}
+};
 ```
 
 ## test plugin
