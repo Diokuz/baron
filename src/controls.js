@@ -14,7 +14,7 @@
                 element: forward,
 
                 handler: function() {
-                    var y = self.pos() - params.delta || 30;
+                    var y = self.pos() + params.delta || 30;
 
                     self.pos(y);
                 },
@@ -33,7 +33,7 @@
                 element: backward,
 
                 handler: function() {
-                    var y = self.pos() + params.delta || 30;
+                    var y = self.pos() - params.delta || 30;
 
                     self.pos(y);
                 },
