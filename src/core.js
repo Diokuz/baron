@@ -524,7 +524,7 @@ var
         },
 
         update: function(params) {
-            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+            fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
             this.updatePositions();
