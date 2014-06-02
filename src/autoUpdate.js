@@ -1,6 +1,6 @@
 /* Autoupdate plugin for baron 0.6+ */
 (function(window, undefined) {
-    var mutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
@@ -21,7 +21,7 @@
     };
 
     baron.fn.autoUpdate = function(params) {
-        if (!mutationObserver) return this;
+        if (!MutationObserver) return this;
 
         var i = 0;
 
