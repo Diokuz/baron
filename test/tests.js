@@ -72,6 +72,17 @@ describe("Барон.", function() {
             assert.ok(!cls);
             assert.ok(!size);
         });
+
+        it("dispose на бароне где не было элементов", function(done) {
+            var baron = $('.not_exist').baron({
+                bar: '.sadlfhasdhflakjsdhflaksjdhflakjsdh',
+                barOnCls: barOnCls
+            });
+
+            baron.dispose();
+
+            done();
+        });
     });
 
     describe("Навешивание классов", function() {

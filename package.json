@@ -1,7 +1,7 @@
 {
     "name": "baron",
     "description": "A small, fast and crossbrowser custom scrollbar with native system scroll mechanic.",
-    "version": "0.7.6",
+    "version": "0.7.7",
     "homepage": "https://github.com/Diokuz/baron",
     "authors": [
         "Dmitry Kuznecov <@Diokuz>"
@@ -27,6 +27,6 @@
         "chai": "~1.7.0",
         "phantomjs": "~1.9.2",
         "jscs": "~1.2.4",
-        "grunt-jscs-checker": "~0.3.2"
+        "grunt-jscs-checker": "~0.4.0"
     }
 }
