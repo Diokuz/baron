@@ -10,14 +10,17 @@
         });
 
         this.on('init', function() {
-            self._observer.observe(self.root, {childList: true, subtree: true, characterData: true});
+            self._observer.observe(self.root, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
         });
 
         this.on('dispose', function() {
             self._observer.dissconect();
             delete self._observer;
         });
-
     };
 
     baron.fn.autoUpdate = function(params) {

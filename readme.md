@@ -162,7 +162,7 @@ All parameters are optional (except scroller or root, if you are not using baron
 `scroll` methods:
 
 ```js
-scroll.update(); // Update scroller
+scroll.update(); // Update scroller for ie10- (MutationObserver supported)
 scroll.dispose(); // Remove baron instance and related event handlers
 ```
 

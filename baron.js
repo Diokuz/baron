@@ -45,7 +45,7 @@ var
             roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(roots, params, $);
+        return new baron.fn.constructor(roots, params, $).autoUpdate();
     };
 
     baron.fn = {
@@ -76,9 +76,11 @@ var
         dispose: function() {
             var params = this.params;
 
-            each(this, function(item) {
-                item.dispose(params);
-            });
+            if (this[0]) { /* Если есть хотя бы 1 рабочий инстанс */
+                each(this, function(item) {
+                    item.dispose(params);
+                });
+            }
             this.params = null;
         },
 
@@ -524,7 +526,7 @@ var
         },
 
         update: function(params) {
-            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+            fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
             this.updatePositions();
@@ -1067,28 +1069,32 @@ var
 })(window);
 /* Autoupdate plugin for baron 0.6+ */
 (function(window, undefined) {
-    var mutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
 
         this._observer = new MutationObserver(function() {
+            console.log('observe callback');
             self.update();
         });
 
         this.on('init', function() {
-            self._observer.observe(self.root, {childList: true, subtree: true, characterData: true});
+            self._observer.observe(self.root, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
         });
 
         this.on('dispose', function() {
             self._observer.dissconect();
             delete self._observer;
         });
-
     };
 
     baron.fn.autoUpdate = function(params) {
-        if (!mutationObserver) return this;
+        if (!MutationObserver) return this;
 
         var i = 0;
 

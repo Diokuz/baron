@@ -5,7 +5,6 @@
 
 var
     _baron = baron, // Stored baron value for noConflict usage
-    $ = jQuery, // Trying to use jQuery
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
@@ -77,9 +76,11 @@ var
         dispose: function() {
             var params = this.params;
 
-            each(this, function(item) {
-                item.dispose(params);
-            });
+            if (this[0]) { /* Если есть хотя бы 1 рабочий инстанс */
+                each(this, function(item) {
+                    item.dispose(params);
+                });
+            }
             this.params = null;
         },
 
@@ -525,7 +526,7 @@ var
         },
 
         update: function(params) {
-            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+            fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
             this.updatePositions();
@@ -568,7 +569,7 @@ var
         return baron;
     };
 
-    baron.version = '0.7.6';
+    baron.version = '0.7.7';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -719,7 +720,7 @@ var
 
             if (params.clickable) {
                 this._eventHandlers.push(event); // For auto-dispose
-                eventManager(event.element, event.type, event.handler, 'off');
+                // eventManager(event.element, event.type, event.handler, 'off');
                 eventManager(event.element, event.type, event.handler, 'on');
             }
         }
@@ -825,28 +826,47 @@ var
 (function(window, undefined) {
     var controls = function(params) {
         var forward, backward, track, screen,
-            self = this; // AAAAAA!!!!!11
+            self = this, // AAAAAA!!!!!11
+            event;
 
         screen = params.screen || 0.9;
 
         if (params.forward) {
             forward = this.$(params.forward, this.clipper);
 
-            this.event(forward, 'click', function() {
-                var y = self.pos() - params.delta || 30;
+            event = {
+                element: forward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() - params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.backward) {
             backward = this.$(params.backward, this.clipper);
 
-            this.event(backward, 'click', function() {
-                var y = self.pos() + params.delta || 30;
+            event = {
+                element: backward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() + params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.track) {
@@ -857,23 +877,31 @@ var
             }
 
             if (track) {
-                this.event(track, 'mousedown', function(e) {
-                    var x = e['offset' + self.origin.x],
-                        xBar = self.bar[self.origin.offsetPos],
-                        sign = 0;
+                event = {
+                    element: track,
 
-                    if (x < xBar) {
-                        sign = -1;
-                    } else if (x > xBar + self.bar[self.origin.offset]) {
-                        sign = 1;
-                    }
+                    handler: function(e) {
+                        var x = e['offset' + self.origin.x],
+                            xBar = self.bar[self.origin.offsetPos],
+                            sign = 0;
 
-                    var y = self.pos() + sign * screen * self.scroller[self.origin.client];
-                    self.pos(y);
-                });
+                        if (x < xBar) {
+                            sign = -1;
+                        } else if (x > xBar + self.bar[self.origin.offset]) {
+                            sign = 1;
+                        }
+
+                        var y = self.pos() + sign * screen * self.scroller[self.origin.client];
+                        self.pos(y);
+                    },
+
+                    type: 'mousedown'
+                };
+
+                this._eventHandlers.push(event); // For auto-dispose
+                this.event(event.element, event.type, event.handler, 'on');
             }
         }
-
     };
 
     baron.fn.controls = function(params) {
@@ -1132,7 +1160,7 @@ var
 })(window);
 /* Autoupdate plugin for baron 0.6+ */
 (function(window, undefined) {
-    var mutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
@@ -1153,7 +1181,7 @@ var
     };
 
     baron.fn.autoUpdate = function(params) {
-        if (!mutationObserver) return this;
+        if (!MutationObserver) return this;
 
         var i = 0;
 

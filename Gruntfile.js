@@ -11,7 +11,8 @@ module.exports = function (grunt) {
             },
             core: {
                 src: [
-                    'src/core.js'
+                    'src/core.js',
+                    'src/autoUpdate.js'
                 ],
                 dest: 'dist/<%= pkg.name %>.js'
             },
@@ -23,8 +24,8 @@ module.exports = function (grunt) {
             },
             online: {
                 files: {
-                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js'],
-                    '<%= pkg.name %>.js': ['src/core.js', 'src/fix.js']
+                    'dist/<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/autoUpdate.js'],
+                    '<%= pkg.name %>.js': ['src/core.js', 'src/fix.js', 'src/autoUpdate.js']
                 }
             }
         },

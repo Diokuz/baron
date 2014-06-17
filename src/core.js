@@ -45,7 +45,7 @@ var
             roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(roots, params, $);
+        return new baron.fn.constructor(roots, params, $).autoUpdate();
     };
 
     baron.fn = {
