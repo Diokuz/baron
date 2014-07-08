@@ -1088,7 +1088,7 @@ var
         });
 
         this.on('dispose', function() {
-            self._observer.dissconect();
+            self._observer.disconnect();
             delete self._observer;
         });
     };
