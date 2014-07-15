@@ -571,7 +571,7 @@ var
 
     baron.version = '0.7.7';
 
-    if ($ && $.fn) { // Adding baron to jQuery as plugin
+    if (window.$ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
     }
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
