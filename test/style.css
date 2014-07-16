@@ -1,12 +1,12 @@
-html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
+html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 
 .test {
     z-index: 0;
+    display: inline-block;
+    margin: 5px;
     width: 30%;
     height: 400px;
-    display: inline-block;
     background: #eee;
-    margin: 5px;
     box-shadow: 0 0 4px #ccc;
     vertical-align: top;
 }
@@ -28,22 +28,22 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     position: relative;
     z-index: 1;
     overflow: hidden;
-    height: 200px;
     margin: 1px auto;
-    background: #fff;
+    height: 200px;
     border: 1px solid #fc9;
+    background: #fff;
     box-shadow:
         0 5px 15px -3px rgba(0, 0, 0, .7),
         0 0 0 1px rgba(0, 0, 0, .05);
 }
 .scroller {
-    height: 100%;
-    padding: 0;
     display: block;
+    padding: 0;
+    height: 100%;
 }
-.scroller::-moz-focus-inner { 
+.scroller::-moz-focus-inner {
+    padding: 10px; 
     border: 10px solid red;
-    padding: 10px;
 }
 .scroller:focus {
     outline: none;
@@ -53,12 +53,12 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     height: 0;
 }
 .scroller__bar-wrapper {
-    display: none;
     position: absolute;
-    z-index: 1;
     top: 10px;
-    bottom: 10px;
     right: 5px;
+    bottom: 10px;
+    z-index: 1;
+    display: none;
     width: 8px;
     border-radius: 5px;
     background: #ddf;
@@ -66,17 +66,17 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
 }
 .scroller__track {
     position: absolute;
-    z-index: 3;
     top: 0;
     right: 0;
     bottom: 0;
+    z-index: 3;
 }
 .scroller__track-visual {
     position: absolute;
-    z-index: 2;
     top: 0;
     right: 0;
     bottom: 0;
+    z-index: 2;
     width: 10px;
     background: rgba(255, 100, 100, .2);
 }
@@ -84,8 +84,8 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     box-shadow: 0 0 7px rgba(0, 0, 0, .4) inset;
 }
 .scroller__track_h {
-    left: 0;
     bottom: auto;
+    left: 0;
     width: auto;
 }
 .scroller__bar {
@@ -126,10 +126,10 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     box-shadow: 0 0 4px rgba(255, 255, 255, 1);
 }
 .header__title {
-    width: 100%;
     /*height: 20px;*/
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+    width: 100%;
     background: #ebe7e4;
     background-color: rgba(200, 255, 250, 1);
     box-shadow: 0 -1px 0 rgba(0, 0, 0, .05);
@@ -164,10 +164,10 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
 
 
 .test_horizontal .scroller {
-    height: 100%;
-    width: auto;
     overflow-x: scroll;
     overflow-y: hidden;
+    width: auto;
+    height: 100%;
     white-space: nowrap;
 }
 .test_horizontal .container {
@@ -175,16 +175,16 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     height: 100%;
 }
 .test_horizontal .header {
-    height: 100%;
     display: inline-block;
-    white-space: normal;
+    height: 100%;
     vertical-align: top;
+    white-space: normal;
 }
 .test_horizontal .text {
     display: inline-block;
-    white-space: normal;
-    vertical-align: top;
     width: 800px;
+    vertical-align: top;
+    white-space: normal;
 }
 .test_horizontal .header__title {
     width: 20px;
@@ -212,10 +212,19 @@ html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana;}
     right: 0;
 }
 .scroller__down {
-    bottom: 0;
     right: 0;
+    bottom: 0;
 }
 
 .scroller__pull {
     background: red;
+}
+
+.anim {
+    height: 0px;
+    background: red;
+    transition: all 1s linear;
+}
+.anim._visible {
+    height: 1000px;
 }

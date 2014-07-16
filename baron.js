@@ -119,6 +119,15 @@ var
 
                 type: 'scroll'
             }, {
+                // css transitions & animations
+                element: item.root,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'transitionend animationend'
+            }, {
                 // onKeyup (textarea):
                 element: item.scroller,
 
@@ -1075,7 +1084,6 @@ var
         var self = this;
 
         this._observer = new MutationObserver(function() {
-            console.log('observe callback');
             self.update();
         });
 
