@@ -1,4 +1,6 @@
-Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
+[![Build Status](https://travis-ci.org/Diokuz/baron.svg)](https://travis-ci.org/Diokuz/baron)
+
+Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic. 
 
 ## Demo
 
