@@ -22,7 +22,7 @@ var
     each = function(obj, iterator) {
         var i = 0;
 
-        if (obj.length === undefined || obj === window) obj = [obj];
+         if (obj.length === undefined || obj === window) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
@@ -623,7 +623,7 @@ var
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
-            $(this.scroller).css(this.origin.crossSize, '');
+            this.$(this.scroller).css(this.origin.crossSize, '');
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;
@@ -910,6 +910,85 @@ var
         return this;
     };
 })(window);
+/* Autoupdate plugin for baron 0.6+ */
+(function(window) {
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+
+    var autoUpdate = function() {
+        var self = this;
+        var watcher;
+
+        function actualizeWatcher() {
+            if (!self.root[self.origin.offset]) {
+                startWatch();
+            } else {
+                stopWatch();
+            }
+        }
+
+        // Set interval timeout for watching when root node will be visible
+        function startWatch() {
+            if (watcher) return;
+
+            watcher = setInterval(function() {
+                if (self.root[self.origin.offset]) {
+                    stopWatch();
+                    self.update();
+                }
+            }, 300); // is it good enought for you?)
+        }
+
+        function stopWatch() {
+            clearInterval(watcher);
+            watcher = null;
+        }
+
+        var debouncedUpdater = self._debounce(function() {
+            self.update();
+        }, 300);
+
+        this._observer = new MutationObserver(function() {
+            actualizeWatcher();
+            self.update();
+            debouncedUpdater();
+        });
+
+        this.on('init', function() {
+            self._observer.observe(self.root, {
+                childList: true,
+                subtree: true,
+                characterData: true
+                // attributes: true
+                // No reasons to set attributes to true
+                // The case when root/child node with already properly inited baron toggled to hidden and then back to visible,
+                // and the size of parent was changed during that hidden state, is very rare
+                // Other cases are covered by watcher, and you still can do .update by yourself
+            });
+
+            actualizeWatcher();
+        });
+
+        this.on('dispose', function() {
+            self._observer.disconnect();
+            stopWatch();
+            delete self._observer;
+        });
+    };
+
+    baron.fn.autoUpdate = function(params) {
+        if (!MutationObserver) return this;
+
+        var i = 0;
+
+        while (this[i]) {
+            autoUpdate.call(this[i], params);
+            i++;
+        }
+
+        return this;
+    };
+})(window);
+
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
     var controls = function(params) {
@@ -1149,84 +1228,6 @@ var
 
         while (this[i]) {
             pull.call(this[i], params);
-            i++;
-        }
-
-        return this;
-    };
-})(window);
-/* Autoupdate plugin for baron 0.6+ */
-(function(window) {
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
-
-    var autoUpdate = function() {
-        var self = this;
-        var watcher;
-
-        function actualizeWatcher() {
-            if (!self.root[self.origin.offset]) {
-                startWatch();
-            } else {
-                stopWatch();
-            }
-        }
-
-        // Set interval timeout for watching when root node will be visible
-        function startWatch() {
-            if (watcher) return;
-
-            watcher = setInterval(function() {
-                if (self.root[self.origin.offset]) {
-                    stopWatch();
-                    self.update();
-                }
-            }, 300); // is it good enought for you?)
-        }
-
-        function stopWatch() {
-            clearInterval(watcher);
-            watcher = null;
-        }
-
-        var debouncedUpdater = self._debounce(function() {
-            self.update();
-        }, 300);
-
-        this._observer = new MutationObserver(function() {
-            actualizeWatcher();
-            self.update();
-            debouncedUpdater();
-        });
-
-        this.on('init', function() {
-            self._observer.observe(self.root, {
-                childList: true,
-                subtree: true,
-                characterData: true
-                // attributes: true
-                // No reasons to set attributes to true
-                // The case when root/child node with already properly inited baron toggled to hidden and then back to visible,
-                // and the size of parent was changed during that hidden state, is very rare
-                // Other cases are covered by watcher, and you still can do .update by yourself
-            });
-
-            actualizeWatcher();
-        });
-
-        this.on('dispose', function() {
-            self._observer.disconnect();
-            stopWatch();
-            delete self._observer;
-        });
-    };
-
-    baron.fn.autoUpdate = function(params) {
-        if (!MutationObserver) return this;
-
-        var i = 0;
-
-        while (this[i]) {
-            autoUpdate.call(this[i], params);
             i++;
         }
 
