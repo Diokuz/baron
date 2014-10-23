@@ -30,6 +30,8 @@ describe("Плагин autoUpdate", function() {
     it("Добавление прилипающего заголовка. ", function(done) {
         $('.wrapper._origin').html(originalHTML);
 
+        $('.wrapper._origin .scroller')[0].scrollTop = 0; // f ff
+
         baron = $('.wrapper._origin .scroller').baron({
             bar: '.scroller__bar',
             barOnCls: barOnCls
@@ -46,7 +48,7 @@ describe("Плагин autoUpdate", function() {
 
         setTimeout(function() {
             var barHeight2 = $('.scroller__bar').height();
-            assert(barHeight2 < barHeight1, 'Высота бара должна уменьшиться');
+            assert(barHeight2 < barHeight1, 'Высота бара должна уменьшиться: ' + barHeight2 + ' vs ' + barHeight1);
 
             var ht1 = headerScroller.find('.header').eq(0).offset().top;
             assert(ht1 > 0, 'Начальная позиция первого заголовка должна быть ниже текста');
@@ -61,8 +63,8 @@ describe("Плагин autoUpdate", function() {
 
                 baron.dispose();
                 done();
-            }, 20);
-        }, 0);
+            }, 10);
+        }, 401);
     });
 
     it("Добавление блока с css-анимируемой высотой. ", function(done) {
@@ -89,5 +91,44 @@ describe("Плагин autoUpdate", function() {
                 done();
             }, 1100);
         }, 300);
+    });
+
+    describe("Инициализация на скрытом блоке", function() {
+        var baron,
+            block = $('.wrapper._origin');
+
+        beforeEach(function() {
+            block.css({display: 'none'});
+            $('.wrapper._origin').html(originalHTML);
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+        });
+
+        it("После появления адекватно работает", function(done) {
+            block.css({display: 'block'});
+            setTimeout(function() {
+                var width = $('.wrapper._origin .scroller')[0].clientWidth; // Нельзя брать $.width() потому что он возьмет из styles
+                var barWidth = $('.wrapper._origin .scroller__bar')[0].clientWidth;
+
+                assert(width > 0, 'Ширина скроллера должна быть уже больше 0, ' + width);
+                assert(barWidth > 0, 'Ширина бара должна быть уже больше 0, ' + barWidth);
+                done();
+            }, 400);
+        });
+
+        it("После появления root-ноды адекватно работает сразу же", function(done) {
+            block.css({display: 'block'});
+            setTimeout(function() {
+                var width = $('.wrapper._origin .scroller')[0].clientWidth; // Нельзя брать $.width() потому что он возьмет из styles
+                var barWidth = $('.wrapper._origin .scroller__bar')[0].clientWidth;
+
+                assert(width > 0, 'width ' + width);
+                assert(barWidth > 0, 'barWidth ' + barWidth);
+                done();
+            }, 301);
+        });
     });
 });

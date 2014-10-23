@@ -89,7 +89,6 @@ describe("Барон.", function() {
     });
 
     describe("Навешивание классов", function() {
-
         it("После инициализации нет блокирующего класса _scrolling", function() {
             $('.wrapper._origin').html(originalHTML);
 

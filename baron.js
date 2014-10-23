@@ -1,4 +1,4 @@
-(function(window, undefined) {
+(function(window, $, undefined) {
     'use strict';
 
     if (!window) return; // Server side
@@ -36,7 +36,7 @@ var
             $;
 
         params = params || {};
-        $ = params.$ || window.jQuery;
+        $ = params.$ || $ || window.jQuery;
         jQueryMode = this instanceof $;  // this - window or jQuery instance
 
         if (jQueryMode) {
@@ -45,8 +45,19 @@ var
             roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(roots, params, $).autoUpdate();
+        var instance = new baron.fn.constructor(roots, params, $);
+
+        if (instance.autoUpdate) {
+            instance.autoUpdate();
+        }
+
+        return instance;
     };
+
+    // shortcut for getTime
+    function getTime() {
+        return new Date().getTime();
+    }
 
     baron.fn = {
         constructor: function(roots, input, $) {
@@ -242,9 +253,7 @@ var
 
         manageAttr(out.root, params.direction, 'on');
 
-        out.update({
-            initMode: true
-        });
+        out.update();
 
         return out;
     }
@@ -295,6 +304,47 @@ var
     var item = {};
 
     item.prototype = {
+        // underscore.js realization
+        _debounce: function(func, wait) {
+            var self = this,
+                timeout,
+                // args, // right now there is no need for arguments
+                // context, // and for context
+                timestamp;
+                // result; // and for result
+
+            var later = function() {
+                if (self._disposed) {
+                    clearTimeout(timeout);
+                    timeout = self = null;
+                    return;
+                }
+
+                var last = getTime() - timestamp;
+
+                if (last < wait && last >= 0) {
+                    timeout = setTimeout(later, wait - last);
+                } else {
+                    timeout = null;
+                    // result = func.apply(context, args);
+                    func();
+                    // context = args = null;
+                }
+            };
+
+            return function() {
+                // context = this;
+                // args = arguments;
+                timestamp = getTime();
+
+                if (!timeout) {
+                    timeout = setTimeout(later, wait);
+                }
+
+                // return result;
+            };
+        },
+
         constructor: function(params) {
             var $,
                 barPos,
@@ -308,7 +358,7 @@ var
                 resizeLastFire,
                 oldBarSize;
 
-            resizeLastFire = scrollLastFire = new Date().getTime();
+            resizeLastFire = scrollLastFire = getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -331,7 +381,7 @@ var
             // Parameters
             this.direction = params.direction;
             this.origin = origin[this.direction];
-            this.barOnCls = params.barOnCls;
+            this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
@@ -354,7 +404,12 @@ var
             function posBar(pos) {
                 /* jshint validthis:true */
                 if (this.bar) {
-                    $(this.bar).css(this.origin.pos, +pos + 'px');
+                    var was = $(this.bar).css(this.origin.pos),
+                        will = +pos + 'px';
+
+                    if (will && will != was) {
+                        $(this.bar).css(this.origin.pos, will);
+                    }
                 }
             }
 
@@ -412,9 +467,9 @@ var
             this.barOn = function(dispose) {
                 if (this.barOnCls) {
                     if (dispose || this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]) {
-                        $(this.root).removeClass(this.barOnCls);
+                        if ($(this.root).hasClass(this.barOnCls)) $(this.root).removeClass(this.barOnCls);
                     } else {
-                        $(this.root).addClass(this.barOnCls);
+                        if (!$(this.root).hasClass(this.barOnCls)) $(this.root).addClass(this.barOnCls);
                     }
                 }
             };
@@ -437,31 +492,52 @@ var
                 var self = this,
                     delay = 0;
 
-                if (new Date().getTime() - resizeLastFire < pause) {
+                if (getTime() - resizeLastFire < pause) {
                     clearTimeout(resizePauseTimer);
                     delay = pause;
                 }
 
                 function upd() {
                     var delta,
-                        client;
+                        client,
+                        offset,
+                        was,
+                        will;
+
+                    // Change a css inline rule only if it is really changing value
+                    // function tryCss(prop, value, ) {
+                    //     var was = $(self.clipper).css(self.origin.crossSize),
+                    //         will = self.clipper[self.origin.crossClient] - delta + 'px';
+                    // };
 
                     self.barOn();
 
                     client = self.scroller[self.origin.crossClient];
+                    offset = self.scroller[self.origin.crossOffset];
+                    delta = offset - client;
 
-                    delta = self.scroller[self.origin.crossOffset] - client;
+                    if (offset) { // if there is no size, css should not be set
+                        if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
+                            was = $(self.clipper).css(self.origin.crossSize);
+                            will = self.clipper[self.origin.crossClient] - delta + 'px';
 
-                    if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
-                        $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
+                            if (was != will) {
+                                $(self.clipper).css(self.origin.crossSize, will);
+                            }
+                        }
+
+                        was = $(self.clipper).css(self.origin.crossSize);
+                        will = self.clipper[self.origin.crossClient] + delta + 'px';
+
+                        if (was != will) {
+                            $(self.scroller).css(self.origin.crossSize, will);
+                        }
                     }
-
-                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
 
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
-                    resizeLastFire = new Date().getTime();
+                    resizeLastFire = getTime();
                 }
 
                 if (delay) {
@@ -492,7 +568,7 @@ var
                 Array.prototype.unshift.call( arguments, 'scroll' );
                 fire.apply(self, arguments);
 
-                scrollLastFire = new Date().getTime();
+                scrollLastFire = getTime();
             };
 
             // onScroll handler
@@ -500,12 +576,12 @@ var
                 var delay = 0,
                     self = this;
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
@@ -543,12 +619,14 @@ var
             return this;
         },
 
+        // One instance
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
             $(this.scroller).css(this.origin.crossSize, '');
             this.barOn(true);
             fire.call(this, 'dispose');
+            this._disposed = true;
         },
 
         on: function(eventName, func, arg) {
@@ -578,16 +656,17 @@ var
         return baron;
     };
 
-    baron.version = '0.7.7';
+    baron.version = '0.7.10';
 
-    if (window.$ && $.fn) { // Adding baron to jQuery as plugin
+    if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
     }
+
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
     if (window['module'] && module.exports) {
         module.exports = baron.noConflict();
     }
-})(window);
+})(window, window.$);
 
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
@@ -1077,14 +1156,46 @@ var
     };
 })(window);
 /* Autoupdate plugin for baron 0.6+ */
-(function(window, undefined) {
+(function(window) {
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
+        var watcher;
+
+        function actualizeWatcher() {
+            if (!self.root[self.origin.offset]) {
+                startWatch();
+            } else {
+                stopWatch();
+            }
+        }
+
+        // Set interval timeout for watching when root node will be visible
+        function startWatch() {
+            if (watcher) return;
+
+            watcher = setInterval(function() {
+                if (self.root[self.origin.offset]) {
+                    stopWatch();
+                    self.update();
+                }
+            }, 300); // is it good enought for you?)
+        }
+
+        function stopWatch() {
+            clearInterval(watcher);
+            watcher = null;
+        }
+
+        var debouncedUpdater = self._debounce(function() {
+            self.update();
+        }, 300);
 
         this._observer = new MutationObserver(function() {
+            actualizeWatcher();
             self.update();
+            debouncedUpdater();
         });
 
         this.on('init', function() {
@@ -1092,11 +1203,19 @@ var
                 childList: true,
                 subtree: true,
                 characterData: true
+                // attributes: true
+                // No reasons to set attributes to true
+                // The case when root/child node with already properly inited baron toggled to hidden and then back to visible,
+                // and the size of parent was changed during that hidden state, is very rare
+                // Other cases are covered by watcher, and you still can do .update by yourself
             });
+
+            actualizeWatcher();
         });
 
         this.on('dispose', function() {
             self._observer.disconnect();
+            stopWatch();
             delete self._observer;
         });
     };
