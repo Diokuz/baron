@@ -60,5 +60,28 @@ describe("Барон.", function() {
             assert.ok(Math.abs(height - expectedHeight) <= 1);
         });
 
+        describe("При вызове метода dispose()", function() {
+
+            it("удаляет инстанс барона без ошибок", function() {
+                assert.doesNotThrow(function() {
+                    baronInstance.dispose();
+                }, Error);
+            });
+
+            it("удаляет атрибут data-baron-v", function() {
+                var attrV = bonzoQuery('.scroller').attr('data-baron-v'),
+                    attrH = bonzoQuery('.scroller').attr('data-baron-h');
+
+                assert.isNull(attrV);
+                assert.isNull(attrH);
+            });
+
+            it("ставит display: none для bar-ов", function() {
+                var display = bonzoQuery(bar).css('display');
+                assert.ok(display === 'none');
+            });
+
+        });
+
     });
 });
