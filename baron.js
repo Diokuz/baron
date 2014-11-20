@@ -663,7 +663,7 @@ var
     }
 
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
-    if (window['module'] && module.exports) {
+    if (typeof module !== 'undefined' && module.exports) {
         module.exports = baron.noConflict();
     }
 })(window, window.$);
