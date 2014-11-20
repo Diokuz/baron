@@ -155,6 +155,7 @@ var
                     e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
                     item.selection(); // Disable text selection in ie8
                     item.drag.now = 1; // Save private byte
+                    $(item.bar).addClass(item.draggingCls);
                 },
 
                 type: 'touchstart mousedown'
@@ -165,6 +166,7 @@ var
                 handler: function() {
                     item.selection(1); // Enable text selection
                     item.drag.now = 0;
+                    $(item.bar).removeClass(item.draggingCls);
                 },
 
                 type: 'mouseup blur touchend'
@@ -383,6 +385,7 @@ var
             this.origin = origin[this.direction];
             this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
+            this.draggingCls = params.draggingCls;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
 
