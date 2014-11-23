@@ -623,7 +623,7 @@ var
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
-            $(this.scroller).css(this.origin.crossSize, '');
+            this.$(this.scroller).css(this.origin.crossSize, '');
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;
