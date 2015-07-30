@@ -1,11 +1,10 @@
-(function(window, undefined) {
+(function(window, $, undefined) {
     'use strict';
 
     if (!window) return; // Server side
 
 var
     _baron = baron, // Stored baron value for noConflict usage
-    $ = jQuery, // Trying to use jQuery
     pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
     origin = {
         v: { // Vertical
@@ -23,7 +22,7 @@ var
     each = function(obj, iterator) {
         var i = 0;
 
-        if (obj.length === undefined || obj === window) obj = [obj];
+         if (obj.length === undefined || obj === window) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
@@ -37,7 +36,7 @@ var
             $;
 
         params = params || {};
-        $ = params.$ || window.jQuery;
+        $ = params.$ || $ || window.jQuery;
         jQueryMode = this instanceof $;  // this - window or jQuery instance
 
         if (jQueryMode) {
@@ -46,8 +45,19 @@ var
             roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(roots, params, $);
+        var instance = new baron.fn.constructor(roots, params, $);
+
+        if (instance.autoUpdate) {
+            instance.autoUpdate();
+        }
+
+        return instance;
     };
+
+    // shortcut for getTime
+    function getTime() {
+        return new Date().getTime();
+    }
 
     baron.fn = {
         constructor: function(roots, input, $) {
@@ -77,9 +87,11 @@ var
         dispose: function() {
             var params = this.params;
 
-            each(this, function(item) {
-                item.dispose(params);
-            });
+            if (this[0]) { /* Если есть хотя бы 1 рабочий инстанс */
+                each(this, function(item) {
+                    item.dispose(params);
+                });
+            }
             this.params = null;
         },
 
@@ -117,6 +129,15 @@ var
                 },
 
                 type: 'scroll'
+            }, {
+                // css transitions & animations
+                element: item.root,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'transitionend animationend'
             }, {
                 // onKeyup (textarea):
                 element: item.scroller,
@@ -232,9 +253,7 @@ var
 
         manageAttr(out.root, params.direction, 'on');
 
-        out.update({
-            initMode: true
-        });
+        out.update();
 
         return out;
     }
@@ -285,6 +304,47 @@ var
     var item = {};
 
     item.prototype = {
+        // underscore.js realization
+        _debounce: function(func, wait) {
+            var self = this,
+                timeout,
+                // args, // right now there is no need for arguments
+                // context, // and for context
+                timestamp;
+                // result; // and for result
+
+            var later = function() {
+                if (self._disposed) {
+                    clearTimeout(timeout);
+                    timeout = self = null;
+                    return;
+                }
+
+                var last = getTime() - timestamp;
+
+                if (last < wait && last >= 0) {
+                    timeout = setTimeout(later, wait - last);
+                } else {
+                    timeout = null;
+                    // result = func.apply(context, args);
+                    func();
+                    // context = args = null;
+                }
+            };
+
+            return function() {
+                // context = this;
+                // args = arguments;
+                timestamp = getTime();
+
+                if (!timeout) {
+                    timeout = setTimeout(later, wait);
+                }
+
+                // return result;
+            };
+        },
+
         constructor: function(params) {
             var $,
                 barPos,
@@ -298,7 +358,7 @@ var
                 resizeLastFire,
                 oldBarSize;
 
-            resizeLastFire = scrollLastFire = new Date().getTime();
+            resizeLastFire = scrollLastFire = getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -321,7 +381,7 @@ var
             // Parameters
             this.direction = params.direction;
             this.origin = origin[this.direction];
-            this.barOnCls = params.barOnCls;
+            this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
@@ -344,7 +404,12 @@ var
             function posBar(pos) {
                 /* jshint validthis:true */
                 if (this.bar) {
-                    $(this.bar).css(this.origin.pos, +pos + 'px');
+                    var was = $(this.bar).css(this.origin.pos),
+                        will = +pos + 'px';
+
+                    if (will && will != was) {
+                        $(this.bar).css(this.origin.pos, will);
+                    }
                 }
             }
 
@@ -402,9 +467,9 @@ var
             this.barOn = function(dispose) {
                 if (this.barOnCls) {
                     if (dispose || this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]) {
-                        $(this.root).removeClass(this.barOnCls);
+                        if ($(this.root).hasClass(this.barOnCls)) $(this.root).removeClass(this.barOnCls);
                     } else {
-                        $(this.root).addClass(this.barOnCls);
+                        if (!$(this.root).hasClass(this.barOnCls)) $(this.root).addClass(this.barOnCls);
                     }
                 }
             };
@@ -427,31 +492,52 @@ var
                 var self = this,
                     delay = 0;
 
-                if (new Date().getTime() - resizeLastFire < pause) {
+                if (getTime() - resizeLastFire < pause) {
                     clearTimeout(resizePauseTimer);
                     delay = pause;
                 }
 
                 function upd() {
                     var delta,
-                        client;
+                        client,
+                        offset,
+                        was,
+                        will;
+
+                    // Change a css inline rule only if it is really changing value
+                    // function tryCss(prop, value, ) {
+                    //     var was = $(self.clipper).css(self.origin.crossSize),
+                    //         will = self.clipper[self.origin.crossClient] - delta + 'px';
+                    // };
 
                     self.barOn();
 
                     client = self.scroller[self.origin.crossClient];
+                    offset = self.scroller[self.origin.crossOffset];
+                    delta = offset - client;
 
-                    delta = self.scroller[self.origin.crossOffset] - client;
+                    if (offset) { // if there is no size, css should not be set
+                        if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
+                            was = $(self.clipper).css(self.origin.crossSize);
+                            will = self.clipper[self.origin.crossClient] - delta + 'px';
 
-                    if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
-                        $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
+                            if (was != will) {
+                                $(self.clipper).css(self.origin.crossSize, will);
+                            }
+                        }
+
+                        was = $(self.clipper).css(self.origin.crossSize);
+                        will = self.clipper[self.origin.crossClient] + delta + 'px';
+
+                        if (was != will) {
+                            $(self.scroller).css(self.origin.crossSize, will);
+                        }
                     }
-
-                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
 
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
-                    resizeLastFire = new Date().getTime();
+                    resizeLastFire = getTime();
                 }
 
                 if (delay) {
@@ -482,7 +568,7 @@ var
                 Array.prototype.unshift.call( arguments, 'scroll' );
                 fire.apply(self, arguments);
 
-                scrollLastFire = new Date().getTime();
+                scrollLastFire = getTime();
             };
 
             // onScroll handler
@@ -490,12 +576,12 @@ var
                 var delay = 0,
                     self = this;
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
@@ -525,7 +611,7 @@ var
         },
 
         update: function(params) {
-            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+            fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
             this.updatePositions();
@@ -533,12 +619,14 @@ var
             return this;
         },
 
+        // One instance
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
-            $(this.scroller).css(this.origin.crossSize, '');
+            this.$(this.scroller).css(this.origin.crossSize, '');
             this.barOn(true);
             fire.call(this, 'dispose');
+            this._disposed = true;
         },
 
         on: function(eventName, func, arg) {
@@ -568,16 +656,17 @@ var
         return baron;
     };
 
-    baron.version = '0.7.6';
+    baron.version = '0.7.10';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
     }
+
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
     if (window['module'] && module.exports) {
         module.exports = baron.noConflict();
     }
-})(window);
+})(window, window.$);
 
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
@@ -719,7 +808,7 @@ var
 
             if (params.clickable) {
                 this._eventHandlers.push(event); // For auto-dispose
-                eventManager(event.element, event.type, event.handler, 'off');
+                // eventManager(event.element, event.type, event.handler, 'off');
                 eventManager(event.element, event.type, event.handler, 'on');
             }
         }
@@ -821,32 +910,130 @@ var
         return this;
     };
 })(window);
+/* Autoupdate plugin for baron 0.6+ */
+(function(window) {
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+
+    var autoUpdate = function() {
+        var self = this;
+        var watcher;
+
+        function actualizeWatcher() {
+            if (!self.root[self.origin.offset]) {
+                startWatch();
+            } else {
+                stopWatch();
+            }
+        }
+
+        // Set interval timeout for watching when root node will be visible
+        function startWatch() {
+            if (watcher) return;
+
+            watcher = setInterval(function() {
+                if (self.root[self.origin.offset]) {
+                    stopWatch();
+                    self.update();
+                }
+            }, 300); // is it good enought for you?)
+        }
+
+        function stopWatch() {
+            clearInterval(watcher);
+            watcher = null;
+        }
+
+        var debouncedUpdater = self._debounce(function() {
+            self.update();
+        }, 300);
+
+        this._observer = new MutationObserver(function() {
+            actualizeWatcher();
+            self.update();
+            debouncedUpdater();
+        });
+
+        this.on('init', function() {
+            self._observer.observe(self.root, {
+                childList: true,
+                subtree: true,
+                characterData: true
+                // attributes: true
+                // No reasons to set attributes to true
+                // The case when root/child node with already properly inited baron toggled to hidden and then back to visible,
+                // and the size of parent was changed during that hidden state, is very rare
+                // Other cases are covered by watcher, and you still can do .update by yourself
+            });
+
+            actualizeWatcher();
+        });
+
+        this.on('dispose', function() {
+            self._observer.disconnect();
+            stopWatch();
+            delete self._observer;
+        });
+    };
+
+    baron.fn.autoUpdate = function(params) {
+        if (!MutationObserver) return this;
+
+        var i = 0;
+
+        while (this[i]) {
+            autoUpdate.call(this[i], params);
+            i++;
+        }
+
+        return this;
+    };
+})(window);
+
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
     var controls = function(params) {
         var forward, backward, track, screen,
-            self = this; // AAAAAA!!!!!11
+            self = this, // AAAAAA!!!!!11
+            event;
 
         screen = params.screen || 0.9;
 
         if (params.forward) {
             forward = this.$(params.forward, this.clipper);
 
-            this.event(forward, 'click', function() {
-                var y = self.pos() - params.delta || 30;
+            event = {
+                element: forward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() - params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.backward) {
             backward = this.$(params.backward, this.clipper);
 
-            this.event(backward, 'click', function() {
-                var y = self.pos() + params.delta || 30;
+            event = {
+                element: backward,
 
-                self.pos(y);
-            });
+                handler: function() {
+                    var y = self.pos() + params.delta || 30;
+
+                    self.pos(y);
+                },
+
+                type: 'click'
+            };
+
+            this._eventHandlers.push(event); // For auto-dispose
+            this.event(event.element, event.type, event.handler, 'on');
         }
 
         if (params.track) {
@@ -857,23 +1044,31 @@ var
             }
 
             if (track) {
-                this.event(track, 'mousedown', function(e) {
-                    var x = e['offset' + self.origin.x],
-                        xBar = self.bar[self.origin.offsetPos],
-                        sign = 0;
+                event = {
+                    element: track,
 
-                    if (x < xBar) {
-                        sign = -1;
-                    } else if (x > xBar + self.bar[self.origin.offset]) {
-                        sign = 1;
-                    }
+                    handler: function(e) {
+                        var x = e['offset' + self.origin.x],
+                            xBar = self.bar[self.origin.offsetPos],
+                            sign = 0;
 
-                    var y = self.pos() + sign * screen * self.scroller[self.origin.client];
-                    self.pos(y);
-                });
+                        if (x < xBar) {
+                            sign = -1;
+                        } else if (x > xBar + self.bar[self.origin.offset]) {
+                            sign = 1;
+                        }
+
+                        var y = self.pos() + sign * screen * self.scroller[self.origin.client];
+                        self.pos(y);
+                    },
+
+                    type: 'mousedown'
+                };
+
+                this._eventHandlers.push(event); // For auto-dispose
+                this.event(event.element, event.type, event.handler, 'on');
             }
         }
-
     };
 
     baron.fn.controls = function(params) {
@@ -881,97 +1076,6 @@ var
 
         while (this[i]) {
             controls.call(this[i], params);
-            i++;
-        }
-
-        return this;
-    };
-})(window);
-/* Autotests plugin for baron 0.6+ (for developers) */
-(function(window, undefined) {
-    var test = function(params) {
-        var errCount = 0,
-            totalCount = 0;
-
-        var log = function(type, msg, obj) {
-            var text = type + ': ' + msg;
-
-            switch (type) {
-                case 'log': css = 'color: #0b0'; break;
-                case 'warn': css = 'color: #fc9'; break;
-                case 'error': css = 'color: #f00'; break;
-            }
-            totalCount++;
-            if (type == 'log') {
-                errCount++;
-            }
-
-            console.log('%c ' + totalCount + '. ' + text, css);
-            if (obj !== undefined) {
-                console.log(obj);
-            }
-        };
-
-        if (this.scroller && this.scroller.nodeType === 1) {
-            log('log', 'Scroller defined and has proper nodeType value', this.scroller);
-        } else {
-            log('error', 'Scroller not defined or has wrong type (should be html node).', this.scroller);
-        }
-
-        if (this.$ && typeof this.$ == 'function') {
-            log('log', 'Local $ defined and it is a function');
-        } else {
-            log('error', 'Local $ has wrong value or is not defined, or custom params.dom and params.selector not defined', params.$);
-        }
-
-        if (this.scroller.getAttribute('data-baron-v')) {
-            log('log', 'Baron initialized in vertical direction', this.scroller.getAttribute('data-baron-v'));
-            if (this.scroller.clientHeight < this.scroller.scrollHeight && this.scroller.getAttribute('data-baron-v')) {
-                log('log', 'There are enought space for scrolling in vertical direction right now', this.scroller.scrollHeight - this.scroller.clientHeight + 'px');
-            } else {
-                log('log', 'There are not enought space for scrolling in vertical direction right now');
-            }
-        }
-        if (this.scroller.getAttribute('data-baron-h')) {
-            log('log', 'Baron initialized in horizontal direction', this.scroller.getAttribute('data-baron-h'));
-            if (this.scroller.clientWidth < this.scroller.scrollWidth) {
-                log('log', 'There are enought space for scrolling in horizontal direction right now', this.scroller.scrollWidth - this.scroller.clientWidth + 'px');
-            } else {
-                log('log', 'There are not enought space for scrolling in horizontal direction right now');
-            }
-        }
-
-        if (this.bar && this.bar.nodeType === 1) {
-            log('log', 'Bar defined and has proper nodeType value', this.bar);
-        } else {
-            log('warn', 'Bar not defined or has wrong type (should be html node).', this.bar);
-        }
-
-        if (this.barOnCls) {
-            log('log', 'CSS classname barOnCls defined', this.barOnCls);
-        } else {
-            log('warn', 'barOnCls not defined - bar will be visible or not visible all the time', this.barOnCls);
-        }
-
-        // Preformance test
-        var t1 = new Date().getTime(),
-            x;
-        for (var i = 0 ; i < 1000 ; i += 10) {
-            x = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
-            this.pos(x);
-            this.event(this.scroller, 'scroll', undefined, 'trigger');
-        }
-        var t2 = new Date().getTime();
-        log('log', 'Preformance test: ' + (t2 - t1) / 1000 + ' milliseconds per scroll event');
-
-        log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
-    };
-
-    baron.fn.test = function(params) {
-        var i = 0;
-
-        while (this[i]) {
-            test.call(this[i], params);
             i++;
         }
 
@@ -1130,35 +1234,91 @@ var
         return this;
     };
 })(window);
-/* Autoupdate plugin for baron 0.6+ */
+/* Autotests plugin for baron 0.6+ (for developers) */
 (function(window, undefined) {
-    var mutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+    var test = function(params) {
+        var errCount = 0,
+            totalCount = 0;
 
-    var autoUpdate = function() {
-        var self = this;
+        var log = function(type, msg, obj) {
+            var text = type + ': ' + msg;
 
-        this._observer = new MutationObserver(function() {
-            self.update();
-        });
+            switch (type) {
+                case 'log': css = 'color: #0b0'; break;
+                case 'warn': css = 'color: #fc9'; break;
+                case 'error': css = 'color: #f00'; break;
+            }
+            totalCount++;
+            if (type == 'log') {
+                errCount++;
+            }
 
-        this.on('init', function() {
-            self._observer.observe(self.root, {childList: true, subtree: true, characterData: true});
-        });
+            console.log('%c ' + totalCount + '. ' + text, css);
+            if (obj !== undefined) {
+                console.log(obj);
+            }
+        };
 
-        this.on('dispose', function() {
-            self._observer.dissconect();
-            delete self._observer;
-        });
+        if (this.scroller && this.scroller.nodeType === 1) {
+            log('log', 'Scroller defined and has proper nodeType value', this.scroller);
+        } else {
+            log('error', 'Scroller not defined or has wrong type (should be html node).', this.scroller);
+        }
 
+        if (this.$ && typeof this.$ == 'function') {
+            log('log', 'Local $ defined and it is a function');
+        } else {
+            log('error', 'Local $ has wrong value or is not defined, or custom params.dom and params.selector not defined', params.$);
+        }
+
+        if (this.scroller.getAttribute('data-baron-v')) {
+            log('log', 'Baron initialized in vertical direction', this.scroller.getAttribute('data-baron-v'));
+            if (this.scroller.clientHeight < this.scroller.scrollHeight && this.scroller.getAttribute('data-baron-v')) {
+                log('log', 'There are enought space for scrolling in vertical direction right now', this.scroller.scrollHeight - this.scroller.clientHeight + 'px');
+            } else {
+                log('log', 'There are not enought space for scrolling in vertical direction right now');
+            }
+        }
+        if (this.scroller.getAttribute('data-baron-h')) {
+            log('log', 'Baron initialized in horizontal direction', this.scroller.getAttribute('data-baron-h'));
+            if (this.scroller.clientWidth < this.scroller.scrollWidth) {
+                log('log', 'There are enought space for scrolling in horizontal direction right now', this.scroller.scrollWidth - this.scroller.clientWidth + 'px');
+            } else {
+                log('log', 'There are not enought space for scrolling in horizontal direction right now');
+            }
+        }
+
+        if (this.bar && this.bar.nodeType === 1) {
+            log('log', 'Bar defined and has proper nodeType value', this.bar);
+        } else {
+            log('warn', 'Bar not defined or has wrong type (should be html node).', this.bar);
+        }
+
+        if (this.barOnCls) {
+            log('log', 'CSS classname barOnCls defined', this.barOnCls);
+        } else {
+            log('warn', 'barOnCls not defined - bar will be visible or not visible all the time', this.barOnCls);
+        }
+
+        // Preformance test
+        var t1 = new Date().getTime(),
+            x;
+        for (var i = 0 ; i < 1000 ; i += 10) {
+            x = i % (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+            this.pos(x);
+            this.event(this.scroller, 'scroll', undefined, 'trigger');
+        }
+        var t2 = new Date().getTime();
+        log('log', 'Preformance test: ' + (t2 - t1) / 1000 + ' milliseconds per scroll event');
+
+        log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
     };
 
-    baron.fn.autoUpdate = function(params) {
-        if (!mutationObserver) return this;
-
+    baron.fn.test = function(params) {
         var i = 0;
 
         while (this[i]) {
-            autoUpdate.call(this[i], params);
+            test.call(this[i], params);
             i++;
         }
 

@@ -1,4 +1,4 @@
-(function(window, undefined) {
+(function(window, $, undefined) {
     'use strict';
 
     if (!window) return; // Server side
@@ -22,7 +22,7 @@ var
     each = function(obj, iterator) {
         var i = 0;
 
-        if (obj.length === undefined || obj === window) obj = [obj];
+         if (obj.length === undefined || obj === window) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
@@ -36,7 +36,7 @@ var
             $;
 
         params = params || {};
-        $ = params.$ || window.jQuery;
+        $ = params.$ || $ || window.jQuery;
         jQueryMode = this instanceof $;  // this - window or jQuery instance
 
         if (jQueryMode) {
@@ -45,8 +45,19 @@ var
             roots = $(params.root || params.scroller);
         }
 
-        return new baron.fn.constructor(roots, params, $);
+        var instance = new baron.fn.constructor(roots, params, $);
+
+        if (instance.autoUpdate) {
+            instance.autoUpdate();
+        }
+
+        return instance;
     };
+
+    // shortcut for getTime
+    function getTime() {
+        return new Date().getTime();
+    }
 
     baron.fn = {
         constructor: function(roots, input, $) {
@@ -76,9 +87,11 @@ var
         dispose: function() {
             var params = this.params;
 
-            each(this, function(item) {
-                item.dispose(params);
-            });
+            if (this[0]) { /* Если есть хотя бы 1 рабочий инстанс */
+                each(this, function(item) {
+                    item.dispose(params);
+                });
+            }
             this.params = null;
         },
 
@@ -116,6 +129,15 @@ var
                 },
 
                 type: 'scroll'
+            }, {
+                // css transitions & animations
+                element: item.root,
+
+                handler: function() {
+                    item.update();
+                },
+
+                type: 'transitionend animationend'
             }, {
                 // onKeyup (textarea):
                 element: item.scroller,
@@ -231,9 +253,7 @@ var
 
         manageAttr(out.root, params.direction, 'on');
 
-        out.update({
-            initMode: true
-        });
+        out.update();
 
         return out;
     }
@@ -284,6 +304,47 @@ var
     var item = {};
 
     item.prototype = {
+        // underscore.js realization
+        _debounce: function(func, wait) {
+            var self = this,
+                timeout,
+                // args, // right now there is no need for arguments
+                // context, // and for context
+                timestamp;
+                // result; // and for result
+
+            var later = function() {
+                if (self._disposed) {
+                    clearTimeout(timeout);
+                    timeout = self = null;
+                    return;
+                }
+
+                var last = getTime() - timestamp;
+
+                if (last < wait && last >= 0) {
+                    timeout = setTimeout(later, wait - last);
+                } else {
+                    timeout = null;
+                    // result = func.apply(context, args);
+                    func();
+                    // context = args = null;
+                }
+            };
+
+            return function() {
+                // context = this;
+                // args = arguments;
+                timestamp = getTime();
+
+                if (!timeout) {
+                    timeout = setTimeout(later, wait);
+                }
+
+                // return result;
+            };
+        },
+
         constructor: function(params) {
             var $,
                 barPos,
@@ -297,7 +358,7 @@ var
                 resizeLastFire,
                 oldBarSize;
 
-            resizeLastFire = scrollLastFire = new Date().getTime();
+            resizeLastFire = scrollLastFire = getTime();
 
             $ = this.$ = params.$;
             this.event = params.event;
@@ -320,7 +381,7 @@ var
             // Parameters
             this.direction = params.direction;
             this.origin = origin[this.direction];
-            this.barOnCls = params.barOnCls;
+            this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
@@ -343,7 +404,12 @@ var
             function posBar(pos) {
                 /* jshint validthis:true */
                 if (this.bar) {
-                    $(this.bar).css(this.origin.pos, +pos + 'px');
+                    var was = $(this.bar).css(this.origin.pos),
+                        will = +pos + 'px';
+
+                    if (will && will != was) {
+                        $(this.bar).css(this.origin.pos, will);
+                    }
                 }
             }
 
@@ -401,9 +467,9 @@ var
             this.barOn = function(dispose) {
                 if (this.barOnCls) {
                     if (dispose || this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]) {
-                        $(this.root).removeClass(this.barOnCls);
+                        if ($(this.root).hasClass(this.barOnCls)) $(this.root).removeClass(this.barOnCls);
                     } else {
-                        $(this.root).addClass(this.barOnCls);
+                        if (!$(this.root).hasClass(this.barOnCls)) $(this.root).addClass(this.barOnCls);
                     }
                 }
             };
@@ -426,31 +492,52 @@ var
                 var self = this,
                     delay = 0;
 
-                if (new Date().getTime() - resizeLastFire < pause) {
+                if (getTime() - resizeLastFire < pause) {
                     clearTimeout(resizePauseTimer);
                     delay = pause;
                 }
 
                 function upd() {
                     var delta,
-                        client;
+                        client,
+                        offset,
+                        was,
+                        will;
+
+                    // Change a css inline rule only if it is really changing value
+                    // function tryCss(prop, value, ) {
+                    //     var was = $(self.clipper).css(self.origin.crossSize),
+                    //         will = self.clipper[self.origin.crossClient] - delta + 'px';
+                    // };
 
                     self.barOn();
 
                     client = self.scroller[self.origin.crossClient];
+                    offset = self.scroller[self.origin.crossOffset];
+                    delta = offset - client;
 
-                    delta = self.scroller[self.origin.crossOffset] - client;
+                    if (offset) { // if there is no size, css should not be set
+                        if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
+                            was = $(self.clipper).css(self.origin.crossSize);
+                            will = self.clipper[self.origin.crossClient] - delta + 'px';
 
-                    if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
-                        $(self.clipper).css(self.origin.crossSize, self.clipper[self.origin.crossClient] - delta + 'px');
+                            if (was != will) {
+                                $(self.clipper).css(self.origin.crossSize, will);
+                            }
+                        }
+
+                        was = $(self.clipper).css(self.origin.crossSize);
+                        will = self.clipper[self.origin.crossClient] + delta + 'px';
+
+                        if (was != will) {
+                            $(self.scroller).css(self.origin.crossSize, will);
+                        }
                     }
-
-                    $(self.scroller).css(self.origin.crossSize, self.clipper[self.origin.crossClient] + delta + 'px');
 
                     Array.prototype.unshift.call(arguments, 'resize');
                     fire.apply(self, arguments);
 
-                    resizeLastFire = new Date().getTime();
+                    resizeLastFire = getTime();
                 }
 
                 if (delay) {
@@ -481,7 +568,7 @@ var
                 Array.prototype.unshift.call( arguments, 'scroll' );
                 fire.apply(self, arguments);
 
-                scrollLastFire = new Date().getTime();
+                scrollLastFire = getTime();
             };
 
             // onScroll handler
@@ -489,12 +576,12 @@ var
                 var delay = 0,
                     self = this;
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
 
-                if (new Date().getTime() - scrollLastFire < pause) {
+                if (getTime() - scrollLastFire < pause) {
                     clearTimeout(scrollPauseTimer);
                     delay = pause;
                 }
@@ -524,7 +611,7 @@ var
         },
 
         update: function(params) {
-            fire.call(this, 'upd', params); // Обновляем параметры всех плагинов
+            fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
             this.updatePositions();
@@ -532,12 +619,14 @@ var
             return this;
         },
 
+        // One instance
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
-            $(this.scroller).css(this.origin.crossSize, '');
+            this.$(this.scroller).css(this.origin.crossSize, '');
             this.barOn(true);
             fire.call(this, 'dispose');
+            this._disposed = true;
         },
 
         on: function(eventName, func, arg) {
@@ -567,13 +656,14 @@ var
         return baron;
     };
 
-    baron.version = '0.7.7';
+    baron.version = '0.7.10';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
     }
+
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
     if (window['module'] && module.exports) {
         module.exports = baron.noConflict();
     }
-})(window);
+})(window, window.$);

@@ -24,36 +24,6 @@
         "<",
         "<="
     ],
-    "disallowLeftStickedOperators": [
-        "?",
-        "/",
-        "*",
-        "=",
-        "==",
-        "===",
-        "!=",
-        "!==",
-        ">",
-        ">=",
-        "<",
-        "<="
-    ],
-    "requireRightStickedOperators": ["!"],
-    "disallowRightStickedOperators": [
-        "?",
-        "/",
-        "*",
-        ":",
-        "=",
-        "==",
-        "===",
-        "!=",
-        "!==",
-        ">",
-        ">=",
-        "<",
-        "<="
-    ],
     "requireSpaceBeforeBinaryOperators": [
         "+",
         "-",

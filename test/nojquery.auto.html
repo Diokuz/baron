@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <script src="../js/qwery.js"></script>
+    <script src="../js/bonzo.js"></script>
+    <script src="../js/bean.js"></script>
+
+    <script src="../src/core.js"></script>
+    <script src="../src/autoUpdate.js"></script>
+    <script src="../src/fix.js"></script>
+    <script src="../src/pull.js"></script>
+    <script src="../src/test.js"></script>
+    <script src="../src/controls.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../baron.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+    <style>
+        .wrapper {
+            width: 200px;
+            display: inline-block;
+        }
+        .test {
+            display: block;
+            height: auto;
+            width: auto;
+            background: #fff;
+            box-shadow: none;
+        }
+    </style>
+
+    <title>Baron nojquery test page</title>
+
+</head>
+
+<body>
+    <div id="mocha"></div>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script>
+        var assert = chai.assert;
+
+        mocha.ui('bdd');
+        mocha.reporter('html');
+    </script>
+
+    <div class="wrapper _origin wrapper_headers">
+    </div>
+
+    <div class="wrapper _origin wrapper_">
+    </div>
+
+    <div class="wrapper _origin wrapper_">
+        <textarea class="scroller" style="font-size: 40px; line-height: 100px">-</textarea>
+        <div class="scroller__track">
+            <div class="scroller__bar"></div>
+        </div>
+    </div>
+
+    <div class="wrapper _contenteditable">
+        <div class="scroller">
+            <div class="container" contenteditable style="min-height: 100%">
+                not work
+            </div>
+
+            <div class="scroller__track">
+                <div class="scroller__bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="nojqueryTests.js"></script>
+
+    <script>
+        if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+        else { mocha.run(); }
+    </script>
+
+</body>
+
+</html>
