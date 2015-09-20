@@ -14,7 +14,7 @@ http://diokuz.github.io/baron/
 - Plugin system (fixable headers, sticky footer, autotests and more)
 - (new) Can be inited on hidden blocks
 
-Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system where the CSS property 'overflow: scroll' is applied.
+Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
 ## Simple usage
 
@@ -97,13 +97,13 @@ $('.scroller').baron();
 You can specify some parameters on baron initialization:
 
 ```js
-var scroll = $('.scroller').baron(params);
+$('.scroller').baron(params);
 
 // or
 var scroll = baron(params);
 ```
 
-and store baron scrollbar object to `scroll` variable.
+and store baron scrollbar object to `scroll` variable (or dont - baron stores all its instances and links them with html-nodes).
 
 where:
 
@@ -160,16 +160,35 @@ var params = {
 };
 ```
 
-All parameters are optional (except scroller or root, if you are not using baron as jQuery plugin).
+All parameters are optional (except scroller; or root, if you are not using baron as jQuery plugin).
 
-`scroll` methods:
+## Methods
+
+### update
+
+In some cases, such as infinity scroll (container size changing) in old browsers, which does not support MutationObserver; or css-transition applied to size, need for baron updating is raises. You can do this in two ways:
 
 ```js
-scroll.update(); // Update scroller for ie10- (MutationObserver supported)
-scroll.dispose(); // Remove baron instance and related event handlers
+// 1. Invoke update method on baron-variable, which you stored after baron initialization
+scroll.update();
+
+// 2. Invoke update method on html-node
+$('.scroller').baron().update();
+// In that case you use baron() just as getter for baron instance from $('.scroller') html-nodes, and to do this, you should call baron() without arguments; or it will throw a "secont inicialization" error.
 ```
 
-Note: baron returns the baron object, even in jQuery mode. That can break jQuery chaining. For example, you can't do this:
+### dispose
+
+If html-block with scroller is removed from your page, to prevent memory-leaking and performance issues, you should dispose corresponding baron instances, by calling method dispose:
+
+```js
+scroll.dispose();
+
+// or
+$('.scroller').baron().dispose();
+```
+
+Note: baron returns the baron object, even in jQuery mode. That is breaks jQuery chaining. For example, you can't do this:
 
 ```js
 $('.scroller').baron().css().animate();
@@ -178,7 +197,8 @@ $('.scroller').baron().css().animate();
 but you can:
 
 ```js
-$('.scroller').css().animate().baron();
+$('.scroller').css().animate() // jQuery chaining
+    .baron().update(); // baron chaining
 ```
 
 and even more:
@@ -218,7 +238,7 @@ vScroll.dispose();
 hScroll.dispose();
 ```
 
-##Updating baron
+## Updating baron
 
 When container size changed (for example: you load additional data to the container using ajax), you should call update() method:
 
@@ -232,9 +252,19 @@ or fire custom event 'sizeChange' to wrapper:
 $('.scroller').trigger('sizeChange');
 ```
 
-##Disposing baron
+## Disposing baron
 
-If you removed html-nodes, which used baron, from DOM, dont forget dispose related baron instance manually. Use 'dispose' method for that.
+If you removed html-nodes, which was used by baron, from DOM, dont forget dispose related baron instance manually. Use 'dispose' method for that. There are two ways for disposing:
+
+```js
+var scroll = $('.scroller').baron();
+scroll.dispose();
+
+// or
+$('.scroller').baron().dispose();
+```
+
+Baron stores all its instances in window.baron._instances, and link them with html-nodes by data-baron-[dir]-id attribute values.
 
 ##noConflict mode
 
@@ -248,125 +278,17 @@ var graf = baron.noConflict();
 // now window.baron points to that other library again, and you can use window.graf() etc.
 ```
 
-## Custom build (Grunt)
-
-If you want exclude plugins functionality, type
-```js
-grunt core
-```
-in your console, and you will get dist/baron.js and dist/baron.min.js only with core functionality.
-
-Type
-```js
-grunt full
-```
-to build full version of baron (including all available plugins).
-
-Output files you can find in /dist/ folder.
-
 ## Browsers support
 
 Full support: Chrome 1+, Firefox 3.6+, Safari 5+, Opera 9+ on Windows, OS X and iOS. Also, the best ever browser downloader - Internet Explorer - supported since version 7.
 
 Partial (core) support: IE6.
 
-Not supported: Opera mini, old versions of Android browser, and other browsers which does not implemented the `overflow: scroll` CSS property.
+Not supported: Opera mini and old versions of Android browser (2-).
 
-## fix plugin
+## Plugins
 
-To use fixable headers you should initialize fix plugin after baron:
-
-```html
-<div class="scroller">
-    <div class="header__title-wrapper">
-        <div class="header__title">First element</div>
-    </div>
-    ...content...
-    <div class="header__title-wrapper">
-        <div class="header__title">Second element</div>
-    </div>
-    ...content...
-</div>
-```
-
-```js
-baron(baronParams).fix(params);
-```
-
-where:
-```js
-var params = {
-    // CSS selector for fixable elements
-    // Must have parentNode (no margin and padding allowed!) with same height (see demo for details). Also see 'limiter' parameter.
-    elements: '.header__title',
-
-    // CSS class for elements which now are outside of viewport
-    outside: 'header__title_state_fixed',
-
-    // CSS class for elements which now are in viewport
-    inside: 'header__title_state_unfixed',
-
-    // CSS class for closest outsite element wrapper from top (left)
-    before: 'header__title_position_top',
-
-    // CSS class for closest outsite element wrapper from bottom (right)
-    after: 'header__title_position_bottom',
-
-    // if true - sets track top (left) position to header[0].parentNode.offsetHeight (offsetWidth)
-    // Default: false
-    limiter: true,
-
-    // Radius for element fixing in px
-    // Default: 0
-    radius: 10,
-
-    // Works identical to outside as if radius === 0
-    grad: 'header__title_state_grad',
-
-    // Wether click on element should scroll to
-    clickable: false,
-
-    // User defined callback on click (data == {x1: current scrollTop, x2: new scrollTop})
-    scroll: function(data) {}
-};
-```
-
-## Controls plugin
-
-```js
-baron().controls(params);
-
-var params = {
-    // Element to be used as interactive track. Note: it could be different from 'track' param of baron.
-    track: '.visual-track',
-
-    // Element to be used as 'down' / 'right' button
-    forward: '.forward-btn',
-
-    // Element to be used as 'up' / 'left' button
-    backward: '.backward-btn',
-
-    // Multiplyer for page-down action. Use 1 to scroll preciesly one screen per track click.
-    // Default: .9
-    screen: .5
-
-    // Scroll distance per control button click in px
-    // Default: 30
-    delta: 40
-};
-```
-
-## test plugin
-
-If you have some troubles with baron, use test plugin:
-
-```js
-baron(...).test(params);
-```
-
-And read results in browser console.
-
-There is no params for test() right now.
+@see docs/plugins.md
 
 ## License
 
