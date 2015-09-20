@@ -3,10 +3,10 @@
 
     if (!window) return; // Server side
 
-var
-    _baron = baron, // Stored baron value for noConflict usage
-    pos = ['left', 'top', 'right', 'bottom', 'width', 'height'],
-    origin = {
+    var _baron = baron; // Stored baron value for noConflict usage
+    var pos = ['left', 'top', 'right', 'bottom', 'width', 'height'];
+    var instances = []; // Global store for all baron instances (to be able to dispose them on html-nodes)
+    var origin = {
         v: { // Vertical
             x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4],
             client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
@@ -17,20 +17,20 @@ var
             client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
-    },
+    };
 
-    each = function(obj, iterator) {
+    function each(obj, iterator) {
         var i = 0;
 
-         if (obj.length === undefined || obj === window) obj = [obj];
+        if (obj.length === undefined || obj === window) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
             i++;
         }
-    },
+    }
 
-    baron = function(params) {
+    function baron(params) {
         var jQueryMode,
             roots,
             $;
@@ -52,32 +52,45 @@ var
         }
 
         return instance;
-    };
+    }
 
     // shortcut for getTime
     function getTime() {
         return new Date().getTime();
     }
 
+    baron._instances = instances; // for debug
+
     baron.fn = {
         constructor: function(roots, input, $) {
             var params = validate(input);
 
             params.$ = $;
+            this.length = 0;
             each.call(this, roots, function(root, i) {
-                var localParams = clone(params);
+                var id = +manageAttr(root, params.direction); // Could be NaN
 
-                if (params.root && params.scroller) {
-                    localParams.scroller = params.$(params.scroller, root);
-                    if (!localParams.scroller.length) {
+                // baron() without params can return existing instances,
+                // but baron(params) will throw an Error as a second initialization
+                if (id == id && instances[id] && !input) {
+                    this[i] = instances[id];
+                } else {
+                    var localParams = clone(params);
+
+                    // root and scroller can be different nodes
+                    if (params.root && params.scroller) {
+                        localParams.scroller = params.$(params.scroller, root);
+                        if (!localParams.scroller.length) {
+                            localParams.scroller = root;
+                        }
+                    } else {
                         localParams.scroller = root;
                     }
-                } else {
-                    localParams.scroller = root;
+
+                    localParams.root = root;
+                    this[i] = init(localParams);
                 }
 
-                localParams.root = root;
-                this[i] = init(localParams);
                 this.length = i + 1;
             });
 
@@ -87,11 +100,10 @@ var
         dispose: function() {
             var params = this.params;
 
-            if (this[0]) { /* Если есть хотя бы 1 рабочий инстанс */
-                each(this, function(item) {
-                    item.dispose(params);
-                });
-            }
+            each(this, function(item) {
+                item.dispose(params);
+            });
+
             this.params = null;
         },
 
@@ -232,11 +244,12 @@ var
         // }
     }
 
-    function manageAttr(node, direction, mode) {
-        var attrName = 'data-baron-' + direction;
+    // set, remove or read baron-specific id-attribute
+    function manageAttr(node, direction, mode, id) {
+        var attrName = 'data-baron-' + direction + '-id';
 
         if (mode == 'on') {
-            node.setAttribute(attrName, 'inited');
+            node.setAttribute(attrName, id);
         } else if (mode == 'off') {
             node.removeAttribute(attrName);
         } else {
@@ -245,13 +258,16 @@ var
     }
 
     function init(params) {
-        if (manageAttr(params.root, params.direction)) throw new Error('Second baron initialization');
+        if (manageAttr(params.root, params.direction)) {
+            console.log('Error! Baron for this node already initialized', params.root);
+        }
 
         var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
 
         manageEvents(out, params.event, 'on');
 
-        manageAttr(out.root, params.direction, 'on');
+        manageAttr(out.root, params.direction, 'on', instances.length);
+        instances.push(out);
 
         out.update();
 

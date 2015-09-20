@@ -45,10 +45,10 @@ describe("Барон.", function() {
         });
 
         it("Выставляет аттрибут data-baron-v в значение inited", function() {
-            var attrV = bonzoQuery('.scroller').attr('data-baron-v'),
-                attrH = bonzoQuery('.scroller').attr('data-baron-h');
+            var attrV = bonzoQuery('.scroller').attr('data-baron-v-id'),
+                attrH = bonzoQuery('.scroller').attr('data-baron-h-id');
 
-            assert.ok(attrV == 'inited');
+            assert.ok(attrV);
             assert.ok(!attrH);
         });
 

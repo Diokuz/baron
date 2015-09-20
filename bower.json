@@ -1,7 +1,7 @@
 {
   "name": "baron",
   "main": "baron.js",
-  "version": "0.7.10",
+  "version": "0.7.11",
   "homepage": "https://github.com/Diokuz/baron",
   "authors": [
     "Kuznetsov Dmitriy <diokuz@gmail.com>"
