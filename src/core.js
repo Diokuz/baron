@@ -597,11 +597,6 @@
                     delay = pause;
                 }
 
-                if (getTime() - scrollLastFire < pause) {
-                    clearTimeout(scrollPauseTimer);
-                    delay = pause;
-                }
-
                 if (delay) {
                     scrollPauseTimer = setTimeout(function() {
                         self.updatePositions();
