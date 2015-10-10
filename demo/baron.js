@@ -5,16 +5,23 @@
 
     var _baron = baron; // Stored baron value for noConflict usage
     var pos = ['left', 'top', 'right', 'bottom', 'width', 'height'];
-    var instances = []; // Global store for all baron instances (to be able to dispose them on html-nodes)
+    // Global store for all baron instances (to be able to dispose them on html-nodes)
+    var instances = [];
     var origin = {
         v: { // Vertical
-            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2], size: pos[5], crossSize: pos[4],
-            client: 'clientHeight', crossClient: 'clientWidth', crossScroll: 'scrollWidth', offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
+            x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2],
+            size: pos[5], crossSize: pos[4],
+            client: 'clientHeight', crossClient: 'clientWidth',
+            crossScroll: 'scrollWidth',
+            offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
         h: { // Horizontal
-            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3], size: pos[4], crossSize: pos[5],
-            client: 'clientWidth', crossClient: 'clientHeight', crossScroll: 'scrollHeight', offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
+            x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3],
+            size: pos[4], crossSize: pos[5],
+            client: 'clientWidth', crossClient: 'clientHeight',
+            crossScroll: 'scrollHeight',
+            offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
     };
@@ -131,7 +138,8 @@
     };
 
     function manageEvents(item, eventManager, mode) {
-        item._eventHandlers = item._eventHandlers || [ // Creating new functions for one baron item only one time
+        // Creating new functions for one baron item only one time
+        item._eventHandlers = item._eventHandlers || [
             {
                 // onScroll:
                 element: item.scroller,
@@ -164,7 +172,7 @@
                 element: item.bar,
 
                 handler: function(e) {
-                    e.preventDefault(); // Text selection disabling in Opera... and all other browsers?
+                    e.preventDefault(); // Text selection disabling in Opera
                     item.selection(); // Disable text selection in ie8
                     item.drag.now = 1; // Save private byte
                 },
@@ -240,7 +248,8 @@
         // event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
         // event(window, 'resize', item._eventHandlers.onResize, mode);
         // if (item.root) {
-        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode); // Custon event for alternate baron update mechanism
+        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode);
+        //     // Custon event for alternate baron update mechanism
         // }
     }
 
@@ -262,7 +271,8 @@
             console.log('Error! Baron for this node already initialized', params.root);
         }
 
-        var out = new item.prototype.constructor(params); // __proto__ of returning object is baron.prototype
+        // __proto__ of returning object is baron.prototype
+        var out = new item.prototype.constructor(params);
 
         manageEvents(out, params.event, 'on');
 
@@ -386,7 +396,7 @@
 
             // DOM elements
             this.root = params.root; // Always html node, not just selector
-            this.scroller = getNode(params.scroller); // (params.scroller) ? getNode(params.scroller, this.root) : this.root;
+            this.scroller = getNode(params.scroller);
             this.bar = getNode(params.bar, this.root);
             track = this.track = getNode(params.track, this.root);
             if (!this.track && this.bar) {
@@ -449,7 +459,8 @@
 
             // Cursor position in main direction in px // Now with iOs support
             this.cursor = function(e) {
-                return e['client' + this.origin.x] || (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
+                return e['client' + this.origin.x] ||
+                    (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
             };
 
             // Text selection pos preventing
@@ -482,10 +493,16 @@
             // Switch on the bar by adding user-defined CSS classname to scroller
             this.barOn = function(dispose) {
                 if (this.barOnCls) {
-                    if (dispose || this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]) {
-                        if ($(this.root).hasClass(this.barOnCls)) $(this.root).removeClass(this.barOnCls);
+                    if (dispose ||
+                        this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize])
+                    {
+                        if ($(this.root).hasClass(this.barOnCls)) {
+                            $(this.root).removeClass(this.barOnCls);
+                        }
                     } else {
-                        if (!$(this.root).hasClass(this.barOnCls)) $(this.root).addClass(this.barOnCls);
+                        if (!$(this.root).hasClass(this.barOnCls)) {
+                            $(this.root).addClass(this.barOnCls);
+                        }
                     }
                 }
             };
@@ -495,7 +512,9 @@
             };
 
             this.drag = function(e) {
-                this.scroller[this.origin.scroll] = posToRel.call(this, this.cursor(e) - scrollerPos0) * (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+                var rel = posToRel.call(this, this.cursor(e) - scrollerPos0);
+                var k = (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
+                this.scroller[this.origin.scroll] = rel * k;
             };
 
             // Text selection preventing on drag
@@ -514,39 +533,34 @@
                 }
 
                 function upd() {
-                    var delta,
-                        client,
+                    var client,
                         offset,
                         was,
                         will;
 
-                    // Change a css inline rule only if it is really changing value
-                    // function tryCss(prop, value, ) {
-                    //     var was = $(self.clipper).css(self.origin.crossSize),
-                    //         will = self.clipper[self.origin.crossClient] - delta + 'px';
-                    // };
-
-                    self.barOn();
-
-                    client = self.scroller[self.origin.crossClient];
                     offset = self.scroller[self.origin.crossOffset];
-                    delta = offset - client;
 
                     if (offset) { // if there is no size, css should not be set
-                        if (params.freeze && !self.clipper.style[self.origin.crossSize]) { // Sould fire only once
+                        self.barOn();
+                        client = self.scroller[self.origin.crossClient];
+
+                        // Two different appropches for different directions
+                        if (self.direction == 'v') { // vertical
+                            var delta = offset - client;
+
                             was = $(self.clipper).css(self.origin.crossSize);
-                            will = self.clipper[self.origin.crossClient] - delta + 'px';
+                            will = self.clipper[self.origin.crossClient] + delta + 'px';
+
+                            if (was != will) {
+                                $(self.scroller).css(self.origin.crossSize, will);
+                            }
+                        } else { // horizontal
+                            was = $(self.clipper).css(self.origin.crossSize);
+                            will = self.scroller[self.origin.crossClient] + 'px';
 
                             if (was != will) {
                                 $(self.clipper).css(self.origin.crossSize, will);
                             }
-                        }
-
-                        was = $(self.clipper).css(self.origin.crossSize);
-                        will = self.clipper[self.origin.crossClient] + delta + 'px';
-
-                        if (was != will) {
-                            $(self.scroller).css(self.origin.crossSize, will);
                         }
                     }
 
@@ -568,7 +582,8 @@
                     self = this;
 
                 if (self.bar) {
-                    newBarSize = (track[self.origin.client] - self.barTopLimit) * self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
+                    newBarSize = (track[self.origin.client] - self.barTopLimit) *
+                        self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
 
                     // Positioning bar
                     if (parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {

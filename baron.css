@@ -9,9 +9,7 @@
     height: 100%;
     border: 0;
 }
-.scroller::-webkit-scrollbar { /* Preventing webkit bug of horizontal scrolling */
-    width: 0;
-}
+
 .scroller__bar { /* The bar. You should define width, right and background */
     position: absolute;
     right: 0;    

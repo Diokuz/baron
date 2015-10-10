@@ -48,10 +48,6 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 .scroller:focus {
     outline: none;
 }
-.scroller::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-}
 .scroller__bar-wrapper {
     position: absolute;
     top: 10px;
@@ -167,12 +163,12 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
     overflow-x: scroll;
     overflow-y: hidden;
     width: auto;
-    height: 100%;
+    height: auto;
     white-space: nowrap;
 }
 .test_horizontal .container {
-    display: inline-block;
-    height: 100%;
+    height: 110px;
+    width: 2000px;
 }
 .test_horizontal .header {
     display: inline-block;
@@ -189,6 +185,14 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 .test_horizontal .header__title {
     width: 20px;
     height: 100%;
+}
+
+.test_bidir .scroller,
+.test_bidir-2 .scroller,
+.test_bar-outside .scroller,
+.test_textarea .scroller {
+    overflow: scroll;
+    height: 150px;
 }
 
 .test_textarea .scroller__bar {

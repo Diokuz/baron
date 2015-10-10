@@ -1,3 +1,8 @@
+## 0.8.0
+
+ - rework of horizontal scroll
+ - removed `freeze` param
+
 ## 0.6.2
 
 - dispose method added (to free memory and remove event listeners when scroller removed from dom)
