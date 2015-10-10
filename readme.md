@@ -134,10 +134,6 @@ var params = {
     // Default: 'v' (vertical), 'h' for second baron invocation
     direction: 'h',
 
-    // Freezing size of scroller parent, if true. Actual for horizontal scrolling.
-    // Default: false
-    freeze: true,
-
     // Minimum time delay between two scroll or resize events fires in seconds
     // Default: 0
     pause: .2,
@@ -237,6 +233,8 @@ hScroll = baron(hParams);
 vScroll.dispose();
 hScroll.dispose();
 ```
+
+*Note: horizontal scroll works in a different way: height of scroller is auto (you can set it to particular value in CSS), and height of clipper is varing by baron.*
 
 ## Updating baron
 
