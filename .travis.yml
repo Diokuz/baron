@@ -1,6 +1,9 @@
 language: node_js
+sudo: false
 node_js:
-  - "0.10"
+  - "0.12"
+before_install:
+  - npm install -g npm
 script:
-  - gulp lint
-  - gulp test
+  - node_modules/.bin/gulp lint
+  - node_modules/.bin/gulp test
