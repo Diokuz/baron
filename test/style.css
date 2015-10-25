@@ -98,7 +98,8 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 .wrapper_very-simple .scroller__bar {
     display: block;
 }
-.scroller__bar:hover {
+.scroller__bar:hover,
+.scroller__bar._dragging {
     opacity: .8;
 }
 .baron .scroller__bar {

@@ -175,6 +175,9 @@
                     e.preventDefault(); // Text selection disabling in Opera
                     item.selection(); // Disable text selection in ie8
                     item.drag.now = 1; // Save private byte
+                    if (item.draggingCls) {
+                        $(item.bar).addClass(item.draggingCls);
+                    }
                 },
 
                 type: 'touchstart mousedown'
@@ -185,6 +188,9 @@
                 handler: function() {
                     item.selection(1); // Enable text selection
                     item.drag.now = 0;
+                    if (item.draggingCls) {
+                        $(item.bar).removeClass(item.draggingCls);
+                    }
                 },
 
                 type: 'mouseup blur touchend'
@@ -409,6 +415,7 @@
             this.origin = origin[this.direction];
             this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
+            this.draggingCls = params.draggingCls;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
 

@@ -109,26 +109,36 @@ where:
 
 ```js
 var params = {
-    // Selector for scroller element.
+    // Selector for `scroller` element.
     // Default: this (in jQuery mode).
     scroller: '.scroller',
 
-    // Root html element for baron. Use this param when your html-scrollbar content is outside scroller
+    // `Root` html element for baron. Use this param when your html-scrollbar content is outside scroller
     // Default: scroller
     root: $('.my_scroller'),
 
-    // Selector for bar element
+    // Selector for `bar` element
     // Default: 'undefined'
     bar: '.scroller__bar',
 
-    // Track
+    // `Track`
     // Default: parent node of bar
     track: '.scroller__track',
 
-    // CSS classname for scroller when its needed (when content height above scroller heights)
+    // CSS classname for `scroller` when its needed (when content height above scroller heights)
     // Default: ''
     barOnCls: 'baron',
     // Note: by default scroller__bar should be invisible
+
+    // CSS classname for `scroller` from start till end + 300ms of scrolling process
+    // You can boost performance by using `_scrolling {pointer-events: none}`
+    // Default: ''
+    scrollingCls: '_scrolling',
+
+    // CSS classname for `bar` when it dragging by cursor
+    // Its better than `.bar:hover` rule
+    // Default: ''
+    draggingCls: '_dragging',
 
     // Scroll direction
     // Default: 'v' (vertical), 'h' for second baron invocation
