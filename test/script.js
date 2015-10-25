@@ -25,7 +25,8 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         //track: '.scroller__track',
         barOnCls: 'baron',
-        pause: 0.1
+        pause: 0.1,
+        draggingCls: '_dragging'
     }).fix({
         elements: '.header__title',
         outside: 'header__title_state_fixed',
