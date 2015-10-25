@@ -194,7 +194,7 @@ scroll.dispose();
 $('.scroller').baron().dispose();
 ```
 
-Note: baron returns the baron object, even in jQuery mode. That is breaks jQuery chaining. For example, you can't do this:
+Note: baron returns the baron object, even in jQuery mode. That breaks jQuery chaining. For example, you can't do this:
 
 ```js
 $('.scroller').baron().css().animate();
