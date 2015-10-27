@@ -180,7 +180,7 @@ scroll.update();
 
 // 2. Invoke update method on html-node
 $('.scroller').baron().update();
-// In that case you use baron() just as getter for baron instance from $('.scroller') html-nodes, and to do this, you should call baron() without arguments; or it will throw a "secont inicialization" error.
+// In that case you use baron() just as getter for baron instance from $('.scroller') html-nodes, and to do this, you should call baron() without arguments; or it will throw a "second inicialization" error.
 ```
 
 ### dispose
