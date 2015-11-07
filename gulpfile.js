@@ -95,6 +95,7 @@ gulp.task('copy', ['build.baron'], function() {
 });
 
 gulp.task('build', ['build.baron', 'build.demo', 'copy']);
+gulp.task('default', ['build']);
 
 /**
  * Tests

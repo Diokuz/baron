@@ -233,3 +233,16 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 .anim._visible {
     height: 1000px;
 }
+
+.wrapper_flex {
+    display: flex;
+}
+.wrapper_flex .scroller {
+    display: flex;
+    flex-direction: column;
+}
+.wrapper_flex .container {
+    display: flex;
+    flex: 1 0 auto;
+    flex-direction: column;
+}
