@@ -387,9 +387,7 @@
                 scrollerPos0,
                 track,
                 resizePauseTimer,
-                scrollPauseTimer,
                 scrollingTimer,
-                pause,
                 scrollLastFire,
                 resizeLastFire,
                 oldBarSize;
@@ -422,11 +420,6 @@
             this.draggingCls = params.draggingCls;
             this.impact = params.impact;
             this.barTopLimit = 0;
-            pause = params.pause * 1000 || 0;
-
-            if (params.pause) {
-                console.warn('Baronjs: "pause" param will be removed in 0.8+ version');
-            }
 
             // Updating height or width of bar
             function setBarSize(size) {
@@ -540,12 +533,13 @@
 
             // onResize & DOM modified handler
             this.resize = function() {
-                var self = this,
-                    delay = 0;
+                var self = this;
+                var minPeriod = self.params.resizeDebounce || 300;
+                var delay = 0;
 
-                if (getTime() - resizeLastFire < pause) {
+                if (getTime() - resizeLastFire < minPeriod) {
                     clearTimeout(resizePauseTimer);
-                    delay = pause;
+                    delay = minPeriod;
                 }
 
                 function upd() {
@@ -632,25 +626,13 @@
 
             // onScroll handler
             this.scroll = function() {
-                var delay = 0,
-                    self = this;
+                var self = this;
 
-                if (getTime() - scrollLastFire < pause) {
-                    clearTimeout(scrollPauseTimer);
-                    delay = pause;
-                }
-
-                if (delay) {
-                    scrollPauseTimer = setTimeout(function() {
-                        self.updatePositions();
-                    }, delay);
-                } else {
-                    self.updatePositions();
-                }
+                self.updatePositions();
 
                 if (self.scrollingCls) {
                     if (!scrollingTimer) {
-                        this.$(this.scroller).addClass(this.scrollingCls);
+                        self.$(self.scroller).addClass(self.scrollingCls);
                     }
                     clearTimeout(scrollingTimer);
                     scrollingTimer = setTimeout(function() {

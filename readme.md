@@ -147,10 +147,9 @@ var params = {
     // Default: 'v' (vertical), 'h' for second baron invocation
     direction: 'h',
 
-    // Minimum time delay between two scroll or resize events fires in seconds
-    // Default: 0
-    // @deprecated
-    pause: .2,
+    // Minimum time delay between two resize events fires in seconds [0..1] or milliseconds (1..∞)
+    // Default: 300 ms
+    resizeDebounce: .2,
 
     // Local copy of jQuery-like utility
     // Default: window.jQuery
