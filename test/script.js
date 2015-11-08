@@ -206,4 +206,7 @@ $(document).ready(function() {
         bar: '.scroller__bar',
         barOnCls: 'baron'
     });
+
+    // Flexbox width bug
+    $('.wrapper_flex .scroller').baron();
 });

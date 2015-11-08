@@ -10,7 +10,8 @@
     var origin = {
         v: { // Vertical
             x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2],
-            size: pos[5], crossSize: pos[4],
+            size: pos[5],
+            crossSize: pos[4], crossMinSize: 'min-' + pos[4], crossMaxSize: 'max-' + pos[4],
             client: 'clientHeight', crossClient: 'clientWidth',
             crossScroll: 'scrollWidth',
             offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
@@ -18,7 +19,8 @@
         },
         h: { // Horizontal
             x: 'X', pos: pos[0], oppos: pos[2], crossPos: pos[1], crossOpPos: pos[3],
-            size: pos[4], crossSize: pos[5],
+            size: pos[4],
+            crossSize: pos[5], crossMinSize: 'min-' + pos[5], crossMaxSize: 'max-' + pos[5],
             client: 'clientWidth', crossClient: 'clientHeight',
             crossScroll: 'scrollHeight',
             offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
@@ -419,6 +421,10 @@
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
 
+            if (params.pause) {
+                console.warn('Baronjs: "pause" param will be removed in 0.8+ version');
+            }
+
             // Updating height or width of bar
             function setBarSize(size) {
                 /* jshint validthis:true */
@@ -540,12 +546,20 @@
                 }
 
                 function upd() {
-                    var client,
-                        offset,
-                        was,
-                        will;
+                    var was;
+                    var will;
+                    var offset = self.scroller[self.origin.crossOffset];
+                    var client = self.scroller[self.origin.crossClient];
 
-                    offset = self.scroller[self.origin.crossOffset];
+                    // Opera 12 bug https://github.com/Diokuz/baron/issues/105
+                    if (client > 0 && offset === 0) {
+                        // Only Opera 12 in some rare nested flexbox cases goes here
+                        // Sorry guys for magic,
+                        // but I dont want to create temporary html-nodes set
+                        // just for measuring scrollbar size in Opera 12.
+                        // 17px for Windows XP-8.1, 15px for Mac (really rare).
+                        offset = client + 17;
+                    }
 
                     if (offset) { // if there is no size, css should not be set
                         self.barOn();
@@ -559,14 +573,14 @@
                             will = self.clipper[self.origin.crossClient] + delta + 'px';
 
                             if (was != will) {
-                                $(self.scroller).css(self.origin.crossSize, will);
+                                self._setCrossSizes(self.scroller, will);
                             }
                         } else { // horizontal
                             was = $(self.clipper).css(self.origin.crossSize);
-                            will = self.scroller[self.origin.crossClient] + 'px';
+                            will = client + 'px';
 
                             if (was != will) {
-                                $(self.clipper).css(self.origin.crossSize, will);
+                                self._setCrossSizes(self.clipper, will);
                             }
                         }
                     }
@@ -640,6 +654,19 @@
 
             };
 
+            // Flexbox `align-items: stretch` (default) requires to set min-width for vertical
+            // and max-height for horizontal scroll. Just set them all.
+            // http://www.w3.org/TR/css-flexbox-1/#valdef-align-items-stretch
+            this._setCrossSizes = function(node, size) {
+                var css = {};
+
+                css[this.origin.crossSize] = size;
+                css[this.origin.crossMinSize] = size;
+                css[this.origin.crossMaxSize] = size;
+
+                this.$(node).css(css);
+            };
+
             return this;
         },
 
@@ -656,7 +683,11 @@
         dispose: function(params) {
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
-            this.$(this.scroller).css(this.origin.crossSize, '');
+            if (params.direction == 'v') {
+                this._setCrossSizes(this.scroller, '');
+            } else {
+                this._setCrossSizes(this.clipper, '');
+            }
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;

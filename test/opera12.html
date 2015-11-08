@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="../js/jquery-1.9.0.js"></script>
+
+    <script src="../src/core.js"></script>
+
+    <style>
+        article {
+            display: flex;
+            flex-direction: column;
+            width: 300px;
+            height: 100px;
+        }
+
+        section {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ccc;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        div {
+            flex: 1;
+            background: #eee;
+            height: 100px;
+            max-height: 100px;
+            overflow-y: scroll;
+        }
+    </style>
+
+    <title>Baron Opera 12 nested flexbox test page</title>
+
+</head>
+
+<body>
+
+<article>
+    <section>
+        <div></div>
+    </section>
+</article>
+
+<script type="text/javascript">
+    var div = document.querySelector('div');
+    var text = 'If you can see native scrollbar => bug is still here.<br />' + 
+               'aaaaaaaaaaaaaaaaaaaaa a b c d e f g h<br />' + 
+               'offsetWidth: ' + div.offsetWidth +
+               ', offsetTop: ' + div.offsetTop +
+               '<br><br>' +
+               'clientWidth: ' + div.clientWidth;
+
+    div.innerHTML = text + "<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>1";
+
+    $('div').baron();
+</script>
+
+</body>
+
+</html>

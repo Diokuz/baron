@@ -12,7 +12,8 @@ http://diokuz.github.io/baron/
 - Customizable scrollbar design with full CSS support.
 - No strong dependencies on jQuery.
 - Plugin system (fixable headers, sticky footer, autotests and more)
-- (new) Can be inited on hidden blocks
+- Can be inited on hidden blocks
+- Vertical, horizontal and bidirectional scroll
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
@@ -39,10 +40,6 @@ If you want only to hide system scrollbar:
 ```css
 .scroller {
     overflow-y: scroll;
-    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
-}
-.scroller::-webkit-scrollbar { /* Prevents webkit cross-direction scrolling bug */
-    width: 0;
 }
 ```
 
@@ -146,6 +143,7 @@ var params = {
 
     // Minimum time delay between two scroll or resize events fires in seconds
     // Default: 0
+    // @deprecated
     pause: .2,
 
     // Local copy of jQuery-like utility

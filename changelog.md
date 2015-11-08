@@ -1,5 +1,7 @@
-## 0.8.0
+## 0.7.14
 
+ - fixed flexbox bug
+ - fixed Opera 12 nested flexbox bug
  - rework of horizontal scroll
  - removed `freeze` param
 
