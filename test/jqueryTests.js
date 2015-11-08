@@ -47,15 +47,38 @@ describe("Барон.", function() {
             assert.ok(Math.abs(height - expectedHeight) <= 1);
         });
 
-        it.skip("Повторная инициализация бросает ошибку", function(done) {
-            try {
-                baron = $('.wrapper._origin .scroller').baron({
-                    bar: '.scroller__bar',
-                    barOnCls: barOnCls
-                });
-            } catch (e) {
-                done();
-            }
+        it("Повторная инициализация бросает ошибку", function() {
+            var _log = console.log;
+            var i = 0;
+            console.log = function() {
+                i++;
+            };
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+
+            assert(i == 3);
+            console.log = _log;
+        });
+
+        it("Повторный вызов барона без параметров не бросает ошибку", function() {
+            var _log = console.log;
+            var i = 0;
+            console.log = function() {
+                i++;
+            };
+
+            $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+
+            $('.wrapper._origin .scroller').baron(); // another three times
+
+            assert.equal(i, 3);
+            console.log = _log;
         });
 
         it("После вызова метода dispose удаляет атрибуты и классы", function() {
@@ -151,24 +174,16 @@ describe("Барон.", function() {
             eachIt(baron);
         });
 
-        it("Toggling barOnCls.", function() {
+        it("Toggling barOnCls.", function(done) {
             $('.scroller').text('sadkvbalsjdfasjdkhfakjsdhflaksdhflakjhsdafjh');
-
-            $('.scroller').each(function() {
-                // $(this).trigger('scroll');
-                baron.update();
-            });
-
-            assert( $('.wrapper').hasClass(barOnCls), 'При большом количестве контента навешивается класс' );
-
-            $('.scroller').text('');
-
-            $('.scroller').each(function() {
-                // $(this).trigger('scroll');
-                baron.update();
-            });
-
-            assert( !$('.wrapper').hasClass(barOnCls), 'В отсутствии текста класса нет' );
+            setTimeout(function() {
+                assert( $('.wrapper').hasClass(barOnCls), 'При большом количестве контента навешивается класс' );
+                $('.scroller').text('');
+                setTimeout(function() {
+                    assert( !$('.wrapper').hasClass(barOnCls), 'В отсутствии текста класса нет' );
+                    done();
+                }, 0);
+            }, 0);
         });
 
         after(function() {

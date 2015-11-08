@@ -28,7 +28,49 @@
         }
     };
 
-    function each(obj, iterator) {
+    // window.baron and jQuery.fn.baron points to this function
+    function baron(params) {
+        var jQueryMode;
+        var roots;
+        var $;
+        var empty = !params;
+        var defaultParams = {
+            $: window.jQuery,
+            direction: 'v',
+            barOnCls: 'baron',
+            resizeDebounce: 0,
+            event: function(elem, event, func, mode) {
+                params.$(elem)[mode || 'on'](event, func);
+            }
+        };
+
+        params = params || {};
+
+        // Extending default params by user-defined params
+        for (var key in defaultParams) {
+            if (params[key] === undefined) {
+                params[key] = defaultParams[key];
+            }
+        };
+
+        jQueryMode = this instanceof params.$;  // this - global context or jQuery instance
+
+        if (jQueryMode) {
+            params.root = roots = this;
+        } else {
+            roots = $(params.root || params.scroller);
+        }
+
+        var instance = new baron.fn.constructor(roots, empty ? undefined : params);
+
+        if (instance.autoUpdate) {
+            instance.autoUpdate();
+        }
+
+        return instance;
+    }
+
+    function arrayEach(obj, iterator) {
         var i = 0;
 
         if (obj.length === undefined || obj === window) obj = [obj];
@@ -39,30 +81,6 @@
         }
     }
 
-    function baron(params) {
-        var jQueryMode,
-            roots,
-            $;
-
-        params = params || {};
-        $ = params.$ || $ || window.jQuery;
-        jQueryMode = this instanceof $;  // this - window or jQuery instance
-
-        if (jQueryMode) {
-            params.root = roots = this;
-        } else {
-            roots = $(params.root || params.scroller);
-        }
-
-        var instance = new baron.fn.constructor(roots, params, $);
-
-        if (instance.autoUpdate) {
-            instance.autoUpdate();
-        }
-
-        return instance;
-    }
-
     // shortcut for getTime
     function getTime() {
         return new Date().getTime();
@@ -71,34 +89,41 @@
     baron._instances = instances; // for debug
 
     baron.fn = {
-        constructor: function(roots, input, $) {
-            var params = validate(input);
+        constructor: function(roots, userParams) {
+            var params = clone(userParams);
 
-            params.$ = $;
+            // Intrinsic params.event is not the same as userParams.event
+            params.event = function(elems, e, func, mode) {
+                arrayEach(elems, function(elem) {
+                    userParams.event(elem, e, func, mode);
+                });
+            };
+
             this.length = 0;
-            each.call(this, roots, function(root, i) {
+
+            arrayEach.call(this, roots, function(root, i) {
                 var attr = manageAttr(root, params.direction);
                 var id = +attr; // Could be NaN
 
                 // baron() without params can return existing instances,
                 // but baron(params) will throw an Error as a second initialization
-                if (id == id && attr != undefined && instances[id] && !input) {
+                if (id == id && attr != undefined && instances[id] && !userParams) {
                     this[i] = instances[id];
                 } else {
-                    var localParams = clone(params);
+                    var perInstanceParams = clone(params);
 
                     // root and scroller can be different nodes
                     if (params.root && params.scroller) {
-                        localParams.scroller = params.$(params.scroller, root);
-                        if (!localParams.scroller.length) {
-                            localParams.scroller = root;
+                        perInstanceParams.scroller = params.$(params.scroller, root);
+                        if (!perInstanceParams.scroller.length) {
+                            perInstanceParams.scroller = root;
                         }
                     } else {
-                        localParams.scroller = root;
+                        perInstanceParams.scroller = root;
                     }
 
-                    localParams.root = root;
-                    this[i] = init(localParams);
+                    perInstanceParams.root = root;
+                    this[i] = init(perInstanceParams);
                 }
 
                 this.length = i + 1;
@@ -110,7 +135,7 @@
         dispose: function() {
             var params = this.params;
 
-            each(this, function(item) {
+            arrayEach(this, function(item) {
                 item.dispose(params);
             });
 
@@ -130,7 +155,7 @@
             params.root = [];
             params.scroller = this.params.scroller;
 
-            each.call(this, this, function(elem) {
+            arrayEach.call(this, this, function(elem) {
                 params.root.push(elem.root);
             });
             params.direction = (this.params.direction == 'v') ? 'h' : 'v';
@@ -240,7 +265,7 @@
             }
         ];
 
-        each(item._eventHandlers, function(event) {
+        arrayEach(item._eventHandlers, function(event) {
             if (event.element) {
                 eventManager(event.element, event.type, event.handler, mode);
             }
@@ -311,15 +336,9 @@
     function validate(input) {
         var output = clone(input);
 
-        output.direction = output.direction || 'v';
-
-        var event = input.event || function(elem, event, func, mode) {
-            output.$(elem)[mode || 'on'](event, func);
-        };
-
         output.event = function(elems, e, func, mode) {
-            each(elems, function(elem) {
-                event(elem, e, func, mode);
+            arrayEach(elems, function(elem) {
+                input.event(elem, e, func, mode);
             });
         };
 
@@ -420,6 +439,7 @@
             this.draggingCls = params.draggingCls;
             this.impact = params.impact;
             this.barTopLimit = 0;
+            this.resizeDebounce = params.resizeDebounce;
 
             // Updating height or width of bar
             function setBarSize(size) {
@@ -534,7 +554,7 @@
             // onResize & DOM modified handler
             this.resize = function() {
                 var self = this;
-                var minPeriod = self.params.resizeDebounce || 300;
+                var minPeriod = (self.resizeDebounce === undefined) ? 300 : self.resizeDebounce;
                 var delay = 0;
 
                 if (getTime() - resizeLastFire < minPeriod) {

@@ -129,18 +129,18 @@ var params = {
     track: '.scroller__track',
 
     // CSS classname for `scroller` when its needed (when content height above scroller heights)
-    // Default: ''
+    // Default: 'baron'
     barOnCls: 'baron',
     // Note: by default scroller__bar should be invisible
 
     // CSS classname for `scroller` from start till end + 300ms of scrolling process
     // You can boost performance by using `_scrolling {pointer-events: none}`
-    // Default: ''
+    // Default: undefined
     scrollingCls: '_scrolling',
 
     // CSS classname for `bar` when it dragging by cursor
     // Its better than `.bar:hover` rule
-    // Default: ''
+    // Default: undefined
     draggingCls: '_dragging',
 
     // Scroll direction
@@ -149,7 +149,7 @@ var params = {
 
     // Minimum time delay between two resize events fires in seconds [0..1] or milliseconds (1..∞)
     // Default: 300 ms
-    resizeDebounce: .2,
+    resizeDebounce: .2, // s
 
     // Local copy of jQuery-like utility
     // Default: window.jQuery
