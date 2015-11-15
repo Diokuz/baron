@@ -32,7 +32,6 @@
     function baron(params) {
         var jQueryMode;
         var roots;
-        var $;
         var empty = !params;
         var defaultParams = {
             $: window.jQuery,
@@ -58,7 +57,7 @@
         if (jQueryMode) {
             params.root = roots = this;
         } else {
-            roots = $(params.root || params.scroller);
+            roots = params.$(params.root || params.scroller);
         }
 
         var instance = new baron.fn.constructor(roots, empty ? undefined : params);

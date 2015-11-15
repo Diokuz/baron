@@ -175,10 +175,12 @@ describe("Барон.", function() {
         });
 
         it("Toggling barOnCls.", function(done) {
-            $('.scroller').text('sadkvbalsjdfasjdkhfakjsdhflaksdhflakjhsdafjh');
+            $('.scroller').text('sadkvbalsjdfasjdkhf akjsdhflaksdhf lakjhsdafjh sadkvbalsjdfasjdkhf akjsdhflaksdhf lakjhsdafjh');
+            baron.update();
             setTimeout(function() {
                 assert( $('.wrapper').hasClass(barOnCls), 'При большом количестве контента навешивается класс' );
                 $('.scroller').text('');
+                baron.update();
                 setTimeout(function() {
                     assert( !$('.wrapper').hasClass(barOnCls), 'В отсутствии текста класса нет' );
                     done();
