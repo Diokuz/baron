@@ -720,14 +720,14 @@
         return baron;
     };
 
-    baron.version = '0.7.10';
+    baron.version = '0.7.15';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
     }
 
     window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
-    if (window['module'] && module.exports) {
+    if (typeof module != 'undefined') {
         module.exports = baron.noConflict();
     }
 })(window, window.$);

@@ -1,3 +1,7 @@
+## 0.7.15
+
+ - fixed module.exports bug (now baron is compatible with react-baron)
+
 ## 0.7.14
 
  - fixed flexbox bug
