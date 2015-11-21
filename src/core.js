@@ -1,8 +1,9 @@
-(function(window, $, undefined) {
+(function(window, undefined) {
     'use strict';
 
     if (!window) return; // Server side
 
+    var $ = window.$;
     var _baron = baron; // Stored baron value for noConflict usage
     var pos = ['left', 'top', 'right', 'bottom', 'width', 'height'];
     // Global store for all baron instances (to be able to dispose them on html-nodes)
@@ -728,7 +729,7 @@
         return baron;
     };
 
-    baron.version = '0.8.0';
+    baron.version = '0.9.0-alpha';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -738,4 +739,4 @@
     if (typeof module != 'undefined') {
         module.exports = baron.noConflict();
     }
-})(window, window.$);
+})(window);
