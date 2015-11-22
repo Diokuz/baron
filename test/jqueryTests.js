@@ -89,6 +89,31 @@ describe("Барон.", function() {
         });
     });
 
+    describe("noParams mode", function() {
+        it("Инициализация без параметров при имеющемся на странице бароне", function() {
+            // Суть бага в следующем: manageAttr возвращал undefined, который
+            // кастился в 0, поэтому вместо инициализации возвращалась ссылка
+            // на имеющийся нулевой инстанс
+            var first = $('.wrapper._origin.wrapper_headers .scroller');
+            var second = $('.wrapper._origin.wrapper_ .scroller');
+
+            first.baron();
+            second.baron();
+
+            var initAttr = second.attr('data-baron-v-id');
+
+            assert.ok(initAttr);
+
+            // uncomment in 0.8
+            // first.baron().dispose();
+            // second.baron().dispose;
+
+            // var disposeAttr = second.attr('data-baron-v-id');
+
+            // assert.equal(disposeAttr, "");
+        });
+    });
+
     describe("Навешивание классов", function() {
         it("После инициализации нет блокирующего класса _scrolling", function() {
             $('.wrapper._origin').html(originalHTML);

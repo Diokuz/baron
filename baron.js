@@ -77,11 +77,12 @@
             params.$ = $;
             this.length = 0;
             each.call(this, roots, function(root, i) {
-                var id = +manageAttr(root, params.direction); // Could be NaN
+                var attr = manageAttr(root, params.direction);
+                var id = +attr; // Could be NaN
 
                 // baron() without params can return existing instances,
                 // but baron(params) will throw an Error as a second initialization
-                if (id == id && instances[id] && !input) {
+                if (id == id && attr != undefined && instances[id] && !input) {
                     this[i] = instances[id];
                 } else {
                     var localParams = clone(params);
@@ -262,6 +263,7 @@
     }
 
     // set, remove or read baron-specific id-attribute
+    // @returns {String|undefined} - id node value, or undefined, if there is no attr
     function manageAttr(node, direction, mode, id) {
         var attrName = 'data-baron-' + direction + '-id';
 
@@ -720,7 +722,7 @@
         return baron;
     };
 
-    baron.version = '0.7.15';
+    baron.version = '0.7.16';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

@@ -1,3 +1,7 @@
+## 0.7.16
+
+ - fixed noParams initialization bug for multiple barons on page
+
 ## 0.7.15
 
  - fixed module.exports bug (now baron is compatible with react-baron)

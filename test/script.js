@@ -208,5 +208,8 @@ $(document).ready(function() {
     });
 
     // Flexbox width bug
-    $('.wrapper_flex .scroller').baron();
+    $('.wrapper_flexbox .scroller').baron();
+
+    // noParams init bug
+    $('.wrapper_noParams .scroller').baron();
 });
