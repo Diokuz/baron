@@ -1,3 +1,7 @@
+## 0.9.0
+
+ - add `geek` option for css guru.
+
 ## 0.8.0
 
  - `impact` param added

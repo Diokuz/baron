@@ -108,6 +108,12 @@ where:
 
 ```js
 var params = {
+    // Flag, indicating that you know your css,
+    // and baron must minimize the count of setted inline css rules
+    // (i.e. overflow: hidden for clipper and overflow-y: scroll for scroller)
+    // Default: false
+    geek: true,
+
     // Whos width (height) will be setted?
     // Default: 'scroller' for vertical, 'clipper' for horizontal direction.
     impact: 'scroller',

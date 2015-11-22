@@ -41,7 +41,8 @@
             resizeDebounce: 0,
             event: function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);
-            }
+            },
+            geek: false
         };
 
         params = params || {};
@@ -360,6 +361,7 @@
 
     item.prototype = {
         // underscore.js realization
+        // used in autoUpdate plugin
         _debounce: function(func, wait) {
             var self = this,
                 timeout,
@@ -552,6 +554,7 @@
             };
 
             // onResize & DOM modified handler
+            // also fires on init
             this.resize = function() {
                 var self = this;
                 var minPeriod = (self.resizeDebounce === undefined) ? 300 : self.resizeDebounce;
@@ -676,12 +679,30 @@
                 this.$(node).css(css);
             };
 
+            // Set most common css rules
+            this._setCss = function(on) {
+                if (params.geek) return;
+
+                var overflow = on ? 'hidden' : null;
+                var scroll = on ? 'scroll' : null;
+
+                this.$(this.clipper).css({overflow: overflow});
+
+                var axis = this.direction == 'v' ? 'y' : 'x';
+                var scrollerCss = {};
+
+                scrollerCss['overflow-' + axis] = scroll;
+                this.$(this.scroller).css(scrollerCss);
+            };
+
             return this;
         },
 
+        // fires on any update and on init
         update: function(params) {
             fire.call(this, 'upd', params); // Update all plugins' params
 
+            this._setCss(true);
             this.resize(1);
             this.updatePositions();
 
@@ -697,6 +718,7 @@
             } else {
                 this._setCrossSizes(this.clipper, '');
             }
+            this._setCss(false);
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;
