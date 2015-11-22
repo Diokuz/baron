@@ -62,7 +62,7 @@
             roots = params.$(params.root || params.scroller);
         }
 
-        var instance = new baron.fn.constructor(roots, empty ? undefined : params);
+        var instance = new baron.fn.constructor(roots, params, empty);
 
         if (instance.autoUpdate) {
             instance.autoUpdate();
@@ -90,13 +90,13 @@
     baron._instances = instances; // for debug
 
     baron.fn = {
-        constructor: function(roots, userParams) {
-            var params = clone(userParams);
+        constructor: function(roots, totalParams, noUserParams) {
+            var params = clone(totalParams);
 
-            // Intrinsic params.event is not the same as userParams.event
+            // Intrinsic params.event is not the same as totalParams.event
             params.event = function(elems, e, func, mode) {
                 arrayEach(elems, function(elem) {
-                    userParams.event(elem, e, func, mode);
+                    totalParams.event(elem, e, func, mode);
                 });
             };
 
@@ -108,7 +108,7 @@
 
                 // baron() without params can return existing instances,
                 // but baron(params) will throw an Error as a second initialization
-                if (id == id && attr != undefined && instances[id] && !userParams) {
+                if (id == id && attr != undefined && instances[id] && noUserParams) {
                     this[i] = instances[id];
                 } else {
                     var perInstanceParams = clone(params);
