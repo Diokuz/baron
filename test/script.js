@@ -214,4 +214,7 @@ $(document).ready(function() {
 
     // noParams init bug
     $('.wrapper_noParams .scroller').baron();
+
+    // paddings
+    $('.wrapper_mbp .scroller').baron();
 });

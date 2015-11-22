@@ -64,7 +64,7 @@
 
         var instance = new baron.fn.constructor(roots, params, empty);
 
-        if (instance.autoUpdate) {
+        if (instance.autoUpdate && !empty) {
             instance.autoUpdate();
         }
 
@@ -692,6 +692,9 @@
                 var scrollerCss = {};
 
                 scrollerCss['overflow-' + axis] = scroll;
+                scrollerCss['box-sizing'] = 'border-box';
+                scrollerCss.margin = '0';
+                scrollerCss.border = '0';
                 this.$(this.scroller).css(scrollerCss);
             };
 

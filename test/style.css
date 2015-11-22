@@ -234,15 +234,21 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
     height: 1000px;
 }
 
-.wrapper_flex {
+.wrapper_flexbox {
     display: flex;
 }
-.wrapper_flex .scroller {
+.wrapper_flexbox .scroller {
     display: flex;
     flex-direction: column;
 }
-.wrapper_flex .container {
+.wrapper_flexbox .container {
     display: flex;
     flex: 1 0 auto;
     flex-direction: column;
+}
+
+.wrapper_mbp .scroller {
+    padding: 40px;
+    border: 10px solid #fc9;
+    margin: 10px;
 }

@@ -113,6 +113,10 @@ describe("Барон.", function() {
     });
 
     describe("noParams mode", function() {
+        before(function() {
+            $('.wrapper._origin').html(originalHTML);
+        });
+
         it("Инициализация без параметров при имеющемся на странице бароне", function() {
             // Суть бага в следующем: manageAttr возвращал undefined, который
             // кастился в 0, поэтому вместо инициализации возвращалась ссылка
@@ -127,13 +131,52 @@ describe("Барон.", function() {
 
             assert.ok(initAttr);
 
-            // uncomment in 0.8
-            // first.baron().dispose();
-            // second.baron().dispose;
+            first.baron().dispose();
+            second.baron().dispose();
 
-            // var disposeAttr = second.attr('data-baron-v-id');
+            var disposeAttr = second.attr('data-baron-v-id');
 
-            // assert.equal(disposeAttr, "");
+            assert.equal(disposeAttr, undefined);
+        });
+    });
+
+    describe("geek param", function() {
+        before(function() {
+            $('.wrapper._origin').html(originalHTML);
+        });
+
+        it("Навешиваются все дефолтные стили", function() {
+            var notGeek = $('.wrapper._origin.wrapper_headers .scroller');
+            var geek = $('.wrapper._origin.wrapper_ .scroller');
+
+            notGeek.baron({geek: false});
+            geek.baron({geek: true});
+
+            var notGeekStyles = {
+                margin: notGeek[0].style.margin,
+                border: notGeek[0].style.border,
+                padding: notGeek[0].style.padding,
+                boxSizing: notGeek[0].style.boxSizing
+            };
+            var geekStyles = {
+                margin: geek[0].style.margin,
+                border: geek[0].style.border,
+                padding: geek[0].style.padding,
+                boxSizing: geek[0].style.boxSizing
+            };
+
+            assert.deepEqual(notGeekStyles, {
+                margin: '0px',
+                border: '0px',
+                padding: '',
+                boxSizing: 'border-box'
+            });
+            assert.deepEqual(geekStyles, {
+                margin: '',
+                border: '',
+                padding: '',
+                boxSizing: ''
+            });
         });
     });
 
