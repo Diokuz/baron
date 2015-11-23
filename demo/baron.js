@@ -420,6 +420,7 @@
             this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
             this.draggingCls = params.draggingCls;
+            this.mode = params.mode;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
 
@@ -567,8 +568,9 @@
                         self.barOn();
                         client = self.scroller[self.origin.crossClient];
 
-                        // Two different appropches for different directions
-                        if (self.direction == 'v') { // vertical
+                        // Two different appropches
+                        var fixScroller = self.mode ? (self.mode == 'scroller') : (self.direction == 'v');
+                        if (fixScroller) {
                             var delta = offset - client;
 
                             was = $(self.clipper).css(self.origin.crossSize);
@@ -577,7 +579,7 @@
                             if (was != will) {
                                 self._setCrossSizes(self.scroller, will);
                             }
-                        } else { // horizontal
+                        } else { // fix clipper
                             was = $(self.clipper).css(self.origin.crossSize);
                             will = client + 'px';
 
