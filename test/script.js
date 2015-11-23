@@ -178,6 +178,8 @@ $(document).ready(function() {
         barOnCls: 'baron'
     });
 
+    window.dima = $('.test_textarea2 .scroller')[0];
+
     // Bar outside
     $('.test_bar-outside').baron({
         scroller: '.scroller',

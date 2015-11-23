@@ -1,3 +1,7 @@
+## 0.8.0
+
+ - `impact` param added
+
 ## 0.7.16
 
  - fixed noParams initialization bug for multiple barons on page

@@ -420,6 +420,7 @@
             this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
             this.draggingCls = params.draggingCls;
+            this.impact = params.impact;
             this.barTopLimit = 0;
             pause = params.pause * 1000 || 0;
 
@@ -567,8 +568,12 @@
                         self.barOn();
                         client = self.scroller[self.origin.crossClient];
 
-                        // Two different appropches for different directions
-                        if (self.direction == 'v') { // vertical
+                        // Two different appropches
+                        var fixScroller = self.impact ?
+                            (self.impact == 'scroller') :
+                            (self.direction == 'v');
+
+                        if (fixScroller) { // scroller
                             var delta = offset - client;
 
                             was = $(self.clipper).css(self.origin.crossSize);
@@ -577,7 +582,7 @@
                             if (was != will) {
                                 self._setCrossSizes(self.scroller, will);
                             }
-                        } else { // horizontal
+                        } else { // clipper
                             was = $(self.clipper).css(self.origin.crossSize);
                             will = client + 'px';
 
@@ -722,7 +727,7 @@
         return baron;
     };
 
-    baron.version = '0.7.16';
+    baron.version = '0.8.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
