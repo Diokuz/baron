@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/Diokuz/baron.svg)](https://travis-ci.org/Diokuz/baron)
 
+*You cannot change the world, but you can change a scrollbar!*
+
 Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic. 
 
 ## Demo
