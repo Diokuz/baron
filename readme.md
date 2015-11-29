@@ -16,6 +16,7 @@ http://diokuz.github.io/baron/
 - Plugin system (fixable headers, sticky footer, autotests and more)
 - Can be inited on hidden blocks
 - Vertical, horizontal and bidirectional scroll
+- Infinite scroll
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
@@ -40,16 +41,6 @@ If you want only to hide system scrollbar:
     Your scrollable content here
 </div>
 ```
-
-* And some CSS:
-
-```css
-.scroller {
-    overflow-y: scroll;
-}
-```
-
-Note: you can choose any class names, and style them as you want.
 
 * Initialize baron:
 
