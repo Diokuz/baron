@@ -303,7 +303,7 @@ Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: h
 
 ## Plugins
 
-@see docs/plugins.md
+@see [docs/plugins.md](https://github.com/Diokuz/baron/blob/master/docs/plugins.md)
 
 ## License
 
