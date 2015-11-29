@@ -140,38 +140,38 @@ describe("Барон.", function() {
         });
     });
 
-    describe("geek param", function() {
+    describe("cssGuru param", function() {
         before(function() {
             $('.wrapper._origin').html(originalHTML);
         });
 
         it("Навешиваются все дефолтные стили", function() {
-            var notGeek = $('.wrapper._origin.wrapper_headers .scroller');
-            var geek = $('.wrapper._origin.wrapper_ .scroller');
+            var notCssGuru = $('.wrapper._origin.wrapper_headers .scroller');
+            var cssGuru = $('.wrapper._origin.wrapper_ .scroller');
 
-            notGeek.baron({geek: false});
-            geek.baron({geek: true});
+            notCssGuru.baron({cssGuru: false});
+            cssGuru.baron({cssGuru: true});
 
-            var notGeekStyles = {
-                margin: notGeek[0].style.margin,
-                border: notGeek[0].style.border,
-                padding: notGeek[0].style.padding,
-                boxSizing: notGeek[0].style.boxSizing
+            var notCssGuruStyles = {
+                margin: notCssGuru[0].style.margin,
+                border: notCssGuru[0].style.border,
+                padding: notCssGuru[0].style.padding,
+                boxSizing: notCssGuru[0].style.boxSizing
             };
-            var geekStyles = {
-                margin: geek[0].style.margin,
-                border: geek[0].style.border,
-                padding: geek[0].style.padding,
-                boxSizing: geek[0].style.boxSizing
+            var cssGuruStyles = {
+                margin: cssGuru[0].style.margin,
+                border: cssGuru[0].style.border,
+                padding: cssGuru[0].style.padding,
+                boxSizing: cssGuru[0].style.boxSizing
             };
 
-            assert.deepEqual(notGeekStyles, {
+            assert.deepEqual(notCssGuruStyles, {
                 margin: '0px',
                 border: '0px',
                 padding: '',
                 boxSizing: 'border-box'
             });
-            assert.deepEqual(geekStyles, {
+            assert.deepEqual(cssGuruStyles, {
                 margin: '',
                 border: '',
                 padding: '',
