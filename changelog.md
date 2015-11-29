@@ -1,6 +1,10 @@
 ## 0.9.0
 
- - add `geek` option for css guru.
+ - add `cssGuru` option for css guru.
+ - add default css.
+ - remove resizeDebounce param.
+ - fix phantom tests.
+ - remove pause param.
 
 ## 0.8.0
 

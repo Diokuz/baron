@@ -42,7 +42,7 @@
             event: function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);
             },
-            geek: false
+            cssGuru: false
         };
 
         params = params || {};
@@ -680,8 +680,8 @@
             };
 
             // Set most common css rules
-            this._setCss = function(on) {
-                if (params.geek) return;
+            this._dumbCss = function(on) {
+                if (params.cssGuru) return;
 
                 var overflow = on ? 'hidden' : null;
                 var scroll = on ? 'scroll' : null;
@@ -705,7 +705,7 @@
         update: function(params) {
             fire.call(this, 'upd', params); // Update all plugins' params
 
-            this._setCss(true);
+            this._dumbCss(true);
             this.resize(1);
             this.updatePositions();
 
@@ -721,7 +721,7 @@
             } else {
                 this._setCrossSizes(this.clipper, '');
             }
-            this._setCss(false);
+            this._dumbCss(false);
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;
