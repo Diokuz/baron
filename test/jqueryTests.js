@@ -47,6 +47,17 @@ describe("Барон.", function() {
             assert.ok(Math.abs(height - expectedHeight) <= 1);
         });
 
+        // https://github.com/Diokuz/baron/issues/116
+        it("Попытка браузера заскроллить клиппер блокируется в следующем тике", function(done) {
+            var clipper = scroller.parentNode;
+            clipper.scrollLeft = 9999;
+
+            setTimeout(function() {
+                assert.equal(clipper.scrollLeft, 0);
+                done();
+            }, 0);
+        });
+
         it("Повторная инициализация бросает ошибку", function() {
             var _log = console.log;
             var i = 0;

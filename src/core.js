@@ -14,7 +14,7 @@
             size: pos[5],
             crossSize: pos[4], crossMinSize: 'min-' + pos[4], crossMaxSize: 'max-' + pos[4],
             client: 'clientHeight', crossClient: 'clientWidth',
-            crossScroll: 'scrollWidth',
+            crossScroll: 'scrollLeft',
             offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
@@ -23,7 +23,7 @@
             size: pos[4],
             crossSize: pos[5], crossMinSize: 'min-' + pos[5], crossMaxSize: 'max-' + pos[5],
             client: 'clientWidth', crossClient: 'clientHeight',
-            crossScroll: 'scrollHeight',
+            crossScroll: 'scrollTop',
             offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
@@ -263,6 +263,15 @@
                 },
 
                 type: 'sizeChange'
+            }, {
+                // Clipper onScroll bug https://github.com/Diokuz/baron/issues/116
+                element: item.clipper,
+
+                handler: function() {
+                    item.clipperOnScroll();
+                },
+
+                type: 'scroll'
             }
         ];
 
@@ -664,6 +673,15 @@
                     }, 300);
                 }
 
+            };
+
+            // https://github.com/Diokuz/baron/issues/116
+            this.clipperOnScroll = function() {
+                var scrollEdge = this.origin.crossScroll;
+
+                if (this.clipper[scrollEdge]) {
+                    this.clipper[scrollEdge] = 0;
+                }
             };
 
             // Flexbox `align-items: stretch` (default) requires to set min-width for vertical

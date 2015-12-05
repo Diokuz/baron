@@ -42,6 +42,14 @@ If you want only to hide system scrollbar:
 </div>
 ```
 
+* And CSS
+
+```css
+.scroller::-webkit-scrollbar { /* For Mac OS X styled scrollbars */
+    width: 0;
+}
+```
+
 * Initialize baron:
 
 ```js
@@ -64,7 +72,7 @@ $('.scroller').baron();
     overflow-y: scroll;
     /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
 }
-.scroller::-webkit-scrollbar { /* Preventing webkit cross-direction scrolling bug */
+.scroller::-webkit-scrollbar { /* For Mac OS X styled scrollbars */
     width: 0;
 }
 .scroller__track {

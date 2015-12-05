@@ -1,4 +1,8 @@
-## 0.9.0
+## 1.0.2
+
+ - fix ie clipper (cross-scroll)[https://github.com/Diokuz/baron/issues/116]
+
+## 1.0.0
 
  - add `cssGuru` option for css guru.
  - add default css.
