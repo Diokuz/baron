@@ -67,7 +67,11 @@ var params = {
         }
 
         bean[mode || 'on'](elem, event, func);
-    }
+    },
+
+    // For dir="rtl"
+    // Default: false
+    rtl: true
 };
 ```
 

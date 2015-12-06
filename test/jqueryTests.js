@@ -123,6 +123,58 @@ describe("Барон.", function() {
         });
     });
 
+    describe("RTL", function() {
+        var baron,
+            scroller,
+            bar;
+
+        before(function() {
+            scroller = $('.scroller')[0];
+            bar = $('.scroller__bar')[0];
+
+            scroller.parentNode.dir = 'rtl';
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                rtl: true
+            });
+
+            eachIt(baron);
+        });
+
+        it("Выставляет аттрибут data-baron-v в значение inited", function() {
+            var attrV = $('.scroller').attr('data-baron-v-id'),
+                attrH = $('.scroller').attr('data-baron-h-id');
+
+            assert.ok(attrV);
+            assert.ok(!attrH);
+        });
+
+        it("Находит bar и выставляет ему правильную высоту", function() {
+            var height = parseInt($(bar).css('height'), 10),
+                expectedHeight = Math.round(scroller.clientHeight * scroller.clientHeight / scroller.scrollHeight);
+
+            assert.ok(baron[0].bar === bar);
+            assert.ok(Math.abs(height - expectedHeight) <= 1);
+        });
+
+        // https://github.com/Diokuz/baron/issues/116
+        it("Попытка браузера заскроллить клиппер блокируется в следующем тике", function(done) {
+            var clipper = scroller.parentNode;
+            clipper.scrollLeft = 0;
+
+            setTimeout(function() {
+                assert.equal(clipper.scrollLeft, clipper.scrollWidth - clipper.clientWidth);
+                done();
+            }, 0);
+        });
+
+        after(function() {
+            scroller.parentNode.dir = 'ltr';
+        });
+    });
+
     describe("noParams mode", function() {
         before(function() {
             $('.wrapper._origin').html(originalHTML);

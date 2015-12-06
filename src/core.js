@@ -14,7 +14,7 @@
             size: pos[5],
             crossSize: pos[4], crossMinSize: 'min-' + pos[4], crossMaxSize: 'max-' + pos[4],
             client: 'clientHeight', crossClient: 'clientWidth',
-            crossScroll: 'scrollLeft',
+            scrollEdge: 'scrollLeft',
             offset: 'offsetHeight', crossOffset: 'offsetWidth', offsetPos: 'offsetTop',
             scroll: 'scrollTop', scrollSize: 'scrollHeight'
         },
@@ -23,7 +23,7 @@
             size: pos[4],
             crossSize: pos[5], crossMinSize: 'min-' + pos[5], crossMaxSize: 'max-' + pos[5],
             client: 'clientWidth', crossClient: 'clientHeight',
-            crossScroll: 'scrollTop',
+            scrollEdge: 'scrollTop',
             offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
@@ -325,6 +325,11 @@
         instances.push(out);
 
         out.update();
+
+        out.scrollEdge = 0;
+        if (params.rtl) {
+            out.scrollEdge = out.clipper[out.origin.scrollEdge]; // initial position
+        }
 
         return out;
     }
@@ -677,11 +682,10 @@
 
             // https://github.com/Diokuz/baron/issues/116
             this.clipperOnScroll = function() {
-                var scrollEdge = this.origin.crossScroll;
+                if (this.direction == 'h') return;
 
-                if (this.clipper[scrollEdge]) {
-                    this.clipper[scrollEdge] = 0;
-                }
+                // clipper.scrollLeft = initial scroll position (0 for ltr, 17 for rtl)
+                this.clipper[this.origin.scrollEdge] = this.scrollEdge;
             };
 
             // Flexbox `align-items: stretch` (default) requires to set min-width for vertical
@@ -776,7 +780,7 @@
         return baron;
     };
 
-    baron.version = '1.0.3';
+    baron.version = '1.1.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

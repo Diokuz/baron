@@ -1,3 +1,7 @@
+## 1.1.0
+
+ - add `rtl` param.
+
 ## 1.0.3
 
  - add ```-ms-overflow-style: none``` for non-guru css mode.
