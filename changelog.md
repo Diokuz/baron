@@ -1,3 +1,7 @@
+## 1.0.3
+
+ - add ```-ms-overflow-style: none``` for non-guru css mode.
+
 ## 1.0.2
 
  - fix ie clipper (cross-scroll)[https://github.com/Diokuz/baron/issues/116]

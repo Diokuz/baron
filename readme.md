@@ -69,6 +69,7 @@ $('.scroller').baron();
 
 ```css
 .scroller {
+    -ms-overflow-style: none; // better feel in ie10+ in some rare cases
     overflow-y: scroll;
     /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
 }

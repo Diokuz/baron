@@ -702,10 +702,14 @@
                 if (params.cssGuru) return;
 
                 var overflow = on ? 'hidden' : null;
+                var msOverflowStyle = on ? 'none' : null;
+
+                this.$(this.clipper).css({
+                    overflow: overflow,
+                    msOverflowStyle: msOverflowStyle
+                });
+
                 var scroll = on ? 'scroll' : null;
-
-                this.$(this.clipper).css({overflow: overflow});
-
                 var axis = this.direction == 'v' ? 'y' : 'x';
                 var scrollerCss = {};
 
