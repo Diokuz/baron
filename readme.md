@@ -2,7 +2,9 @@
 
 *You cannot change the world, but you can change a scrollbar!*
 
-Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic. 
+<img src="http://diokuz.github.io/pics/demo.gif" width="475px" height="331px" alt="Baron demo">
+
+Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
 
 ## [Demo](http://diokuz.github.io/baron/)
 
