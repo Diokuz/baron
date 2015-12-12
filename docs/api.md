@@ -35,7 +35,7 @@ var params = {
     barOnCls: 'baron',
     // Note: by default scroller__bar should be invisible
 
-    // CSS classname for `scroller` from start till end + 300ms of scrolling process
+    // CSS classname for `root` from start till end + 300ms of scrolling process
     // You can boost performance by using `_scrolling {pointer-events: none}`
     // Default: undefined
     scrollingCls: '_scrolling',

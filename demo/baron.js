@@ -669,11 +669,11 @@
 
                 if (self.scrollingCls) {
                     if (!scrollingTimer) {
-                        self.$(self.scroller).addClass(self.scrollingCls);
+                        self.$(self.root).addClass(self.scrollingCls);
                     }
                     clearTimeout(scrollingTimer);
                     scrollingTimer = setTimeout(function() {
-                        self.$(self.scroller).removeClass(self.scrollingCls);
+                        self.$(self.root).removeClass(self.scrollingCls);
                         scrollingTimer = undefined;
                     }, 300);
                 }
@@ -780,7 +780,7 @@
         return baron;
     };
 
-    baron.version = '1.1.0';
+    baron.version = '1.2.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

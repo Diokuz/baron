@@ -1,3 +1,7 @@
+## 1.2.0
+
+ - `scrollingCls` param now sets on `root`, not `scroller`.
+
 ## 1.1.0
 
  - add `rtl` param.
