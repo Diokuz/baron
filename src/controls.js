@@ -14,7 +14,7 @@
                 element: forward,
 
                 handler: function() {
-                    var y = self.pos() - params.delta || 30;
+                    var y = self.pos() + (params.delta || 30);
 
                     self.pos(y);
                 },
@@ -33,7 +33,7 @@
                 element: backward,
 
                 handler: function() {
-                    var y = self.pos() + params.delta || 30;
+                    var y = self.pos() - (params.delta || 30);
 
                     self.pos(y);
                 },
@@ -57,6 +57,9 @@
                     element: track,
 
                     handler: function(e) {
+                        // https://github.com/Diokuz/baron/issues/121
+                        if (e.target != track) return;
+
                         var x = e['offset' + self.origin.x],
                             xBar = self.bar[self.origin.offsetPos],
                             sign = 0;

@@ -1,4 +1,7 @@
 html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
+::-webkit-scrollbar {
+    width: 0;
+}
 
 .test {
     z-index: 0;
@@ -213,12 +216,20 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
     user-select: none;
 }
 .scroller__up {
+    position: absolute;
     top: 0;
     right: 0;
+    width: 10px;
+    height: 10px;
+    background: red;
 }
 .scroller__down {
+    position: absolute;
     right: 0;
     bottom: 0;
+    width: 10px;
+    height: 10px;
+    background: red;
 }
 
 .scroller__pull {

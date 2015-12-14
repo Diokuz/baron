@@ -1,3 +1,7 @@
+## 1.2.1
+
+ - [fix `controls` click and direction](https://github.com/Diokuz/baron/issues/121).
+
 ## 1.2.0
 
  - `scrollingCls` param now sets on `root`, not `scroller`.
