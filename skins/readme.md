@@ -2,12 +2,13 @@
 
 Note: these skins are for vertical direction only.
 
-To use them, copy `html` to your page and grab `css` from `skins.css`.
+To use them, copy `html` to your page and grab `css` from `styles.css`.
 
-Dont forget change `MODIFIER` to real value!
+Dont forget use `baron.css`, and change `MODIFIER` to real value!
 
 ## HTML
 
+```html
 <div class="baron baron__root baron__clipper _MODIFIER">
     <div class="baron__scroller">
     <div class="baron__track">
@@ -18,6 +19,7 @@ Dont forget change `MODIFIER` to real value!
         <div class="baron__control baron__down">▼</div>
     </div>
 </div>
+```
 
 ## MODIFIER
 
