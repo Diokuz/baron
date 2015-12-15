@@ -1,71 +1,71 @@
 html, body {height: 100%;margin: 0; padding: 0; font-family: Verdana}
 
 body {
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     margin: 0 auto;
-    padding: 10px;
+    padding: 20px;
     text-align: center;
 }
 
-.wrapper {
+.main__clipper {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #fc9;
+    overflow: hidden;
+}
+.main__scroller {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 100%;
+    white-space: nowrap;
+}
+.main__scroller::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+.main__bar {
+    position: absolute;
+    bottom: 0;
+    width: 10px;
+    height: 10px;
+    background: #fc9;
+}
+
+/* node that hides system scrollbar by overflow: hidden; */
+.baron {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
     position: relative;
     overflow: hidden;
+    min-width: 300px;
     width: 30%;
     height: 70%;
-    
+    margin: 20px;
     background: #fff;
-    border: 1px solid #fc9;
     box-shadow:
         0 5px 15px -3px rgba(0, 0, 0, .7),
         0 0 0 1px rgba(0, 0, 0, .05);
     text-align: left;
-}
-.scroller {
-    height: 100%;
-    overflow-y: scroll;
-    /*-webkit-overflow-scrolling: touch;*/
-    /* uncomment to accelerate scrolling on iOs */
-}
-.scroller::-webkit-scrollbar {
-    width: 0;
-}
-.scroller__bar-wrapper {
-    position: absolute;
-    z-index: 3;
-    top: 10px;
-    bottom: 10px;
-    right: 5px;
-    width: 8px;
-    border-radius: 5px;
-    background: #ddf;
-    background: rgba(0, 0, 255, .1);
-    pointer-events: none;
-}
-.scroller__bar {
-    position: absolute;
-    z-index: 1;
-    width: 8px;
-    border-radius: 3px;
-    background: #987;
-    opacity: 0;
-    -webkit-transition: opacity .2s linear;
-    transition: opacity .2s linear;
-    pointer-events: auto;
-}
-.scroller__bar:hover {
-    opacity: .8;
-}
-.baron .scroller__bar {
-    opacity: .6;
-}
-.baron_h .scroller__bar_h {
-    opacity: .6;
-    bottom: 30px;
+    white-space: normal;
 }
 
+.header__title {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; /* For padding and border, if exist */
+    margin: 0;
+    width: 100%;
+    background: #999;
+
+    /* pointer-events: none; /* IE9+ https://developer.mozilla.org/en-US/docs/CSS/pointer-events */
+}
+.header__title_state_fixed {
+    position: absolute;
+    z-index: 1; /* Removing flicker effect */
+}
+
+/* fixable headers */
 .header__title {
     position: relative;
     z-index: 2;
@@ -78,11 +78,12 @@ body {
     box-shadow: 0 -1px 0 rgba(0, 0, 0, .05);
     color: #222;
     font-size: 14px;
-    line-height: 20px; /* sync with .search-results__header-wrapper height */
+    line-height: 20px; /* sync with .search-results__header-clipper height */
     opacity: 1;
     -webkit-transition: background-color .2s;
     transition: background-color .2s;
     cursor: pointer;
+    pointer-events: none;
 }
 .header__title_state_fixed {
     position: absolute;
@@ -119,34 +120,10 @@ body {
     pointer-events: none;
 }
 
-.wrapper_2 .text {
-    width: 800px;
-}
-.wrapper_2 .header__title {
-    position: absolute;
-    bottom: 0;
-    z-index: 1;
-}
-.wrapper_2 .header__title_state_fixed {
-    position: static;
-}
-
 .text {
     overflow: hidden;
     margin: 10px;
     font-size: 12px;
-}
-
-.wrapper_iphone .header__title_state_fixed {
-    position: relative;
-}
-.wrapper_iphone .header__title_position_top {
-    position: absolute;
-    top: 0;
-}
-.wrapper_iphone .header__title_position_bottom {
-    position: absolute;
-    bottom: 0;
 }
 
 .load {

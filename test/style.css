@@ -1,6 +1,7 @@
 html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 ::-webkit-scrollbar {
     width: 0;
+    height: 0;
 }
 
 .test {
@@ -262,4 +263,16 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
     padding: 40px;
     border: 10px solid #fc9;
     margin: 10px;
+}
+
+.scroller_h {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    height: 100%;
+    width: 100%;
+}
+.container_h {
+    height: 100%;
+    width: 400%;
+    background-image: linear-gradient(to right, green, #0f0);
 }

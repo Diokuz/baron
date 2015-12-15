@@ -10,6 +10,8 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 ## [API](docs/api.md)
 
+## [Skins](skins/)
+
 ## Features
 
 - Doesn't replace native system scroll mechanic.
@@ -40,85 +42,29 @@ If you have any problems, just set [`cssGuru`](docs/api.md) option to `true`.
 
 ## Simple usage
 
-If you want only to hide system scrollbar:
-
-* Include either the development or minified version of baron.js:
+* Include either the development or minified version of `baron.js`:
 
 ```html
 <script src="baron.js"></script>
 ```
 
-* Make some HTML:
+* Copy some template [HTML](skins/) and include baron [CSS](skins/styles.css):
 
 ```html
-<div class="scroller">
-    Your scrollable content here
-</div>
-```
-
-* And CSS
-
-```css
-.scroller::-webkit-scrollbar { /* For Mac OS X styled scrollbars */
-    width: 0;
-}
+<link rel="stylesheet" href="baron.css" />
 ```
 
 * Initialize baron:
 
 ```js
-$('.scroller').baron();
+$('.baron').baron();
 ```
 
 ## Advanced usage
 
-```html
-<div class="scroller">
-    Your scrollable content here
-    <div class="scroller__track"><!-- Track is optional -->
-        <div class="scroller__bar"></div>
-    </div>
-</div>
-```
+You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see BASE section in [skins](skins/styles.css)), dont forget to use them.
 
-```css
-.scroller {
-    overflow-y: scroll;
-    -ms-overflow-style: none; /* better feel in ie10+ in some rare cases */
-    /* -webkit-overflow-scrolling: touch; *//* uncomment to accelerate scrolling on iOS */
-}
-.scroller::-webkit-scrollbar { /* For Mac OS X styled scrollbars */
-    width: 0;
-}
-.scroller__track {
-    display: none; /* Invisible by default */
-    position: absolute;
-    right: 4px;
-    top: 10px;
-    bottom: 4px;
-    width: 10px;
-    background: rgba(0, 0, 0, .1);
-}
-.baron > .scroller__track {
-    display: block; /* Visible when scrolling is possible */
-}
-.scroller__bar { /* The bar. You should define width, right position and background */
-    position: absolute;    
-    z-index: 1;
-    right: 0;
-    width: 10px;
-    background: #999;
-}
-```
-
-You can specify some parameters on baron initialization:
-
-```js
-$('.scroller').baron(params);
-
-// or
-var scroll = baron(params);
-```
+You can change html-template, if you need that, and there many options (see [API](docs/api.md)).
 
 ## [Chaining](docs/chaining.md)
 

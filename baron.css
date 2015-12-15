@@ -1,37 +1,51 @@
-/* CSS styles in this file are need for proper Baron work */
-.wrapper {
+.baron__clipper {
     position: relative;
     overflow: hidden;
 }
-.scroller {
+.baron__scroller {
     overflow-y: scroll;
+    -ms-overflow-style: none;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin: 0;
+    border: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    border: 0;
+    -webkit-overflow-scrolling: touch;
+    /* remove line to customize scrollbar in iOs */
 }
-
-.scroller__bar { /* The bar. You should define width, right and background */
+.baron__scroller::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+.baron__track {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+.baron._scrollbar .baron__track {
+    display: block;
+}
+.baron__free {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+.baron__bar {
+    display: none;
     position: absolute;
     right: 0;    
     z-index: 1;
     width: 10px;
     background: #999;
 }
-.scroller__bar_h {
-    bottom: 2px;
-    height: 8px;
+.baron._scrollbar .baron__bar {
+    display: block;
 }
-
-.header__title {
-    -moz-box-sizing: border-box;
-    box-sizing: border-box; /* For padding and border, if exist */
-    margin: 0;
-    width: 100%;
-    background: #999;
-
-    /* pointer-events: none; /* IE9+ https://developer.mozilla.org/en-US/docs/CSS/pointer-events */
-}
-.header__title_state_fixed {
-    position: absolute;
-    z-index: 1; /* Removing flicker effect */
+.baron__control {
+    display: none;
 }

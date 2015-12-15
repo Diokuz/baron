@@ -8,31 +8,16 @@
 
     <script src="baron.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="../baron.css" />
+    <link rel="stylesheet" href="../baron.css" />
     <link rel="stylesheet" type="text/css" href="style.css" />
 
     <!-- Page specific script -->
     <script>
         window.onload = function() {
             window.dima = baron({
-                root: '.wrapper_1',
-                scroller: '.scroller',
-                bar: '.scroller__bar',
-                barOnCls: 'baron'
-            }).autoUpdate();
-
-            baron({
-                scroller: '.wrapper_2 .scroller',
-                bar: '.scroller__bar',
-                barOnCls: 'baron'
-            }).fix({
-                elements: '.header__title',
-                outside: 'header__title_state_fixed',
-                before: 'header__title_position_top',
-                after: 'header__title_position_bottom'
-            }).baron({
-                barOnCls: 'baron_h',
-                bar: '.scroller__bar_h'
+                root: '.baron',
+                scroller: '.baron__scroller',
+                bar: '.baron__bar'
             }).autoUpdate();
 
             $("#add_section").on("click", function(){
@@ -76,8 +61,8 @@
 
 <body>
 
-    <div class="wrapper wrapper_1">
-        <div class="scroller">
+    <div class="baron ">
+        <div class="baron__scroller">
             <div class="container">
                 <div class="header">
                     <h1 class="header__title">Baron</h1>
@@ -125,20 +110,8 @@
                 </div>
             </div>
         </div>
-        <div class="scroller__bar-wrapper">
-            <div class="scroller__bar"></div>
-        </div>
-    </div>
-
-    <div class="wrapper wrapper_2">
-        <div class="scroller">
-            <p class="text">Baron is a title of nobility. In the kingdom of England, the medieval Latin word baro, baronis was used originally to denote a tenant-in-chief of the early Norman kings who held his lands by the feudal tenure of "barony" (in Latin per baroniam), and who was entitled to attend the Great Council which by the 13th century had developed into the Parliament of England.
-            <p class="text">The title was quite common in most European countries often in a slightly modified form. In Italian, the word used was Barone. The corresponding title in the Holy Roman Empire was Freiherr.
-            <div class="header">
-                <h1 class="header__title">Sticky footer</h1>
-            </div>
-            <div class="scroller__bar"></div>
-            <div class="scroller__bar scroller__bar_h"></div>
+        <div class="baron__track">
+            <div class="baron__bar"></div>
         </div>
     </div>
 
