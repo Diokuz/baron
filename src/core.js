@@ -37,7 +37,7 @@
         var defaultParams = {
             $: window.jQuery,
             direction: 'v',
-            barOnCls: 'baron',
+            barOnCls: '_scrollbar',
             resizeDebounce: 0,
             event: function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);

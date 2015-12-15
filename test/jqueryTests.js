@@ -35,8 +35,7 @@ describe("Барон.", function() {
 
         before(function() {
             baron = $('.wrapper._origin .scroller').baron({
-                bar: '.scroller__bar',
-                barOnCls: barOnCls
+                bar: '.scroller__bar'
             });
 
             scroller = $('.scroller')[0];
@@ -51,6 +50,12 @@ describe("Барон.", function() {
 
             assert.ok(attrV);
             assert.ok(!attrH);
+        });
+
+        it("Выставляет дефолтный baOnCls", function() {
+            var has = $('.scroller').hasClass('_scrollbar');
+
+            assert.ok(has);
         });
 
         it("Находит bar и выставляет ему правильную высоту", function() {

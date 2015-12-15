@@ -31,9 +31,9 @@ var params = {
     track: '.scroller__track',
 
     // CSS classname for `scroller` when its needed (when content height above scroller heights)
-    // Default: 'baron'
-    barOnCls: 'baron',
-    // Note: by default scroller__bar should be invisible
+    // Default: '_scrollbar'
+    barOnCls: '_scrollbar',
+    // Note: without barOnCls, scroller__bar should be invisible
 
     // CSS classname for `root` from start till end + 300ms of scrolling process
     // You can boost performance by using `_scrolling {pointer-events: none}`
