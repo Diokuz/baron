@@ -11,6 +11,9 @@ Dont forget use `baron.css`, and change `MODIFIER` to real value!
 ```html
 <div class="baron baron__root baron__clipper _MODIFIER">
     <div class="baron__scroller">
+        <!-- Your content here -->
+    </div>
+
     <div class="baron__track">
         <div class="baron__control baron__up">▲</div>
         <div class="baron__free">
