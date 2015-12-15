@@ -21,6 +21,7 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 - Can be inited on hidden blocks
 - Vertical, horizontal and bidirectional scroll
 - Infinite scroll
+- Nested scrollers
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
@@ -62,9 +63,17 @@ $('.baron').baron();
 
 ## Advanced usage
 
-You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see BASE section in [skins](skins/styles.css)), dont forget to use them.
+You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them.
 
-You can change html-template, if you need that, and there many options (see [API](docs/api.md)).
+You can change html-template, if you need that, and there many options (see [API](docs/api.md)) for all features, described above.
+
+## Nested scrollers
+
+Baron do support nested scrollers. To make scrollers happy, follow the rule:
+
+* Initialize baron instances from ancestor to descendant scrollers order.
+
+Third World War will not begun if you break that rule, but there may be some bad user-experience with baron-instances updates (when size of one scroller depends on size of another). Use `/demo` as example.
 
 ## [Chaining](docs/chaining.md)
 
