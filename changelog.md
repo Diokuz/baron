@@ -1,3 +1,10 @@
+## 2.0.0
+
+ - update demo
+ - add [skins](skins)
+ - add base baron css styles
+ - remove cssGuru param
+
 ## 1.2.1
 
  - [fix `controls` click and direction](https://github.com/Diokuz/baron/issues/121).

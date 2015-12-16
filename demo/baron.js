@@ -34,18 +34,27 @@
         var jQueryMode;
         var roots;
         var empty = !params;
+
+        params = params || {};
+
         var defaultParams = {
             $: window.jQuery,
             direction: 'v',
+            // Хитрая логика в этом месте. Приоритет взятия root:
+            // 1. this of jQuery
+            // 2. params.root
+            // 3. params.scroller
+            // 4. '.baron'
+            root: params.scroller || '.baron',
             barOnCls: '_scrollbar',
+            scroller: '.baron__scroller',
+            track: '.baron__track',
+            bar: '.baron__bar',
             resizeDebounce: 0,
             event: function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);
-            },
-            cssGuru: false
+            }
         };
-
-        params = params || {};
 
         // Extending default params by user-defined params
         for (var key in defaultParams) {
@@ -59,7 +68,7 @@
         if (jQueryMode) {
             params.root = roots = this;
         } else {
-            roots = params.$(params.root || params.scroller);
+            roots = params.$(params.root);
         }
 
         var instance = new baron.fn.constructor(roots, params, empty);
@@ -701,28 +710,8 @@
                 this.$(node).css(css);
             };
 
-            // Set most common css rules
-            this._dumbCss = function(on) {
-                if (params.cssGuru) return;
-
-                var overflow = on ? 'hidden' : null;
-                var msOverflowStyle = on ? 'none' : null;
-
-                this.$(this.clipper).css({
-                    overflow: overflow,
-                    msOverflowStyle: msOverflowStyle
-                });
-
-                var scroll = on ? 'scroll' : null;
-                var axis = this.direction == 'v' ? 'y' : 'x';
-                var scrollerCss = {};
-
-                scrollerCss['overflow-' + axis] = scroll;
-                scrollerCss['box-sizing'] = 'border-box';
-                scrollerCss.margin = '0';
-                scrollerCss.border = '0';
-                this.$(this.scroller).css(scrollerCss);
-            };
+            // Check if all styles are right
+            this.checkBaseStyles = function() {};
 
             return this;
         },
@@ -731,7 +720,7 @@
         update: function(params) {
             fire.call(this, 'upd', params); // Update all plugins' params
 
-            this._dumbCss(true);
+            this.checkBaseStyles(true);
             this.resize(1);
             this.updatePositions();
 
@@ -747,7 +736,6 @@
             } else {
                 this._setCrossSizes(this.clipper, '');
             }
-            this._dumbCss(false);
             this.barOn(true);
             fire.call(this, 'dispose');
             this._disposed = true;

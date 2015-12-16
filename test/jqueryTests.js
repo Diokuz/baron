@@ -228,46 +228,6 @@ describe("Барон.", function() {
         });
     });
 
-    describe("cssGuru param", function() {
-        before(function() {
-            $('.wrapper._origin').html(originalHTML);
-        });
-
-        it("Навешиваются все дефолтные стили", function() {
-            var notCssGuru = $('.wrapper._origin.wrapper_headers .scroller');
-            var cssGuru = $('.wrapper._origin.wrapper_ .scroller');
-
-            notCssGuru.baron({cssGuru: false});
-            cssGuru.baron({cssGuru: true});
-
-            var notCssGuruStyles = {
-                margin: notCssGuru[0].style.margin,
-                border: notCssGuru[0].style.border,
-                padding: notCssGuru[0].style.padding,
-                boxSizing: notCssGuru[0].style.boxSizing
-            };
-            var cssGuruStyles = {
-                margin: cssGuru[0].style.margin,
-                border: cssGuru[0].style.border,
-                padding: cssGuru[0].style.padding,
-                boxSizing: cssGuru[0].style.boxSizing
-            };
-
-            assert.deepEqual(notCssGuruStyles, {
-                margin: '0px',
-                border: '0px',
-                padding: '',
-                boxSizing: 'border-box'
-            });
-            assert.deepEqual(cssGuruStyles, {
-                margin: '',
-                border: '',
-                padding: '',
-                boxSizing: ''
-            });
-        });
-    });
-
     describe("Навешивание классов", function() {
         it("После инициализации нет блокирующего класса _scrolling", function() {
             $('.wrapper._origin').html(originalHTML);

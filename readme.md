@@ -37,9 +37,13 @@ Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: h
 
 ! Also, **Firefox for Mac OS X**, in default non-persistant scrollbar mode [is not supported](https://github.com/Diokuz/baron/issues/110).
 
-## 1.0 migration
+## 2.0 migration
 
-If you have any problems, just set [`cssGuru`](docs/api.md) option to `true`.
+All `cls` params default values were changed. For example, default `barOnCls` now is `_scrollbar`, default `root` is `.baron__root` or `.baron`, etc. Now by default `baron` expect BEM block named `baron`, with elements like `baron__clipper`, `baron__scroller`, `baron__track`, `baron__bar`... Check [API](docs/api.md).
+
+Non-zero paddings for scroller now forbidden. That is because of Mac OS X version of Firefox. Baron will work anyway, but baron in Mac OS X Firefix may be buggy.
+
+`cssGuru` param now removed: it is supposed that you properly use official `baron.css` base styles. Also, several css-skins added, check them too!
 
 ## Simple usage
 
