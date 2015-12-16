@@ -806,7 +806,7 @@
         return baron;
     };
 
-    baron.version = '1.2.1';
+    baron.version = '2.0.0-alpha';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
