@@ -25,6 +25,32 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
+## Simple usage
+
+* Include either the development or minified version of `baron.js`:
+
+```html
+<script src="baron.js"></script>
+```
+
+* Initialize baron:
+
+```js
+$('.myScroller').baron();
+```
+
+## Advanced usage
+
+You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [sinks](skins/).
+
+## Nested scrollers
+
+Baron do support nested scrollers. To make scrollers happy, follow the rule:
+
+* Initialize baron instances from ancestor to descendant scrollers order.
+
+Third World War will not begun if you break that rule, but there may be some bad user-experience with baron-instances updates (when size of one scroller depends on size of another). Use `/demo` as example.
+
 ## Browsers support
 
 Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: hidden`.
@@ -35,45 +61,17 @@ Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: h
 
 `overflow: scroll` not supported by Opera mini and old versions of Android browser (2-). That means, you cannot make scrollable html-elements for them anyway.
 
-! Also, **Firefox for Mac OS X**, in default non-persistant scrollbar mode [is not supported](https://github.com/Diokuz/baron/issues/110).
+Firefox for Mac OS X now [supported](https://github.com/Diokuz/baron/issues/110).
+
+## 2.0 migration
+
+`impact` param default value changed to `scroller` for all directions. That impact horizontal scrollbars.
+
+If you use % cross-paddings (padding-left and padding-right for vertical direction) for scroller, it will be buggy in Mac OS X Firefox because of need for extra-padding to support it. Use pixels instead, or make html-container inside scroller.
 
 ## 1.0 migration
 
 If you have any problems, just set [`cssGuru`](docs/api.md) option to `true`.
-
-## Simple usage
-
-* Include either the development or minified version of `baron.js`:
-
-```html
-<script src="baron.js"></script>
-```
-
-* Copy some template [HTML](skins/) and include baron [CSS](skins/styles.css):
-
-```html
-<link rel="stylesheet" href="baron.css" />
-```
-
-* Initialize baron:
-
-```js
-$('.baron').baron();
-```
-
-## Advanced usage
-
-You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them.
-
-You can change html-template, if you need that, and there many options (see [API](docs/api.md)) for all features, described above.
-
-## Nested scrollers
-
-Baron do support nested scrollers. To make scrollers happy, follow the rule:
-
-* Initialize baron instances from ancestor to descendant scrollers order.
-
-Third World War will not begun if you break that rule, but there may be some bad user-experience with baron-instances updates (when size of one scroller depends on size of another). Use `/demo` as example.
 
 ## [Chaining](docs/chaining.md)
 

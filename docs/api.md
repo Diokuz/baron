@@ -11,8 +11,8 @@ var params = {
     cssGuru: true,
 
     // Whos width (height) will be setted?
-    // Default: 'scroller' for vertical, 'clipper' for horizontal direction.
-    impact: 'scroller',
+    // Default: 'scroller'
+    impact: 'clipper',
 
     // Selector for `scroller` element.
     // Default: this (in jQuery mode).

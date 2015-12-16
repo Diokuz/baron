@@ -7,6 +7,10 @@ $(document).ready(function() {
 
     b.update();
 
+    $('.wrapper_very-simple-rtl .scroller').baron({
+        rtl: true
+    });
+
     // Simple initialization with minimum parameters, but with headers
     for (i = 0 ; i < 100 ; i++) {
         try {

@@ -6,8 +6,7 @@ window.onload = function() {
         bar: '.main__bar',
         scrollingCls: '_scrolling',
         draggingCls: '_dragging',
-        direction: 'h',
-        impact: 'scroller'
+        direction: 'h'
     });
 
     baron({

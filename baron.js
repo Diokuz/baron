@@ -29,6 +29,12 @@
         }
     };
 
+    // Some ugly vars
+    var theBiggestScrollbarSizeEverPossible = 20;
+    // I hate you https://github.com/Diokuz/baron/issues/110
+    var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/;
+    var isMacFF = macosxffRe.test(window.navigator.userAgent);
+
     // window.baron and jQuery.fn.baron points to this function
     function baron(params) {
         var jQueryMode;
@@ -42,7 +48,8 @@
             event: function(elem, event, func, mode) {
                 params.$(elem)[mode || 'on'](event, func);
             },
-            cssGuru: false
+            cssGuru: false,
+            impact: 'scroller'
         };
 
         params = params || {};
@@ -585,26 +592,25 @@
                     var offset = self.scroller[self.origin.crossOffset];
                     var client = self.scroller[self.origin.crossClient];
 
+                    // https://github.com/Diokuz/baron/issues/110
+                    if (isMacFF) {
+                        offset = client + theBiggestScrollbarSizeEverPossible;
+
                     // Opera 12 bug https://github.com/Diokuz/baron/issues/105
-                    if (client > 0 && offset === 0) {
+                    } else if (client > 0 && offset === 0) {
                         // Only Opera 12 in some rare nested flexbox cases goes here
                         // Sorry guys for magic,
                         // but I dont want to create temporary html-nodes set
                         // just for measuring scrollbar size in Opera 12.
                         // 17px for Windows XP-8.1, 15px for Mac (really rare).
-                        offset = client + 17;
+                        offset = client + theBiggestScrollbarSizeEverPossible;
                     }
 
                     if (offset) { // if there is no size, css should not be set
                         self.barOn();
                         client = self.scroller[self.origin.crossClient];
 
-                        // Two different appropches
-                        var fixScroller = self.impact ?
-                            (self.impact == 'scroller') :
-                            (self.direction == 'v');
-
-                        if (fixScroller) { // scroller
+                        if (self.impact == 'scroller') { // scroller
                             var delta = offset - client;
 
                             was = $(self.clipper).css(self.origin.crossSize);
@@ -684,7 +690,7 @@
             this.clipperOnScroll = function() {
                 if (this.direction == 'h') return;
 
-                // clipper.scrollLeft = initial scroll position (0 for ltr, 17 for rtl)
+                // clipper.scrollLeft = initial scroll position (0 for ltr, 20 for rtl)
                 this.clipper[this.origin.scrollEdge] = this.scrollEdge;
             };
 
@@ -724,6 +730,27 @@
                 this.$(this.scroller).css(scrollerCss);
             };
 
+            // onInit actions
+            this._dumbCss(true);
+
+            if (isMacFF) {
+                var padding = 'paddingRight';
+                var css = {};
+                var paddingWas = window.getComputedStyle(this.scroller)[[padding]];
+
+                if (params.direction == 'h') {
+                    padding = 'paddingBottom';
+                } else if (params.rtl) {
+                    padding = 'paddingLeft';
+                }
+
+                // getComputedStyle is ie9+, but we here only for f ff
+                var numWas = parseInt(paddingWas, 10);
+                if (numWas != numWas) numWas = 0;
+                css[padding] = theBiggestScrollbarSizeEverPossible + numWas + 'px';
+                $(this.scroller).css(css);
+            }
+
             return this;
         },
 
@@ -731,7 +758,6 @@
         update: function(params) {
             fire.call(this, 'upd', params); // Update all plugins' params
 
-            this._dumbCss(true);
             this.resize(1);
             this.updatePositions();
 

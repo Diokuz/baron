@@ -1,3 +1,8 @@
+## 2.0.0
+
+ - `impact` default value now always `scroller`.
+ - Mac OS X Firefox support
+
 ## 1.2.1
 
  - [fix `controls` click and direction](https://github.com/Diokuz/baron/issues/121).
