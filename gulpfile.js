@@ -15,12 +15,14 @@ function buildFiles(params) {
     var full = ['core', 'fix', 'autoUpdate', 'controls', 'pull', 'test'];
     var fns;
 
+    params = params || {};
+
     if (params.full) {
         fns = full;
     } else if (params.core) {
         fns = ['core', 'autoUpdate'];
     } else {
-        fns = _.difference(full, ['test', 'full']);
+        fns = _.difference(full, ['test', 'pull']);
     }
 
     return _.map(fns, function(fn) {
@@ -64,7 +66,7 @@ gulp.task('lint', ['lint.jshint', 'lint.jscs']);
  * Build
  */
 gulp.task('build.demo', function() {
-    return gulp.src(buildFiles({full: true}))
+    return gulp.src(buildFiles())
     .pipe(concat('baron.js'))
     .pipe(gulp.dest('demo/'));
 });
