@@ -212,7 +212,7 @@
                     item.selection(); // Disable text selection in ie8
                     item.drag.now = 1; // Save private byte
                     if (item.draggingCls) {
-                        $(item.bar).addClass(item.draggingCls);
+                        $(item.root).addClass(item.draggingCls);
                     }
                 },
 
@@ -225,7 +225,7 @@
                     item.selection(1); // Enable text selection
                     item.drag.now = 0;
                     if (item.draggingCls) {
-                        $(item.bar).removeClass(item.draggingCls);
+                        $(item.root).removeClass(item.draggingCls);
                     }
                 },
 

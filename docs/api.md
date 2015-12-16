@@ -40,7 +40,7 @@ var params = {
     // Default: undefined
     scrollingCls: '_scrolling',
 
-    // CSS classname for `bar` when it dragging by cursor
+    // CSS classname for `root` when `bar` dragging by cursor
     // Its better than `.bar:hover` rule
     // Default: undefined
     draggingCls: '_dragging',

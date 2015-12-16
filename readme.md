@@ -69,6 +69,8 @@ Firefox for Mac OS X now [supported](https://github.com/Diokuz/baron/issues/110)
 
 If you use % cross-paddings (padding-left and padding-right for vertical direction) for scroller, it will be buggy in Mac OS X Firefox because of need for extra-padding to support it. Use pixels instead, or make html-container inside scroller.
 
+Also, checkout [changelog](changelog.md).
+
 ## 1.0 migration
 
 If you have any problems, just set [`cssGuru`](docs/api.md) option to `true`.

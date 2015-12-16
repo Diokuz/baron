@@ -2,6 +2,7 @@
 
  - `impact` default value now always `scroller`.
  - Mac OS X Firefox support
+ - draggingCls now adds to `root`, not `bar`
 
 ## 1.2.1
 

@@ -56,7 +56,7 @@
         transition: .1s opacity .4s linear;
         pointer-events: auto;
         }
-    .baron__bar._dragging {
+    .baron._dragging .baron__bar {
         /*opacity: 1;*/
         }
     .baron._macosx .baron__bar:hover,
@@ -187,7 +187,7 @@
                     rgba(138, 175, 246, 0) 7px, rgba(138, 175, 246, 0) 8px
                 );
             }
-    .baron._winxp .baron__bar._dragging,
+    .baron._winxp._dragging .baron__bar,
     .baron._winxp .baron__bar:hover {
         background-image: linear-gradient(to right, #d9e7ff, #cadcff);
         }
@@ -225,11 +225,11 @@
         box-shadow: 0 0 1px #d6d3d0;
         }
     .baron._ubuntu12 .baron__bar:hover,
-    .baron._ubuntu12 .baron__bar._dragging {
+    .baron._ubuntu12._dragging .baron__bar {
         background-image: linear-gradient(to right, #e96d3a, #f58050);
         border-color: #e1632f;
         }
-    .baron__bar._dragging {
+    .baron._dragging .baron__bar {
         /*opacity: 1;*/
         }
     .baron._ubuntu12 .baron__bar:hover,
