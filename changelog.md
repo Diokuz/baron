@@ -3,6 +3,7 @@
  - `impact` default value now always `scroller`.
  - Mac OS X Firefox support
  - draggingCls now adds to `root`, not `bar`
+ - second baron init for same direction now always returns existing instance
 
 ## 1.2.1
 

@@ -1,9 +1,5 @@
 // @TODO
 // 1. Многократный autoUpdate
-// 2. Должен вернуть инстанс если без параметров
-// 3. Должен вернуть инстанс, если direction не отличается
-// 4. Должен провести вторую инициализацию, если direction отличается
-// 5. Проверить гетер барона на горизонтальный скролл
 
 var barOnCls = 'baron';
 var originalHTML = [
@@ -124,6 +120,27 @@ describe("Барон.", function() {
             console.log = _log;
         });
 
+        it("Повторная инициализация возвращате ссылку на тот же инстанс", function() {
+            var _log = console.log;
+            console.log = function() {};
+            var second = $('.wrapper._origin .scroller').baron();
+            var third = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls
+            });
+            var fourth = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                direction: 'h'
+            });
+
+            assert.ok(baron[0] === second[0], 'Без параметров');
+            assert.ok(baron[0] === third[0], 'С параметрами, но тот же direction');
+            assert.ok(baron[0] != fourth[0], 'Другой direction');
+
+            console.log = _log;
+        });
+
         it("После вызова метода dispose удаляет атрибуты и классы", function() {
             var sizeDim = baron[0].origin.crossSize;
 
@@ -161,6 +178,8 @@ describe("Барон.", function() {
             bar;
 
         before(function() {
+            $('.wrapper._origin').html(originalHTML);
+
             scroller = $('.scroller')[0];
             bar = $('.scroller__bar')[0];
 
@@ -382,6 +401,14 @@ describe("Барон.", function() {
         });
 
         it("Высота скроллера и клиппера в вебките должна быть одинаковой", function() {
+            var _log = console.log;
+            var msg = '';
+            var root;
+            console.log = function() {
+                msg += arguments[0];
+                root = arguments[1];
+            };
+
             baron = $('.wrapper').baron({
                 scroller: '.scroller_h',
                 direction: 'h',
@@ -392,6 +419,13 @@ describe("Барон.", function() {
             var scrollerHeight = $('.scroller_h').height();
 
             assert.equal(clipperHeight, scrollerHeight);
+            assert.equal(msg, 'Scroller not found!', 'Ошибка "скроллер не найден" залогирована 1 раз');
+            assert.ok(
+                root === $('.wrapper._contenteditable')[0],
+                'Ошибка "скроллер не найден" брошена именно с той root-ноды, где его нет'
+            );
+
+            console.log = _log;
         });
     });
 });

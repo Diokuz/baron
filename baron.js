@@ -130,7 +130,8 @@
                     if (params.root && params.scroller) {
                         perInstanceParams.scroller = params.$(params.scroller, root);
                         if (!perInstanceParams.scroller.length) {
-                            perInstanceParams.scroller = root;
+                            console.log('Scroller not found!', root, params.scroller);
+                            return;
                         }
                     } else {
                         perInstanceParams.scroller = root;
