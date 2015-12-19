@@ -1,3 +1,10 @@
+// @TODO
+// 1. Многократный autoUpdate
+// 2. Должен вернуть инстанс если без параметров
+// 3. Должен вернуть инстанс, если direction не отличается
+// 4. Должен провести вторую инициализацию, если direction отличается
+// 5. Проверить гетер барона на горизонтальный скролл
+
 var barOnCls = 'baron';
 var originalHTML = [
     '<div class="scroller"><div class="container"><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">is the third most populous city in Russia after Moscow and St. Petersburg and the most populous city in Asian Russia, with a population of 1,473,754 (2010 Census). It is the administrative center of Novosibirsk Oblast as well as of Siberian Federal District. The city is located in the southwestern part of Siberia at the banks of the Ob River and occupies an area of 502.1 square kilometers (193.9 sq mi).</p><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">Novosibirsk, founded in 1893 at the future site of a Trans-Siberian Railway bridge crossing the great Siberian river of Ob, first received the name Novonikolayevsk (Новониколаевск), in honor both of Saint Nicholas and of the reigning Tsar Nicholas II. The bridge was completed in the spring of 1897, making the new settlement the regional transport hub. The importance of the city further increased with the completion of the Turkestan-Siberia Railway in the early 20th century. The new railway connected Novosibirsk to Central Asia and the Caspian Sea.</p><div class="header"><h1 class="header__title">Baron</h1></div><p class="text">...of the bridges opening, Novonikolayevsk hosted a population of 7,800 people. Its first bank opened in 1906, with a total of five banks operating by 1915. In 1907, Novonikolayevsk, now with a population exceeding 47,000, was granted town status with full rights for self-government. The pre-revolutionary period saw the population of Novosibirsk reach 80,000. During this period the city experienced steady and rapid economic growth, becoming one of the largest commercial and industrial centers of Siberia and developing a significant agricultural processing industry, as well as a power station, iron foundry, commodity market, several banks, and commercial and shipping companies. By 1917, Novosibirsk possessed seven Orthodox churches and one Roman Catholic church, several cinemas, forty primary schools, a high school, a teaching seminary, and the Romanov House non-classical secondary school. In 1913, Novonikolayevsk became one of the first places in Russia to institute compulsory primary education.</p><div class="header"><h1 class="header__title">Baron</h1></div></div>',
@@ -95,7 +102,7 @@ describe("Барон.", function() {
                 barOnCls: barOnCls
             });
 
-            assert(i == 3);
+            assert.equal(i, 3);
             console.log = _log;
         });
 
@@ -281,6 +288,22 @@ describe("Барон.", function() {
             assert.ok(!$('.wrapper._origin .scroller').hasClass('_scrolling'));
             baron.update();
             assert.ok(!$('.wrapper._origin .scroller').hasClass('_scrolling'));
+        });
+    });
+
+    describe("Механизм обновления размеров", function() {
+        it("Если у scroller был <100% размер, обновление происходит", function() {
+            $('.wrapper._origin').html(originalHTML);
+            $('.wrapper._origin .scroller').css({width: '50px'});
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                scrollingCls: '_scrolling',
+            });
+
+            var width = $('.wrapper._origin .scroller').width();
+            assert.ok(width > 50, 'With is ' + width);
         });
     });
 

@@ -30,8 +30,9 @@
     };
 
     // Some ugly vars
-    var theBiggestScrollbarSizeEverPossible = 20;
+    var opera12maxScrollbarSize = 17;
     // I hate you https://github.com/Diokuz/baron/issues/110
+    var macmsxffScrollbarSize = 15;
     var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/;
     var isMacFF = macosxffRe.test(window.navigator.userAgent);
 
@@ -39,7 +40,7 @@
     function baron(params) {
         var jQueryMode;
         var roots;
-        var empty = !params;
+        var withParams = !!params;
         var defaultParams = {
             $: window.jQuery,
             direction: 'v',
@@ -69,9 +70,9 @@
             roots = params.$(params.root || params.scroller);
         }
 
-        var instance = new baron.fn.constructor(roots, params, empty);
+        var instance = new baron.fn.constructor(roots, params, withParams);
 
-        if (instance.autoUpdate && !empty) {
+        if (instance.autoUpdate) {
             instance.autoUpdate();
         }
 
@@ -97,7 +98,7 @@
     baron._instances = instances; // for debug
 
     baron.fn = {
-        constructor: function(roots, totalParams, noUserParams) {
+        constructor: function(roots, totalParams, withParams) {
             var params = clone(totalParams);
 
             // Intrinsic params.event is not the same as totalParams.event
@@ -113,9 +114,14 @@
                 var attr = manageAttr(root, params.direction);
                 var id = +attr; // Could be NaN
 
-                // baron() without params can return existing instances,
-                // but baron(params) will throw an Error as a second initialization
-                if (id == id && attr != undefined && instances[id] && noUserParams) {
+                // baron() can return existing instances,
+                // @TODO update params on-the-fly
+                // https://github.com/Diokuz/baron/issues/124
+                if (id == id && attr != undefined && instances[id]) {
+                    if (withParams) {
+                        console.log('Error! Baron for this node already initialized', totalParams.root);
+                    }
+
                     this[i] = instances[id];
                 } else {
                     var perInstanceParams = clone(params);
@@ -319,10 +325,6 @@
     }
 
     function init(params) {
-        if (manageAttr(params.root, params.direction)) {
-            console.log('Error! Baron for this node already initialized', params.root);
-        }
-
         // __proto__ of returning object is baron.prototype
         var out = new item.prototype.constructor(params);
 
@@ -591,10 +593,11 @@
                     var will;
                     var offset = self.scroller[self.origin.crossOffset];
                     var client = self.scroller[self.origin.crossClient];
+                    var padding = 0;
 
                     // https://github.com/Diokuz/baron/issues/110
                     if (isMacFF) {
-                        offset = client + theBiggestScrollbarSizeEverPossible;
+                        padding = macmsxffScrollbarSize;
 
                     // Opera 12 bug https://github.com/Diokuz/baron/issues/105
                     } else if (client > 0 && offset === 0) {
@@ -603,7 +606,7 @@
                         // but I dont want to create temporary html-nodes set
                         // just for measuring scrollbar size in Opera 12.
                         // 17px for Windows XP-8.1, 15px for Mac (really rare).
-                        offset = client + theBiggestScrollbarSizeEverPossible;
+                        offset = client + opera12maxScrollbarSize;
                     }
 
                     if (offset) { // if there is no size, css should not be set
@@ -611,9 +614,9 @@
                         client = self.scroller[self.origin.crossClient];
 
                         if (self.impact == 'scroller') { // scroller
-                            var delta = offset - client;
+                            var delta = offset - client + padding;
 
-                            was = $(self.clipper).css(self.origin.crossSize);
+                            was = $(self.scroller).css(self.origin.crossSize);
                             will = self.clipper[self.origin.crossClient] + delta + 'px';
 
                             if (was != will) {
@@ -737,6 +740,8 @@
                 var padding = 'paddingRight';
                 var css = {};
                 var paddingWas = window.getComputedStyle(this.scroller)[[padding]];
+                var delta = this.scroller[this.origin.crossOffset] -
+                            this.scroller[this.origin.crossClient];
 
                 if (params.direction == 'h') {
                     padding = 'paddingBottom';
@@ -744,10 +749,10 @@
                     padding = 'paddingLeft';
                 }
 
-                // getComputedStyle is ie9+, but we here only for f ff
+                // getComputedStyle is ie9+, but we here only in f ff
                 var numWas = parseInt(paddingWas, 10);
                 if (numWas != numWas) numWas = 0;
-                css[padding] = theBiggestScrollbarSizeEverPossible + numWas + 'px';
+                css[padding] = (macmsxffScrollbarSize + numWas) + 'px';
                 $(this.scroller).css(css);
             }
 
@@ -1068,6 +1073,10 @@
         var self = this;
         var watcher;
 
+        if (this._au) {
+            return;
+        }
+
         function actualizeWatcher() {
             if (!self.root[self.origin.offset]) {
                 startWatch();
@@ -1123,6 +1132,8 @@
             stopWatch();
             delete self._observer;
         });
+
+        this._au = true;
     };
 
     baron.fn.autoUpdate = function(params) {

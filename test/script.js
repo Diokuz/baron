@@ -41,8 +41,8 @@ $(document).ready(function() {
     .test()
     .controls({
         track: '.scroller__track-visual',
-        forward: '.scroller__up',
-        backward: '.scroller__down',
+        forward: '.scroller__down',
+        backward: '.scroller__up',
         screen: 0.5,
         delta: 60
     });

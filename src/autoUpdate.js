@@ -6,6 +6,10 @@
         var self = this;
         var watcher;
 
+        if (this._au) {
+            return;
+        }
+
         function actualizeWatcher() {
             if (!self.root[self.origin.offset]) {
                 startWatch();
@@ -61,6 +65,8 @@
             stopWatch();
             delete self._observer;
         });
+
+        this._au = true;
     };
 
     baron.fn.autoUpdate = function(params) {
