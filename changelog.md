@@ -1,3 +1,7 @@
+## 2.0.1
+
+ - Baron now trows an Error when no jQuery nor params.$ found
+
 ## 2.0.0
 
  - `impact` default value now always `scroller`.

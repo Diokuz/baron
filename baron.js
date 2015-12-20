@@ -62,7 +62,12 @@
             }
         };
 
-        jQueryMode = this instanceof params.$;  // this - global context or jQuery instance
+        if (!params.$) {
+            throw new Error('baron: no $ found.');
+        }
+
+        // this - something or jQuery instance
+        jQueryMode = this instanceof params.$;
 
         if (jQueryMode) {
             params.root = roots = this;
@@ -812,7 +817,7 @@
         return baron;
     };
 
-    baron.version = '2.0.0';
+    baron.version = '2.0.1';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

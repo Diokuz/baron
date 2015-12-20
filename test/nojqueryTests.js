@@ -84,4 +84,52 @@ describe("Барон.", function() {
         });
 
     });
+
+    describe("Проблемы с отсутствием jQuery", function() {
+        before(function() {
+            bonzoQuery('.wrapper._origin').html(originalHTML);
+        });
+
+        it("Бросает ошибку, если $ не передан", function(done) {
+            try {
+                baron({
+                    bar: '.scroller__bar',
+                    barOnCls: barOnCls,
+                    root: bonzoQuery('.wrapper._origin .scroller'),
+                    event: function(elem, event, func, mode) { // Events manager
+                        if (mode == 'trigger') {
+                            mode = 'fire';
+                        }
+
+                        bean[mode || 'on'](elem, event, func);
+                    }
+                });
+            } catch (e) {
+                assert.equal(e.message, 'baron: no $ found.');
+                done();
+            }
+        });
+
+        it("Не бросает ошибку, если this === undefined", function(done) {
+            try {
+                baron.call(undefined, {
+                    bar: '.scroller__bar',
+                    barOnCls: barOnCls,
+                    root: bonzoQuery('.wrapper._origin .scroller'),
+                    event: function(elem, event, func, mode) { // Events manager
+                        if (mode == 'trigger') {
+                            mode = 'fire';
+                        }
+
+                        bean[mode || 'on'](elem, event, func);
+                    }
+                });
+            } catch (e) {
+                // pass
+            }
+
+            done();
+        });
+
+    });
 });
