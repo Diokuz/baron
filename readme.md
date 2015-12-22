@@ -8,6 +8,8 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 ## [Demo](http://diokuz.github.io/baron/)
 
+[![Join the chat at https://gitter.im/Diokuz/baron](https://badges.gitter.im/Diokuz/baron.svg)](https://gitter.im/Diokuz/baron?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## [API](docs/api.md)
 
 ## [Skins](skins/)
