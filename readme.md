@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Diokuz/baron.svg)](https://travis-ci.org/Diokuz/baron)
+[![Build Status](https://travis-ci.org/Diokuz/baron.svg)](https://travis-ci.org/Diokuz/baron) [![Join the chat at https://gitter.im/Diokuz/baron](https://badges.gitter.im/Diokuz/baron.svg)](https://gitter.im/Diokuz/baron?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 *You cannot change the world, but you can change a scrollbar!*
 
@@ -7,8 +7,6 @@
 Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
 
 ## [Demo](http://diokuz.github.io/baron/)
-
-[![Join the chat at https://gitter.im/Diokuz/baron](https://badges.gitter.im/Diokuz/baron.svg)](https://gitter.im/Diokuz/baron?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## [API](docs/api.md)
 
