@@ -1,7 +1,7 @@
 You probably here because you got an error
 
 ```
-Baron [ xx:xx:xx ]: second initialization for html-node detected https://github.com/Diokuz/baron/blob/master/docs/logs/second.md <... />
+Baron [ xx:xx:xx ]: repeated initialization for html-node detected https://github.com/Diokuz/baron/blob/master/docs/logs/second.md <... />
 ```
 
 You can have only one baron instance per html-node per one direction: that means maximum one for vertical and another one for horizontal direction for given `root` html-node.
@@ -10,7 +10,7 @@ There are two possible reasons for this error:
 
 ## Second execution of same js-code
 
-You should place baron initialization to section, which executed only one time, during component (module, block...) initialization. There is no need to initialize baron on component update.
+You should place baron initialization to code section, which executes only one time, during component (module, block...) initialization. There is no need to initialize baron on component update.
 
 ## Bad selector
 
