@@ -36,6 +36,12 @@
     var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/;
     var isMacFF = macosxffRe.test(window.navigator.userAgent);
 
+    // removeIf(production)
+    var log = function() {
+        baron.fn.log.apply(this, arguments);
+    };
+    // endRemoveIf(production)
+
     // window.baron and jQuery.fn.baron points to this function
     function baron(params) {
         var jQueryMode;
@@ -62,9 +68,14 @@
             }
         };
 
+        // removeIf(production)
         if (!params.$) {
-            throw new Error('baron: no $ found.');
+            log('error', [
+                'no jQuery nor params.$ detected',
+                'https://github.com/Diokuz/baron/blob/master/docs/logs/no-jquery-detected.md'
+            ].join(', '), params);
         }
+        // endRemoveIf(production)
 
         // this - something or jQuery instance
         jQueryMode = this instanceof params.$;
@@ -123,9 +134,14 @@
                 // @TODO update params on-the-fly
                 // https://github.com/Diokuz/baron/issues/124
                 if (id == id && attr != undefined && instances[id]) {
+                    // removeIf(production)
                     if (withParams) {
-                        console.log('Error! Baron for this node already initialized', totalParams.root);
+                        log('error', [
+                            'repeated initialization for html-node detected',
+                            'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
+                        ].join(', '), totalParams.root[0]);
                     }
+                    // endRemoveIf(production)
 
                     this[i] = instances[id];
                 } else {

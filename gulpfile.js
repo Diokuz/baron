@@ -7,12 +7,13 @@ var jshint = require('gulp-jshint');
 var jscs = require('gulp-jscs');
 
 var concat = require('gulp-concat');
+var removeCode = require('gulp-remove-code');
 var uglify = require('gulp-uglify');
 
 var mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 function buildFiles(params) {
-    var full = ['core', 'fix', 'autoUpdate', 'controls', 'pull', 'test'];
+    var full = ['core', 'fix', 'autoUpdate', 'controls', 'pull', 'test', 'debug'];
     var fns;
 
     params = params || {};
@@ -75,6 +76,7 @@ gulp.task('build.baron', function() {
     return gulp.src(buildFiles(argv))
     .pipe(concat('baron.js'))
     .pipe(gulp.dest('dist/'))
+    .pipe(removeCode({production: true}))
     .pipe(uglify({
         compress: {
             global_defs: {
