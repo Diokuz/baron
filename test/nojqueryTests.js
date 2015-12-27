@@ -90,45 +90,51 @@ describe("Барон.", function() {
             bonzoQuery('.wrapper._origin').html(originalHTML);
         });
 
-        it("Бросает ошибку, если $ не передан", function(done) {
-            try {
-                baron({
-                    bar: '.scroller__bar',
-                    barOnCls: barOnCls,
-                    root: bonzoQuery('.wrapper._origin .scroller'),
-                    event: function(elem, event, func, mode) { // Events manager
-                        if (mode == 'trigger') {
-                            mode = 'fire';
-                        }
+        it("Логирует ошибку, если $ не передан", function() {
+            var _save = console.error;
+            var called = 0;
+            console.error = function() {
+                called++;
+            };
 
-                        bean[mode || 'on'](elem, event, func);
+            baron({
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                root: bonzoQuery('.wrapper._origin .scroller'),
+                event: function(elem, event, func, mode) { // Events manager
+                    if (mode == 'trigger') {
+                        mode = 'fire';
                     }
-                });
-            } catch (e) {
-                assert.equal(e.message, 'baron: no $ found.');
-                done();
-            }
+
+                    bean[mode || 'on'](elem, event, func);
+                }
+            });
+
+            assert.equal(called, 1);
+            console.error = _save;
         });
 
         it("Не бросает ошибку, если this === undefined", function(done) {
-            try {
-                baron.call(undefined, {
-                    bar: '.scroller__bar',
-                    barOnCls: barOnCls,
-                    root: bonzoQuery('.wrapper._origin .scroller'),
-                    event: function(elem, event, func, mode) { // Events manager
-                        if (mode == 'trigger') {
-                            mode = 'fire';
-                        }
+            var _save = console.error;
 
-                        bean[mode || 'on'](elem, event, func);
+            console.error = function() {};
+            var result = baron.call(undefined, {
+                bar: '.scroller__bar',
+                barOnCls: barOnCls,
+                root: bonzoQuery('.wrapper._origin .scroller'),
+                event: function(elem, event, func, mode) { // Events manager
+                    if (mode == 'trigger') {
+                        mode = 'fire';
                     }
-                });
-            } catch (e) {
-                // pass
-            }
+
+                    bean[mode || 'on'](elem, event, func);
+                }
+            });
+
+            assert.ok(result.fix, 'Возвращает пустой но рабочий инстанс барона');
 
             done();
+            console.error = _save;
         });
 
     });

@@ -87,7 +87,7 @@ describe("Барон.", function() {
         });
 
         it("Повторная инициализация бросает ошибку", function() {
-            var _error = console.error;
+            var _save = console.error;
             var i = 0;
             console.error = function() {
                 i++;
@@ -99,11 +99,11 @@ describe("Барон.", function() {
             });
 
             assert.equal(i, 3);
-            console.error = _error;
+            console.error = _save;
         });
 
         it("Повторный вызов барона без параметров не бросает ошибку", function() {
-            var _error = console.error;
+            var _save = console.error;
             var i = 0;
             console.error = function() {
                 i++;
@@ -119,12 +119,12 @@ describe("Барон.", function() {
             $('.wrapper._origin .scroller').baron(); // another three times
 
             assert.equal(i, 3);
-            console.error = _error;
+            console.error = _save;
         });
 
         it("Повторная инициализация возвращате ссылку на тот же инстанс", function() {
-            var _log = console.log;
-            console.log = function() {};
+            var _save = console.error;
+            console.error = function() {};
             var second = $('.wrapper._origin .scroller').baron();
             var third = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
@@ -140,7 +140,7 @@ describe("Барон.", function() {
             assert.ok(baron[0] === third[0], 'С параметрами, но тот же direction');
             assert.ok(baron[0] != fourth[0], 'Другой direction');
 
-            console.log = _log;
+            console.error = _save;
         });
 
         it("После вызова метода dispose удаляет атрибуты и классы", function() {

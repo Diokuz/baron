@@ -78,12 +78,14 @@
         // endRemoveIf(production)
 
         // this - something or jQuery instance
-        jQueryMode = this instanceof params.$;
+        jQueryMode = params.$ && this instanceof params.$;
 
         if (jQueryMode) {
             params.root = roots = this;
-        } else {
+        } else if (params.$) {
             roots = params.$(params.root || params.scroller);
+        } else {
+            roots = []; // noop mode, like jQuery when no matched html-nodes found
         }
 
         var instance = new baron.fn.constructor(roots, params, withParams);
