@@ -87,9 +87,9 @@ describe("Барон.", function() {
         });
 
         it("Повторная инициализация бросает ошибку", function() {
-            var _log = console.log;
+            var _error = console.error;
             var i = 0;
-            console.log = function() {
+            console.error = function() {
                 i++;
             };
 
@@ -99,13 +99,13 @@ describe("Барон.", function() {
             });
 
             assert.equal(i, 3);
-            console.log = _log;
+            console.error = _error;
         });
 
         it("Повторный вызов барона без параметров не бросает ошибку", function() {
-            var _log = console.log;
+            var _error = console.error;
             var i = 0;
-            console.log = function() {
+            console.error = function() {
                 i++;
             };
 
@@ -114,10 +114,12 @@ describe("Барон.", function() {
                 barOnCls: barOnCls
             });
 
+            assert.equal(i, 3);
+
             $('.wrapper._origin .scroller').baron(); // another three times
 
             assert.equal(i, 3);
-            console.log = _log;
+            console.error = _error;
         });
 
         it("Повторная инициализация возвращате ссылку на тот же инстанс", function() {
