@@ -17,7 +17,6 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 - Doesn't replace native system scroll mechanic.
 - Customizable scrollbar design with full CSS support.
 - No strong dependencies on jQuery.
-- Plugin system (fixable headers, sticky footer, autotests and more)
 - Can be inited on hidden blocks
 - Vertical, horizontal and bidirectional scroll
 - Infinite scroll
@@ -25,23 +24,34 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
-## Simple usage
+## Just hiding system scrollbar
 
-* Include either the development or minified version of `baron.js`:
+* Include `baron.js` and some css:
 
 ```html
 <script src="baron.js"></script>
+<style>
+    ::-webkit-scrollbar { /* for Mac OS X support */
+        width: 0;
+    }
+</style>
 ```
 
-* Initialize baron:
+* Initialize baron on your scroller:
 
 ```js
-$('.myScroller').baron();
+$('.my-scroller').baron();
 ```
 
-## Advanced usage
+## Making your own custom-designed scrollbar
 
-You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [sinks](skins/).
+You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [skins](skins/).
+
+## Version for development
+
+Note, that `baron.js` is a development version. It contains additional code and log messages, to make the development process easier.
+
+`baron.min.js` is production-ready: weight less, works a little bit faster.
 
 ## Nested scrollers
 
@@ -49,7 +59,7 @@ Baron do support nested scrollers. To make scrollers happy, follow the rule:
 
 * Initialize baron instances from ancestor to descendant scrollers order.
 
-Third World War will not begun if you break that rule, but there may be some bad user-experience with baron-instances updates (when size of one scroller depends on size of another). Use `/demo` as example.
+Third World War will not begun if you break that rule, but there may be some bad user-experience with baron-instances updates (when size of one scroller depends on size of another). See `/demo` source.
 
 ## Browsers support
 
