@@ -24,7 +24,7 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
 
-## Just hiding system scrollbar
+## 1. Hiding system scrollbar
 
 * Include `baron.js` and some css:
 
@@ -43,7 +43,7 @@ Baron just hides the system scrollbar, without removing it. This guarantees scro
 $('.my-scroller').baron();
 ```
 
-## Making your own custom-designed scrollbar
+## 2. Making your own custom-designed scrollbar
 
 You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [skins](skins/).
 
