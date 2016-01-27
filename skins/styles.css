@@ -12,7 +12,7 @@
     background: rgba(0, 0, 255, .1);
     pointer-events: none;
     }
-.baron._simple.baron .baron__track {
+.baron._simple._scrollbar .baron__track {
     opacity: 1;
     }
     .baron._simple .baron__bar {
