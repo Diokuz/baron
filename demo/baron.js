@@ -40,6 +40,11 @@
     var log = function() {
         baron.fn.log.apply(this, arguments);
     };
+    var liveBarons = 0;
+    var shownErrors = {
+        liveTooMany: false,
+        allTooMany: false
+    };
     // endRemoveIf(production)
 
     // window.baron and jQuery.fn.baron points to this function
@@ -113,7 +118,9 @@
         return new Date().getTime();
     }
 
-    baron._instances = instances; // for debug
+    // removeIf(production)
+    baron._instances = instances;
+    // endRemoveIf(production)
 
     baron.fn = {
         constructor: function(roots, totalParams, withParams) {
@@ -173,20 +180,21 @@
         dispose: function() {
             var params = this.params;
 
-            arrayEach(this, function(item) {
-                item.dispose(params);
+            arrayEach(this, function(instance, index) {
+                instance.dispose(params);
+                instances[index] = null;
             });
 
             this.params = null;
         },
 
         update: function() {
-            var i = 0;
+            var args = arguments;
 
-            while (this[i]) {
-                this[i].update.apply(this[i], arguments);
-                i++;
-            }
+            arrayEach(this, function(instance, index) {
+                // instance cannot be null, because it is stored by user
+                instance.update.apply(instance, args);
+            });
         },
 
         baron: function(params) {
@@ -356,6 +364,27 @@
 
         manageAttr(out.root, params.direction, 'on', instances.length);
         instances.push(out);
+
+        // removeIf(production)
+        liveBarons++;
+        if (liveBarons > 100 && !shownErrors.liveTooMany) {
+            log('warning', [
+                'You have too many live baron instances on page (' + liveBarons + ')!',
+                'Are you forget to dispose some of them?',
+                'All baron instances can be found in baron._instances:'
+            ].join(' '), instances);
+            shownErrors.liveTooMany = true;
+        }
+        if (instances.length > 1000 && !shownErrors.allTooMany) {
+            log('warning', [
+                'You have too many inited baron instances on page (' + instances.length + ')!',
+                'Some of them are disposed, and thats good news.',
+                'but baron.init was call too many times, and thats is bad news.',
+                'All baron instances can be found in baron._instances:'
+            ].join(' '), instances);
+            shownErrors.allTooMany = true;
+        }
+        // endRemoveIf(production)
 
         out.update();
 
@@ -785,6 +814,15 @@
 
         // fires on any update and on init
         update: function(params) {
+            // removeIf(production)
+            if (this._disposed) {
+                log('error', [
+                    'Update on disposed baron instance detected.',
+                    'You should clear your stored baron value for this instance:',
+                    this
+                ].join(' '), params);
+            }
+            // endRemoveIf(production)
             fire.call(this, 'upd', params); // Update all plugins' params
 
             this.resize(1);
@@ -795,6 +833,15 @@
 
         // One instance
         dispose: function(params) {
+            // removeIf(production)
+            if (this._disposed) {
+                log('error', [
+                    'Already disposed:',
+                    this
+                ].join(' '), params);
+            }
+            // endRemoveIf(production)
+
             manageEvents(this, this.event, 'off');
             manageAttr(this.root, params.direction, 'off');
             if (params.direction == 'v') {

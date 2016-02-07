@@ -1,3 +1,8 @@
+## 2.0.2
+
+ - Remove baron instances from baron._instances on dispose (https://github.com/Diokuz/baron/issues/132)
+ - baron._instances now reachable only in dev mode
+
 ## 2.0.1
 
  - Baron now trows an Error when no jQuery nor params.$ found
