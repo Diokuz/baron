@@ -1,3 +1,10 @@
+## 2.1.0
+
+ - Rework of cross-scroll bugs issue https://github.com/Diokuz/baron/issues/134
+ - Add tests for scroll-scroll bugs
+ - Update uglify-js package
+ - Change `main` field to prod version of baron
+
 ## 2.0.2
 
  - Remove baron instances from baron._instances on dispose (https://github.com/Diokuz/baron/issues/132)

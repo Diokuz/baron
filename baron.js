@@ -388,11 +388,6 @@
 
         out.update();
 
-        out.scrollEdge = 0;
-        if (params.rtl) {
-            out.scrollEdge = out.clipper[out.origin.scrollEdge]; // initial position
-        }
-
         return out;
     }
 
@@ -511,6 +506,7 @@
 
             // Parameters
             this.direction = params.direction;
+            this.rtl = params.rtl;
             this.origin = origin[this.direction];
             this.barOnCls = params.barOnCls || '_baron';
             this.scrollingCls = params.scrollingCls;
@@ -631,6 +627,7 @@
 
             // onResize & DOM modified handler
             // also fires on init
+            // Note: max/min-size didnt sets if size did not really changed (for example, on init in Chrome)
             this.resize = function() {
                 var self = this;
                 var minPeriod = (self.resizeDebounce === undefined) ? 300 : self.resizeDebounce;
@@ -744,10 +741,11 @@
 
             // https://github.com/Diokuz/baron/issues/116
             this.clipperOnScroll = function() {
-                if (this.direction == 'h') return;
+                // WTF is this line? https://github.com/Diokuz/baron/issues/134
+                // if (this.direction == 'h') return;
 
-                // clipper.scrollLeft = initial scroll position (0 for ltr, 20 for rtl)
-                this.clipper[this.origin.scrollEdge] = this.scrollEdge;
+                // assign `initial scroll position` to `clipper.scrollLeft` (0 for ltr, ~20 for rtl)
+                this.clipper[this.origin.scrollEdge] = this.rtl ? this.clipper[this.origin.scrollSize] : 0;
             };
 
             // Flexbox `align-items: stretch` (default) requires to set min-width for vertical

@@ -398,6 +398,8 @@ describe("Барон.", function() {
     });
 
     describe("Horizontal mode", function() {
+        var baron;
+
         before(function() {
             $('.wrapper._origin').html(originalHorizontalHTML);
         });
@@ -428,6 +430,10 @@ describe("Барон.", function() {
             );
 
             console.log = _log;
+        });
+
+        after(function() {
+            baron.dispose();
         });
     });
 });
