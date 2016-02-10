@@ -1,3 +1,7 @@
+## 2.1.1
+
+ - Update dist files properly
+
 ## 2.1.0
 
  - Rework of cross-scroll bugs issue https://github.com/Diokuz/baron/issues/134

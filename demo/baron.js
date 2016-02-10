@@ -745,7 +745,11 @@
                 // if (this.direction == 'h') return;
 
                 // assign `initial scroll position` to `clipper.scrollLeft` (0 for ltr, ~20 for rtl)
-                this.clipper[this.origin.scrollEdge] = this.rtl ? this.clipper[this.origin.scrollSize] : 0;
+                if (!this.rtl) {
+                    this.clipper[this.origin.scrollEdge] = 0;
+                } else {
+                    this.clipper[this.origin.scrollEdge] = this.clipper[this.origin.scrollSize];
+                }
             };
 
             // Flexbox `align-items: stretch` (default) requires to set min-width for vertical
