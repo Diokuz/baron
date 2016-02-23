@@ -1,5 +1,7 @@
 /* Autotests plugin for baron 0.6+ (for developers) */
 (function(window, undefined) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
     var test = function(params) {
         var errCount = 0,
             totalCount = 0;
@@ -78,7 +80,7 @@
         log('log', 'Result is ' + errCount + ' / ' + totalCount + '\n');
     };
 
-    baron.fn.test = function(params) {
+    scopedBaron.fn.test = function(params) {
         var i = 0;
 
         while (this[i]) {

@@ -4,6 +4,11 @@
 
 ```js
 var params = {
+    // Two modes available: 'static' (width = width + 17), 'absolute' (right: -17px).
+    // Note: fixable headers works only in 'static' position
+    // Default: 'static'
+    position: 'absolute',
+
     // Flag, indicating that you know your css,
     // and baron must minimize the count of setted inline css rules
     // (i.e. overflow: hidden for clipper and overflow-y: scroll for scroller)

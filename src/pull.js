@@ -1,5 +1,7 @@
 /* Pull to load plugin for baron 0.6+ */
 (function(window, undefined) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
     var pull = function(params) {
         var block = this.$(params.block),
             size = params.size || this.origin.size,
@@ -139,7 +141,7 @@
         });
     };
 
-    baron.fn.pull = function(params) {
+    scopedBaron.fn.pull = function(params) {
         var i = 0;
 
         while (this[i]) {

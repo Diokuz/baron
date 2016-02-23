@@ -445,6 +445,7 @@ describe("Плагин fix.", function() {
             scrollTop;
 
         before(function() {
+            $('.wrapper._origin').html(originalHTML);
             scroller = $('.scroller')[0];
         });
 
@@ -472,7 +473,9 @@ describe("Плагин fix.", function() {
             baron = $('.wrapper._origin .scroller').baron({
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
-            }).fix({
+            });
+
+            baron = baron.fix({
                 elements: '.header__title',
                 outside: 'header__title_state_fixed',
                 before: 'header__title_position_top',

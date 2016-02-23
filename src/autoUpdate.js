@@ -1,5 +1,7 @@
 /* Autoupdate plugin for baron 0.6+ */
 (function(window) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
@@ -69,7 +71,7 @@
         this._au = true;
     };
 
-    baron.fn.autoUpdate = function(params) {
+    scopedBaron.fn.autoUpdate = function(params) {
         if (!MutationObserver) return this;
 
         var i = 0;

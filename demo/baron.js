@@ -61,7 +61,8 @@
                 params.$(elem)[mode || 'on'](event, func);
             },
             cssGuru: false,
-            impact: 'scroller'
+            impact: 'scroller',
+            position: 'static'
         };
 
         params = params || {};
@@ -79,6 +80,13 @@
                 'no jQuery nor params.$ detected',
                 'https://github.com/Diokuz/baron/blob/master/docs/logs/no-jquery-detected.md'
             ].join(', '), params);
+        }
+        if (params.position == 'absolute' && params.impact == 'clipper') {
+            log('error', [
+                'Simultaneous use of `absolute` position and `clipper` impact values detected.',
+                'Those values cannot be used together.',
+                'See more https://github.com/Diokuz/baron/issues/138'
+            ].join(' '), params);
         }
         // endRemoveIf(production)
 
@@ -291,6 +299,7 @@
 
                 type: 'mousemove touchmove'
             }, {
+                // @TODO make one global listener
                 // onResize:
                 element: window,
 
@@ -300,6 +309,7 @@
 
                 type: 'resize'
             }, {
+                // @todo remove
                 // sizeChange:
                 element: item.root,
 
@@ -508,10 +518,12 @@
             this.direction = params.direction;
             this.rtl = params.rtl;
             this.origin = origin[this.direction];
-            this.barOnCls = params.barOnCls || '_baron';
+            this.barOnCls = params.barOnCls;
             this.scrollingCls = params.scrollingCls;
             this.draggingCls = params.draggingCls;
             this.impact = params.impact;
+            this.position = params.position;
+            this.rtl = params.rtl;
             this.barTopLimit = 0;
             this.resizeDebounce = params.resizeDebounce;
 
@@ -639,8 +651,6 @@
                 }
 
                 function upd() {
-                    var was;
-                    var will;
                     var offset = self.scroller[self.origin.crossOffset];
                     var client = self.scroller[self.origin.crossClient];
                     var padding = 0;
@@ -661,25 +671,39 @@
 
                     if (offset) { // if there is no size, css should not be set
                         self.barOn();
-                        client = self.scroller[self.origin.crossClient];
 
                         if (self.impact == 'scroller') { // scroller
                             var delta = offset - client + padding;
 
-                            was = $(self.scroller).css(self.origin.crossSize);
-                            will = self.clipper[self.origin.crossClient] + delta + 'px';
+                            // `static` position works only for `scroller` impact
+                            if (self.position == 'static') { // static
+                                var was = self.$(self.scroller).css(self.origin.crossSize);
+                                var will = self.clipper[self.origin.crossClient] + delta + 'px';
 
-                            if (was != will) {
-                                self._setCrossSizes(self.scroller, will);
+                                if (was != will) {
+                                    self._setCrossSizes(self.scroller, will);
+                                }
+                            } else { // absolute
+                                var css = {};
+                                var key = self.rtl ? 'Left' : 'Right';
+
+                                if (self.direction == 'h') {
+                                    key = 'Bottom';
+                                }
+
+                                css['padding' + key] = delta + 'px';
+                                self.$(self.scroller).css(css);
                             }
                         } else { // clipper
-                            was = $(self.clipper).css(self.origin.crossSize);
-                            will = client + 'px';
+                            var was = $(self.clipper).css(self.origin.crossSize);
+                            var will = client + 'px';
 
                             if (was != will) {
                                 self._setCrossSizes(self.clipper, will);
                             }
                         }
+                    } else {
+                        // do nothing (display: none, or something)
                     }
 
                     Array.prototype.unshift.call(arguments, 'resize');
@@ -736,7 +760,6 @@
                         scrollingTimer = undefined;
                     }, 300);
                 }
-
             };
 
             // https://github.com/Diokuz/baron/issues/116
@@ -765,7 +788,7 @@
                 this.$(node).css(css);
             };
 
-            // Set most common css rules
+            // Set common css rules
             this._dumbCss = function(on) {
                 if (params.cssGuru) return;
 
@@ -774,7 +797,8 @@
 
                 this.$(this.clipper).css({
                     overflow: overflow,
-                    msOverflowStyle: msOverflowStyle
+                    msOverflowStyle: msOverflowStyle,
+                    position: this.position == 'static' ? '' : 'relative'
                 });
 
                 var scroll = on ? 'scroll' : null;
@@ -785,6 +809,20 @@
                 scrollerCss['box-sizing'] = 'border-box';
                 scrollerCss.margin = '0';
                 scrollerCss.border = '0';
+
+                if (this.position == 'absolute') {
+                    scrollerCss.position = 'absolute';
+                    scrollerCss.top = '0';
+
+                    if (this.direction == 'h') {
+                        scrollerCss.left = scrollerCss.right = '0';
+                    } else {
+                        scrollerCss.bottom = '0';
+                        scrollerCss.right = this.rtl ? '0' : '';
+                        scrollerCss.left = this.rtl ? '' : '0';
+                    }
+                }
+
                 this.$(this.scroller).css(scrollerCss);
             };
 
@@ -794,6 +832,7 @@
             if (isMacFF) {
                 var padding = 'paddingRight';
                 var css = {};
+                // getComputedStyle is ie9+, but we here only in f ff
                 var paddingWas = window.getComputedStyle(this.scroller)[[padding]];
                 var delta = this.scroller[this.origin.crossOffset] -
                             this.scroller[this.origin.crossClient];
@@ -804,7 +843,6 @@
                     padding = 'paddingLeft';
                 }
 
-                // getComputedStyle is ie9+, but we here only in f ff
                 var numWas = parseInt(paddingWas, 10);
                 if (numWas != numWas) numWas = 0;
                 css[padding] = (macmsxffScrollbarSize + numWas) + 'px';
@@ -884,7 +922,7 @@
         return baron;
     };
 
-    baron.version = '2.0.1';
+    baron.version = '2.2.0';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;
@@ -898,6 +936,14 @@
 
 /* Fixable elements plugin for baron 0.6+ */
 (function(window, undefined) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
+    // removeIf(production)
+    var log = function() {
+        scopedBaron.fn.log.apply(this, arguments);
+    };
+    // endRemoveIf(production)
+
     var fix = function(userParams) {
         var elements, viewPortSize,
             params = { // Default params
@@ -917,6 +963,15 @@
             eventManager = this.event,
             $ = this.$,
             self = this;
+
+        // removeIf(production)
+        if (this.position != 'static') {
+            log('error', [
+                'Fix plugin cannot work properly in non-static baron position.',
+                'See more https://github.com/Diokuz/baron/issues/135'
+            ].join(' '), this.params);
+        }
+        // endRemoveIf(production)
 
         // i - number of fixing element, pos - fix-position in px, flag - 1: top, 2: bottom
         // Invocation only in case when fix-state changed
@@ -1127,7 +1182,7 @@
         });
     };
 
-    baron.fn.fix = function(params) {
+    scopedBaron.fn.fix = function(params) {
         var i = 0;
 
         while (this[i]) {
@@ -1140,6 +1195,8 @@
 })(window);
 /* Autoupdate plugin for baron 0.6+ */
 (function(window) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
 
     var autoUpdate = function() {
@@ -1209,7 +1266,7 @@
         this._au = true;
     };
 
-    baron.fn.autoUpdate = function(params) {
+    scopedBaron.fn.autoUpdate = function(params) {
         if (!MutationObserver) return this;
 
         var i = 0;
@@ -1225,6 +1282,9 @@
 
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
+
     var controls = function(params) {
         var forward, backward, track, screen,
             self = this, // AAAAAA!!!!!11
@@ -1308,7 +1368,7 @@
         }
     };
 
-    baron.fn.controls = function(params) {
+    scopedBaron.fn.controls = function(params) {
         var i = 0;
 
         while (this[i]) {

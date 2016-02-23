@@ -1,5 +1,8 @@
 /* Controls plugin for baron 0.6+ */
 (function(window, undefined) {
+    // By now window.baron points to real baron
+    var scopedBaron = window.baron;
+
     var controls = function(params) {
         var forward, backward, track, screen,
             self = this, // AAAAAA!!!!!11
@@ -83,7 +86,7 @@
         }
     };
 
-    baron.fn.controls = function(params) {
+    scopedBaron.fn.controls = function(params) {
         var i = 0;
 
         while (this[i]) {
