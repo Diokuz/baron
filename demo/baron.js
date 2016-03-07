@@ -929,7 +929,7 @@
         return baron;
     };
 
-    baron.version = '2.2.0';
+    baron.version = '2.2.2';
 
     if ($ && $.fn) { // Adding baron to jQuery as plugin
         $.fn.baron = baron;

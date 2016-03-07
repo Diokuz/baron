@@ -1,3 +1,7 @@
+## 2.2.2
+
+ - Fix root bidirect bug && add tests https://github.com/Diokuz/baron/issues/139
+
 ## 2.2.0
 
  - Add `position` param
