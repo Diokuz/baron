@@ -1,3 +1,7 @@
+## 2.2.0
+
+ - Add `position` param
+
 ## 2.1.1
 
  - Update dist files properly

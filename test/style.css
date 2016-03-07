@@ -106,7 +106,8 @@ html, body {margin: 0; padding: 0;height: 100%; font-family: Verdana;}
 .scroller__bar._dragging {
     opacity: .8;
 }
-.baron .scroller__bar {
+.baron .scroller__bar,
+._scrollbar .scroller__bar {
     display: block;
 }
 .hbaron .scroller__bar_h {

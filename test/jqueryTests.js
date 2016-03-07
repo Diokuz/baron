@@ -94,8 +94,7 @@ describe("Барон.", function() {
             };
 
             baron = $('.wrapper._origin .scroller').baron({
-                bar: '.scroller__bar',
-                barOnCls: barOnCls
+                bar: '.scroller__bar'
             });
 
             assert.equal(i, 3);
@@ -110,8 +109,7 @@ describe("Барон.", function() {
             };
 
             $('.wrapper._origin .scroller').baron({
-                bar: '.scroller__bar',
-                barOnCls: barOnCls
+                bar: '.scroller__bar'
             });
 
             assert.equal(i, 3);
@@ -141,6 +139,7 @@ describe("Барон.", function() {
             assert.ok(baron[0] != fourth[0], 'Другой direction');
 
             console.error = _save;
+            fourth.dispose();
         });
 
         it("После вызова метода dispose удаляет атрибуты и классы", function() {
@@ -149,28 +148,21 @@ describe("Барон.", function() {
             baron.dispose();
 
             var attrV = $('.scroller').attr('data-baron-v'),
-                attrH = $('.scroller').attr('data-baron-h'),
                 cls = $('.scroller').hasClass(barOnCls),
                 size = $('.scroller')[0].style[sizeDim];
 
-            //$('.scroller').css(sizeDim)
-
-            assert.ok(!attrV);
-            assert.ok(!attrH);
-            assert.ok(!cls);
-            assert.ok(!size);
+            assert.ok(!attrV, 'attrV');
+            assert.ok(!cls, 'cls');
+            assert.ok(!size, 'size');
         });
 
-        it("dispose на бароне где не было элементов", function(done) {
-            var non = $('.not_exist');
-            var baron = non.baron({
+        it("dispose на бароне где не было элементов", function() {
+            var baron = $('.not_exist').baron({
                 bar: '.sadlfhasdhflakjsdhflaksjdhflakjsdh',
                 barOnCls: barOnCls
             });
 
             baron.dispose();
-
-            done();
         });
     });
 

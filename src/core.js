@@ -93,7 +93,9 @@
         // this - something or jQuery instance
         jQueryMode = params.$ && this instanceof params.$;
 
-        if (jQueryMode) {
+        if (params._chain) {
+            roots = params.root;
+        } else if (jQueryMode) {
             params.root = roots = this;
         } else if (params.$) {
             roots = params.$(params.root || params.scroller);
@@ -150,13 +152,13 @@
                 // baron() can return existing instances,
                 // @TODO update params on-the-fly
                 // https://github.com/Diokuz/baron/issues/124
-                if (id == id && attr != undefined && instances[id]) {
+                if (id == id && attr !== null && instances[id]) {
                     // removeIf(production)
                     if (withParams) {
                         log('error', [
                             'repeated initialization for html-node detected',
                             'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
-                        ].join(', '), totalParams.root[0]);
+                        ].join(', '), totalParams.root);
                     }
                     // endRemoveIf(production)
 
@@ -168,7 +170,9 @@
                     if (params.root && params.scroller) {
                         perInstanceParams.scroller = params.$(params.scroller, root);
                         if (!perInstanceParams.scroller.length) {
+                            // removeIf(production)
                             console.log('Scroller not found!', root, params.scroller);
+                            // endRemoveIf(production)
                             return;
                         }
                     } else {
@@ -205,9 +209,12 @@
             });
         },
 
+        // Restriction: only the same scroller can be used
         baron: function(params) {
             params.root = [];
-            params.scroller = this.params.scroller;
+            if (this.params.root) {
+                params.scroller = this.params.scroller;
+            }
 
             arrayEach.call(this, this, function(elem) {
                 params.root.push(elem.root);
@@ -353,7 +360,7 @@
     }
 
     // set, remove or read baron-specific id-attribute
-    // @returns {String|undefined} - id node value, or undefined, if there is no attr
+    // @returns {String|null} - id node value, or null, if there is no attr
     function manageAttr(node, direction, mode, id) {
         var attrName = 'data-baron-' + direction + '-id';
 
@@ -378,7 +385,7 @@
         // removeIf(production)
         liveBarons++;
         if (liveBarons > 100 && !shownErrors.liveTooMany) {
-            log('warning', [
+            log('warn', [
                 'You have too many live baron instances on page (' + liveBarons + ')!',
                 'Are you forget to dispose some of them?',
                 'All baron instances can be found in baron._instances:'
@@ -386,7 +393,7 @@
             shownErrors.liveTooMany = true;
         }
         if (instances.length > 1000 && !shownErrors.allTooMany) {
-            log('warning', [
+            log('warn', [
                 'You have too many inited baron instances on page (' + instances.length + ')!',
                 'Some of them are disposed, and thats good news.',
                 'but baron.init was call too many times, and thats is bad news.',
