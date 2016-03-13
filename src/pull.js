@@ -1,7 +1,13 @@
 /* Pull to load plugin for baron 0.6+ */
-(function(window, undefined) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
+(function(scopedWindow, undefined) {
+    var scopedBaron;
+
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
+
     var pull = function(params) {
         var block = this.$(params.block),
             size = params.size || this.origin.size,
@@ -151,4 +157,4 @@
 
         return this;
     };
-})(window);
+})(this);

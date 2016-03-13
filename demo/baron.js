@@ -1,9 +1,8 @@
-(function(window, undefined) {
+(function(scopedWindow, undefined) {
     'use strict';
 
-    if (!window) return; // Server side
-
-    var $ = window.$;
+    var onClient = typeof window != 'undefined';
+    var $ = scopedWindow.$;
     var _baron = baron; // Stored baron value for noConflict usage
     var pos = ['left', 'top', 'right', 'bottom', 'width', 'height'];
     // Global store for all baron instances (to be able to dispose them on html-nodes)
@@ -34,7 +33,7 @@
     // I hate you https://github.com/Diokuz/baron/issues/110
     var macmsxffScrollbarSize = 15;
     var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/;
-    var isMacFF = macosxffRe.test(window.navigator.userAgent);
+    var isMacFF = macosxffRe.test(scopedWindow.navigator && scopedWindow.navigator.userAgent);
 
     // removeIf(production)
     var log = function() {
@@ -53,7 +52,7 @@
         var roots;
         var withParams = !!params;
         var defaultParams = {
-            $: window.jQuery,
+            $: scopedWindow.jQuery,
             direction: 'v',
             barOnCls: '_scrollbar',
             resizeDebounce: 0,
@@ -115,7 +114,7 @@
     function arrayEach(obj, iterator) {
         var i = 0;
 
-        if (obj.length === undefined || obj === window) obj = [obj];
+        if (obj.length === undefined || obj === scopedWindow) obj = [obj];
 
         while (obj[i]) {
             iterator.call(this, obj[i], i);
@@ -308,7 +307,7 @@
             }, {
                 // @TODO make one global listener
                 // onResize:
-                element: window,
+                element: scopedWindow,
 
                 handler: function() {
                     item.update();
@@ -840,7 +839,7 @@
                 var padding = 'paddingRight';
                 var css = {};
                 // getComputedStyle is ie9+, but we here only in f ff
-                var paddingWas = window.getComputedStyle(this.scroller)[[padding]];
+                var paddingWas = scopedWindow.getComputedStyle(this.scroller)[[padding]];
                 var delta = this.scroller[this.origin.crossOffset] -
                             this.scroller[this.origin.crossClient];
 
@@ -924,27 +923,40 @@
 
     // Use when you need "baron" global var for another purposes
     baron.noConflict = function() {
-        window.baron = _baron; // Restoring original value of "baron" global var
+        scopedWindow.baron = _baron; // Restoring original value of "baron" global var
 
         return baron;
     };
 
     baron.version = '2.2.2';
 
-    if ($ && $.fn) { // Adding baron to jQuery as plugin
-        $.fn.baron = baron;
-    }
-
-    window.baron = baron; // Use noConflict method if you need window.baron var for another purposes
+    // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
-        module.exports = baron.noConflict();
+        module.exports = baron;
+        // @todo webpack
+        require('./fix');
+        require('./pull');
+        require('./controls');
+        require('./autoUpdate');
+    } else {
+        window.baron = baron;
+
+        if ($ && $.fn) { // Adding baron to jQuery as plugin
+            $.fn.baron = baron;
+        }
     }
-})(window);
+})(this);
 
 /* Fixable elements plugin for baron 0.6+ */
-(function(window, undefined) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
+(function(scopedWindow, undefined) {
+    var scopedBaron;
+
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core.js');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
+
     // removeIf(production)
     var log = function() {
         scopedBaron.fn.log.apply(this, arguments);
@@ -1199,12 +1211,16 @@
 
         return this;
     };
-})(window);
+})(this);
 /* Autoupdate plugin for baron 0.6+ */
-(function(window) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+(function(scopedWindow) {
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
+
+    var MutationObserver = scopedWindow.MutationObserver || scopedWindow.WebKitMutationObserver || scopedWindow.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
@@ -1285,12 +1301,17 @@
 
         return this;
     };
-})(window);
+})(this);
 
 /* Controls plugin for baron 0.6+ */
-(function(window, undefined) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
+(function(scopedWindow, undefined) {
+    var scopedBaron;
+
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
 
     var controls = function(params) {
         var forward, backward, track, screen,
@@ -1385,7 +1406,8 @@
 
         return this;
     };
-})(window);
+})(this);
+
 // removeIf(production)
 baron.fn.log = function(level, msg, nodes) {
     var time = new Date().toString();

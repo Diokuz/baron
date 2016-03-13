@@ -1,8 +1,12 @@
 /* Autoupdate plugin for baron 0.6+ */
-(function(window) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
-    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || null;
+(function(scopedWindow) {
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
+
+    var MutationObserver = scopedWindow.MutationObserver || scopedWindow.WebKitMutationObserver || scopedWindow.MozMutationObserver || null;
 
     var autoUpdate = function() {
         var self = this;
@@ -83,4 +87,4 @@
 
         return this;
     };
-})(window);
+})(this);

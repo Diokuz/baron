@@ -10,10 +10,11 @@ var concat = require('gulp-concat');
 var removeCode = require('gulp-remove-code');
 var uglify = require('gulp-uglify');
 
+var mocha = require('gulp-mocha');
 var mochaPhantomJS = require('gulp-mocha-phantomjs');
 
 function buildFiles(params) {
-    var full = ['core', 'fix', 'autoUpdate', 'controls', 'pull', 'test', 'debug'];
+    var full = ['core', 'fix', 'autoUpdate', 'controls', 'pull', 'debug'];
     var fns;
 
     params = params || {};
@@ -23,7 +24,7 @@ function buildFiles(params) {
     } else if (params.core) {
         fns = ['core', 'autoUpdate'];
     } else {
-        fns = _.difference(full, ['test', 'pull']);
+        fns = _.difference(full, ['pull']);
     }
 
     return _.map(fns, function(fn) {
@@ -116,6 +117,11 @@ gulp.task('test', function() {
     }));
 });
 
+gulp.task('unit', function() {
+    return gulp.src(['test/**/*.spec.js'], {read: false})
+        .pipe(mocha());
+});
+
 gulp.task('t', function(cb) {
-    runSequence('lint', 'build', 'test');
+    runSequence('lint', 'build', 'test', 'unit');
 });

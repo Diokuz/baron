@@ -1,7 +1,12 @@
 /* Controls plugin for baron 0.6+ */
-(function(window, undefined) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
+(function(scopedWindow, undefined) {
+    var scopedBaron;
+
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
 
     var controls = function(params) {
         var forward, backward, track, screen,
@@ -96,4 +101,4 @@
 
         return this;
     };
-})(window);
+})(this);

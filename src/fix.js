@@ -1,7 +1,13 @@
 /* Fixable elements plugin for baron 0.6+ */
-(function(window, undefined) {
-    // By now window.baron points to real baron
-    var scopedBaron = window.baron;
+(function(scopedWindow, undefined) {
+    var scopedBaron;
+
+    if (typeof module != 'undefined') {
+        scopedBaron = require('./core.js');
+    } else {
+        scopedBaron = scopedWindow.baron;
+    }
+
     // removeIf(production)
     var log = function() {
         scopedBaron.fn.log.apply(this, arguments);
@@ -256,4 +262,4 @@
 
         return this;
     };
-})(window);
+})(this);
