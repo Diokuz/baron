@@ -928,7 +928,7 @@
         return baron;
     };
 
-    baron.version = '2.2.2';
+    baron.version = '2.2.3';
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
