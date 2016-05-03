@@ -38,7 +38,6 @@ $(document).ready(function() {
         after: 'header__title_position_bottom',
         limiter: true
     })
-    .test()
     .controls({
         track: '.scroller__track-visual',
         forward: '.scroller__down',
@@ -221,4 +220,10 @@ $(document).ready(function() {
 
     // paddings
     $('.wrapper_mbp .scroller').baron();
+
+    // Textarea grow https://github.com/Diokuz/baron/issues/146
+    $('.test_textarea-grow .scroller').baron({
+        bar: '.scroller__bar',
+        barOnCls: 'baron'
+    });
 });
