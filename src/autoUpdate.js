@@ -1,5 +1,7 @@
 /* Autoupdate plugin for baron 0.6+ */
 (function(scopedWindow) {
+    var scopedBaron;
+
     if (typeof module != 'undefined') {
         scopedBaron = require('./core');
     } else {

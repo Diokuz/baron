@@ -928,7 +928,7 @@
         return baron;
     };
 
-    baron.version = '2.2.3';
+    baron.version = '2.2.4';
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
@@ -1214,6 +1214,8 @@
 })(this);
 /* Autoupdate plugin for baron 0.6+ */
 (function(scopedWindow) {
+    var scopedBaron;
+
     if (typeof module != 'undefined') {
         scopedBaron = require('./core');
     } else {
