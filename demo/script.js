@@ -7,7 +7,7 @@ window.onload = function() {
         scrollingCls: '_scrolling',
         draggingCls: '_dragging',
         direction: 'h'
-    });
+    })
 
     baron({
         root: '.baron',
@@ -26,5 +26,5 @@ window.onload = function() {
         track: '.baron__track',
         forward: '.baron__down',
         backward: '.baron__up'
-    });
-};
+    })
+}

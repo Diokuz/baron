@@ -1,26 +1,27 @@
 $(document).ready(function() {
-    var N = 1000;
+    var N = 1000
 
     function test(callback, n) {
-        var t0 = new Date();
-        var scrollHeight = $('.search-results__scroller')[0].scrollHeight - $('.search-results__scroller').height();
-        var scroller = $('.search-results__scroller')[0];
-        var localN = n || N;
+        var t0 = new Date()
+        var scrollHeight = $('.search-results__scroller')[0].scrollHeight - $('.search-results__scroller').height()
+        var scroller = $('.search-results__scroller')[0]
+        var localN = n || N
+        var i = 0
 
-        i = 0;
         var interval = setInterval(function() {
-            i++;
-            var pos = (Math.sin(i / 100) + 1) * scrollHeight / 2;
+            i++
+            var pos = (Math.sin(i / 100) + 1) * scrollHeight / 2
 
-            scroller.scrollTop = pos;
+            scroller.scrollTop = pos
 
             if (i > localN) {
-                clearTimeout(interval);
-                var t1 = new Date();
-                if (!n) console.log('r&r per scroll: ', (t1 - t0) / N);
-                callback(t1 - t0);
+                var t1 = new Date()
+
+                clearTimeout(interval)
+                if (!n) console.log('r&r per scroll: ', (t1 - t0) / N)
+                callback(t1 - t0)
             }
-        }, 0);
+        }, 0)
     }
 
     setTimeout(function() {
@@ -41,21 +42,21 @@ $(document).ready(function() {
                     future: 'search-results__fade_group_bottom',
                     clickable: true,
                     limiter: true // Ограничение скроллбара сверху
-                });
+                })
 
                 // Без fix но зафиксированными
-                // $('.search-results__list-header').addClass('search-results__fade_group_top search-results__fade_state_fixed');
-                // $('.search-results__list-header').eq(0).css({top: '0px'});
-                // $('.search-results__list-header').eq(1).css({top: '38px'});
+                // $('.search-results__list-header').addClass('search-results__fade_group_top search-results__fade_state_fixed')
+                // $('.search-results__list-header').eq(0).css({top: '0px'})
+                // $('.search-results__list-header').eq(1).css({top: '38px'})
 
                 setTimeout(function() {
                     test(function(result2) {
-                        console.log('delta per scroll: ', (result2 - result1) / N);
-                    });
-                }, 500);
-            });
-        }, 300);
-    }, 500);
+                        console.log('delta per scroll: ', (result2 - result1) / N)
+                    })
+                }, 500)
+            })
+        }, 300)
+    }, 500)
 
 
     // $('.search-results__scroller').baron({
@@ -73,5 +74,5 @@ $(document).ready(function() {
     //     future: 'search-results__fade_group_bottom',
     //     clickable: true,
     //     limiter: true // Ограничение скроллбара сверху
-    // });
-});
+    // })
+})

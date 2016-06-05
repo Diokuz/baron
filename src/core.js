@@ -1,12 +1,12 @@
-(function(scopedWindow, undefined) {
-    'use strict';
+(function(scopedWindow) {
+    'use strict'
 
-    var onClient = typeof window != 'undefined';
-    var $ = scopedWindow.$;
-    var _baron = baron; // Stored baron value for noConflict usage
-    var pos = ['left', 'top', 'right', 'bottom', 'width', 'height'];
+    var $ = scopedWindow.$
+    var _baron = baron // Stored baron value for noConflict usage
+    var Item = {}
+    var pos = ['left', 'top', 'right', 'bottom', 'width', 'height']
     // Global store for all baron instances (to be able to dispose them on html-nodes)
-    var instances = [];
+    var instances = []
     var origin = {
         v: { // Vertical
             x: 'Y', pos: pos[1], oppos: pos[3], crossPos: pos[0], crossOpPos: pos[2],
@@ -26,127 +26,129 @@
             offset: 'offsetWidth', crossOffset: 'offsetHeight', offsetPos: 'offsetLeft',
             scroll: 'scrollLeft', scrollSize: 'scrollWidth'
         }
-    };
+    }
 
     // Some ugly vars
-    var opera12maxScrollbarSize = 17;
+    var opera12maxScrollbarSize = 17
     // I hate you https://github.com/Diokuz/baron/issues/110
-    var macmsxffScrollbarSize = 15;
-    var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/;
-    var isMacFF = macosxffRe.test(scopedWindow.navigator && scopedWindow.navigator.userAgent);
+    var macmsxffScrollbarSize = 15
+    var macosxffRe = /[\s\S]*Macintosh[\s\S]*\) Gecko[\s\S]*/
+    var isMacFF = macosxffRe.test(scopedWindow.navigator && scopedWindow.navigator.userAgent)
 
     // removeIf(production)
     var log = function() {
-        baron.fn.log.apply(this, arguments);
-    };
-    var liveBarons = 0;
+        baron.fn.log.apply(this, arguments)
+    }
+    var liveBarons = 0
     var shownErrors = {
         liveTooMany: false,
         allTooMany: false
-    };
+    }
     // endRemoveIf(production)
 
     // window.baron and jQuery.fn.baron points to this function
-    function baron(params) {
-        var jQueryMode;
-        var roots;
-        var withParams = !!params;
+    function baron(user) {
+        var params = user
+        var jQueryMode
+        var roots
+        var withParams = !!params
         var defaultParams = {
             $: scopedWindow.jQuery,
             direction: 'v',
             barOnCls: '_scrollbar',
             resizeDebounce: 0,
             event: function(elem, event, func, mode) {
-                params.$(elem)[mode || 'on'](event, func);
+                params.$(elem)[mode || 'on'](event, func)
             },
             cssGuru: false,
             impact: 'scroller',
             position: 'static'
-        };
+        }
 
-        params = params || {};
+        params = params || {}
 
         // Extending default params by user-defined params
         for (var key in defaultParams) {
             if (params[key] === undefined) {
-                params[key] = defaultParams[key];
+                params[key] = defaultParams[key]
             }
-        };
+        }
 
         // removeIf(production)
         if (!params.$) {
             log('error', [
                 'no jQuery nor params.$ detected',
                 'https://github.com/Diokuz/baron/blob/master/docs/logs/no-jquery-detected.md'
-            ].join(', '), params);
+            ].join(', '), params)
         }
         if (params.position == 'absolute' && params.impact == 'clipper') {
             log('error', [
                 'Simultaneous use of `absolute` position and `clipper` impact values detected.',
                 'Those values cannot be used together.',
                 'See more https://github.com/Diokuz/baron/issues/138'
-            ].join(' '), params);
+            ].join(' '), params)
         }
         // endRemoveIf(production)
 
         // this - something or jQuery instance
-        jQueryMode = params.$ && this instanceof params.$;
+        jQueryMode = params.$ && this instanceof params.$
 
         if (params._chain) {
-            roots = params.root;
+            roots = params.root
         } else if (jQueryMode) {
-            params.root = roots = this;
+            params.root = roots = this
         } else if (params.$) {
-            roots = params.$(params.root || params.scroller);
+            roots = params.$(params.root || params.scroller)
         } else {
-            roots = []; // noop mode, like jQuery when no matched html-nodes found
+            roots = [] // noop mode, like jQuery when no matched html-nodes found
         }
 
-        var instance = new baron.fn.constructor(roots, params, withParams);
+        var instance = new baron.fn.constructor(roots, params, withParams)
 
         if (instance.autoUpdate) {
-            instance.autoUpdate();
+            instance.autoUpdate()
         }
 
-        return instance;
+        return instance
     }
 
-    function arrayEach(obj, iterator) {
-        var i = 0;
+    function arrayEach(_obj, iterator) {
+        var i = 0
+        var obj = _obj
 
-        if (obj.length === undefined || obj === scopedWindow) obj = [obj];
+        if (obj.length === undefined || obj === scopedWindow) obj = [obj]
 
         while (obj[i]) {
-            iterator.call(this, obj[i], i);
-            i++;
+            iterator.call(this, obj[i], i)
+            i++
         }
     }
 
     // shortcut for getTime
     function getTime() {
-        return new Date().getTime();
+        return new Date().getTime()
     }
 
     // removeIf(production)
-    baron._instances = instances;
+    baron._instances = instances
     // endRemoveIf(production)
 
     baron.fn = {
         constructor: function(roots, totalParams, withParams) {
-            var params = clone(totalParams);
+            var params = clone(totalParams)
 
             // Intrinsic params.event is not the same as totalParams.event
             params.event = function(elems, e, func, mode) {
                 arrayEach(elems, function(elem) {
-                    totalParams.event(elem, e, func, mode);
-                });
-            };
+                    totalParams.event(elem, e, func, mode)
+                })
+            }
 
-            this.length = 0;
+            this.length = 0
 
             arrayEach.call(this, roots, function(root, i) {
-                var attr = manageAttr(root, params.direction);
-                var id = +attr; // Could be NaN
+                var attr = manageAttr(root, params.direction)
+                var id = +attr // Could be NaN
 
                 // baron() can return existing instances,
                 // @TODO update params on-the-fly
@@ -157,73 +159,73 @@
                         log('error', [
                             'repeated initialization for html-node detected',
                             'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
-                        ].join(', '), totalParams.root);
+                        ].join(', '), totalParams.root)
                     }
                     // endRemoveIf(production)
 
-                    this[i] = instances[id];
+                    this[i] = instances[id]
                 } else {
-                    var perInstanceParams = clone(params);
+                    var perInstanceParams = clone(params)
 
                     // root and scroller can be different nodes
                     if (params.root && params.scroller) {
-                        perInstanceParams.scroller = params.$(params.scroller, root);
+                        perInstanceParams.scroller = params.$(params.scroller, root)
                         if (!perInstanceParams.scroller.length) {
                             // removeIf(production)
-                            console.log('Scroller not found!', root, params.scroller);
+                            console.log('Scroller not found!', root, params.scroller)
                             // endRemoveIf(production)
-                            return;
+                            return
                         }
                     } else {
-                        perInstanceParams.scroller = root;
+                        perInstanceParams.scroller = root
                     }
 
-                    perInstanceParams.root = root;
-                    this[i] = init(perInstanceParams);
+                    perInstanceParams.root = root
+                    this[i] = init(perInstanceParams)
                 }
 
-                this.length = i + 1;
-            });
+                this.length = i + 1
+            })
 
-            this.params = params;
+            this.params = params
         },
 
         dispose: function() {
-            var params = this.params;
+            var params = this.params
 
             arrayEach(this, function(instance, index) {
-                instance.dispose(params);
-                instances[index] = null;
-            });
+                instance.dispose(params)
+                instances[index] = null
+            })
 
-            this.params = null;
+            this.params = null
         },
 
         update: function() {
-            var args = arguments;
+            var args = arguments
 
-            arrayEach(this, function(instance, index) {
+            arrayEach(this, function(instance) {
                 // instance cannot be null, because it is stored by user
-                instance.update.apply(instance, args);
-            });
+                instance.update.apply(instance, args)
+            })
         },
 
         // Restriction: only the same scroller can be used
         baron: function(params) {
-            params.root = [];
+            params.root = []
             if (this.params.root) {
-                params.scroller = this.params.scroller;
+                params.scroller = this.params.scroller
             }
 
             arrayEach.call(this, this, function(elem) {
-                params.root.push(elem.root);
-            });
-            params.direction = (this.params.direction == 'v') ? 'h' : 'v';
-            params._chain = true;
+                params.root.push(elem.root)
+            })
+            params.direction = (this.params.direction == 'v') ? 'h' : 'v'
+            params._chain = true
 
-            return baron(params);
+            return baron(params)
         }
-    };
+    }
 
     function manageEvents(item, eventManager, mode) {
         // Creating new functions for one baron item only one time
@@ -233,7 +235,7 @@
                 element: item.scroller,
 
                 handler: function(e) {
-                    item.scroll(e);
+                    item.scroll(e)
                 },
 
                 type: 'scroll'
@@ -242,7 +244,7 @@
                 element: item.root,
 
                 handler: function() {
-                    item.update();
+                    item.update()
                 },
 
                 type: 'transitionend animationend'
@@ -251,7 +253,7 @@
                 element: item.scroller,
 
                 handler: function() {
-                    item.update();
+                    item.update()
                 },
 
                 type: 'keyup'
@@ -260,11 +262,11 @@
                 element: item.bar,
 
                 handler: function(e) {
-                    e.preventDefault(); // Text selection disabling in Opera
-                    item.selection(); // Disable text selection in ie8
-                    item.drag.now = 1; // Save private byte
+                    e.preventDefault() // Text selection disabling in Opera
+                    item.selection() // Disable text selection in ie8
+                    item.drag.now = 1 // Save private byte
                     if (item.draggingCls) {
-                        $(item.root).addClass(item.draggingCls);
+                        $(item.root).addClass(item.draggingCls)
                     }
                 },
 
@@ -274,10 +276,10 @@
                 element: document,
 
                 handler: function() {
-                    item.selection(1); // Enable text selection
-                    item.drag.now = 0;
+                    item.selection(1) // Enable text selection
+                    item.drag.now = 0
                     if (item.draggingCls) {
-                        $(item.root).removeClass(item.draggingCls);
+                        $(item.root).removeClass(item.draggingCls)
                     }
                 },
 
@@ -288,7 +290,7 @@
 
                 handler: function(e) {
                     if (e.button != 2) { // Not RM
-                        item._pos0(e);
+                        item._pos0(e)
                     }
                 },
 
@@ -299,7 +301,7 @@
 
                 handler: function(e) {
                     if (item.drag.now) {
-                        item.drag(e);
+                        item.drag(e)
                     }
                 },
 
@@ -310,7 +312,7 @@
                 element: scopedWindow,
 
                 handler: function() {
-                    item.update();
+                    item.update()
                 },
 
                 type: 'resize'
@@ -320,7 +322,7 @@
                 element: item.root,
 
                 handler: function() {
-                    item.update();
+                    item.update()
                 },
 
                 type: 'sizeChange'
@@ -329,31 +331,31 @@
                 element: item.clipper,
 
                 handler: function() {
-                    item.clipperOnScroll();
+                    item.clipperOnScroll()
                 },
 
                 type: 'scroll'
             }
-        ];
+        ]
 
         arrayEach(item._eventHandlers, function(event) {
             if (event.element) {
-                eventManager(event.element, event.type, event.handler, mode);
+                eventManager(event.element, event.type, event.handler, mode)
             }
-        });
+        })
 
         // if (item.scroller) {
-        //     event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode);
+        //     event(item.scroller, 'scroll', item._eventHandlers.onScroll, mode)
         // }
         // if (item.bar) {
-        //     event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode);
+        //     event(item.bar, 'touchstart mousedown', item._eventHandlers.onMouseDown, mode)
         // }
-        // event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode);
-        // event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode);
-        // event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode);
-        // event(window, 'resize', item._eventHandlers.onResize, mode);
+        // event(document, 'mouseup blur touchend', item._eventHandlers.onMouseUp, mode)
+        // event(document, 'touchstart mousedown', item._eventHandlers.onCoordinateReset, mode)
+        // event(document, 'mousemove touchmove', item._eventHandlers.onMouseMove, mode)
+        // event(window, 'resize', item._eventHandlers.onResize, mode)
         // if (item.root) {
-        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode);
+        //     event(item.root, 'sizeChange', item._eventHandlers.onResize, mode)
         //     // Custon event for alternate baron update mechanism
         // }
     }
@@ -361,35 +363,35 @@
     // set, remove or read baron-specific id-attribute
     // @returns {String|null} - id node value, or null, if there is no attr
     function manageAttr(node, direction, mode, id) {
-        var attrName = 'data-baron-' + direction + '-id';
+        var attrName = 'data-baron-' + direction + '-id'
 
         if (mode == 'on') {
-            node.setAttribute(attrName, id);
+            node.setAttribute(attrName, id)
         } else if (mode == 'off') {
-            node.removeAttribute(attrName);
-        } else {
-            return node.getAttribute(attrName);
+            node.removeAttribute(attrName)
         }
+
+        return node.getAttribute(attrName)
     }
 
     function init(params) {
         // __proto__ of returning object is baron.prototype
-        var out = new item.prototype.constructor(params);
+        var out = new Item.prototype.constructor(params)
 
-        manageEvents(out, params.event, 'on');
+        manageEvents(out, params.event, 'on')
 
-        manageAttr(out.root, params.direction, 'on', instances.length);
-        instances.push(out);
+        manageAttr(out.root, params.direction, 'on', instances.length)
+        instances.push(out)
 
         // removeIf(production)
-        liveBarons++;
+        liveBarons++
         if (liveBarons > 100 && !shownErrors.liveTooMany) {
             log('warn', [
                 'You have too many live baron instances on page (' + liveBarons + ')!',
                 'Are you forget to dispose some of them?',
                 'All baron instances can be found in baron._instances:'
-            ].join(' '), instances);
-            shownErrors.liveTooMany = true;
+            ].join(' '), instances)
+            shownErrors.liveTooMany = true
         }
         if (instances.length > 1000 && !shownErrors.allTooMany) {
             log('warn', [
@@ -397,56 +399,40 @@
                 'Some of them are disposed, and thats good news.',
                 'but baron.init was call too many times, and thats is bad news.',
                 'All baron instances can be found in baron._instances:'
-            ].join(' '), instances);
-            shownErrors.allTooMany = true;
+            ].join(' '), instances)
+            shownErrors.allTooMany = true
         }
         // endRemoveIf(production)
 
-        out.update();
+        out.update()
 
-        return out;
+        return out
     }
 
-    function clone(input) {
-        var output = {};
-
-        input = input || {};
+    function clone(_input) {
+        var output = {}
+        var input = _input || {}
 
         for (var key in input) {
             if (input.hasOwnProperty(key)) {
-                output[key] = input[key];
+                output[key] = input[key]
             }
         }
 
-        return output;
-    }
-
-    function validate(input) {
-        var output = clone(input);
-
-        output.event = function(elems, e, func, mode) {
-            arrayEach(elems, function(elem) {
-                input.event(elem, e, func, mode);
-            });
-        };
-
-        return output;
+        return output
     }
 
     function fire(eventName) {
-        /* jshint validthis:true */
         if (this.events && this.events[eventName]) {
-            for (var i = 0 ; i < this.events[eventName].length ; i++) {
-                var args = Array.prototype.slice.call( arguments, 1 );
+            for (var i = 0; i < this.events[eventName].length; i++) {
+                var args = Array.prototype.slice.call( arguments, 1 )
 
-                this.events[eventName][i].apply(this, args);
+                this.events[eventName][i].apply(this, args)
             }
         }
     }
 
-    var item = {};
-
-    item.prototype = {
+    Item.prototype = {
         // underscore.js realization
         // used in autoUpdate plugin
         _debounce: function(func, wait) {
@@ -454,216 +440,211 @@
                 timeout,
                 // args, // right now there is no need for arguments
                 // context, // and for context
-                timestamp;
-                // result; // and for result
+                timestamp
+                // result // and for result
 
             var later = function() {
                 if (self._disposed) {
-                    clearTimeout(timeout);
-                    timeout = self = null;
-                    return;
+                    clearTimeout(timeout)
+                    timeout = self = null
+                    return
                 }
 
-                var last = getTime() - timestamp;
+                var last = getTime() - timestamp
 
                 if (last < wait && last >= 0) {
-                    timeout = setTimeout(later, wait - last);
+                    timeout = setTimeout(later, wait - last)
                 } else {
-                    timeout = null;
-                    // result = func.apply(context, args);
-                    func();
-                    // context = args = null;
+                    timeout = null
+                    // result = func.apply(context, args)
+                    func()
+                    // context = args = null
                 }
-            };
+            }
 
             return function() {
-                // context = this;
-                // args = arguments;
-                timestamp = getTime();
+                // context = this
+                // args = arguments
+                timestamp = getTime()
 
                 if (!timeout) {
-                    timeout = setTimeout(later, wait);
+                    timeout = setTimeout(later, wait)
                 }
 
-                // return result;
-            };
+                // return result
+            }
         },
 
         constructor: function(params) {
-            var $,
+            var _$,
                 barPos,
                 scrollerPos0,
                 track,
                 resizePauseTimer,
                 scrollingTimer,
-                scrollLastFire,
                 resizeLastFire,
-                oldBarSize;
+                oldBarSize
 
-            resizeLastFire = scrollLastFire = getTime();
+            resizeLastFire = getTime()
 
-            $ = this.$ = params.$;
-            this.event = params.event;
-            this.events = {};
+            _$ = this.$ = params.$
+            this.event = params.event
+            this.events = {}
 
             function getNode(sel, context) {
-                return $(sel, context)[0]; // Can be undefined
+                return _$(sel, context)[0] // Can be undefined
             }
 
             // DOM elements
-            this.root = params.root; // Always html node, not just selector
-            this.scroller = getNode(params.scroller);
-            this.bar = getNode(params.bar, this.root);
-            track = this.track = getNode(params.track, this.root);
+            this.root = params.root // Always html node, not just selector
+            this.scroller = getNode(params.scroller)
+            this.bar = getNode(params.bar, this.root)
+            track = this.track = getNode(params.track, this.root)
             if (!this.track && this.bar) {
-                track = this.bar.parentNode;
+                track = this.bar.parentNode
             }
-            this.clipper = this.scroller.parentNode;
+            this.clipper = this.scroller.parentNode
 
             // Parameters
-            this.direction = params.direction;
-            this.rtl = params.rtl;
-            this.origin = origin[this.direction];
-            this.barOnCls = params.barOnCls;
-            this.scrollingCls = params.scrollingCls;
-            this.draggingCls = params.draggingCls;
-            this.impact = params.impact;
-            this.position = params.position;
-            this.rtl = params.rtl;
-            this.barTopLimit = 0;
-            this.resizeDebounce = params.resizeDebounce;
+            this.direction = params.direction
+            this.rtl = params.rtl
+            this.origin = origin[this.direction]
+            this.barOnCls = params.barOnCls
+            this.scrollingCls = params.scrollingCls
+            this.draggingCls = params.draggingCls
+            this.impact = params.impact
+            this.position = params.position
+            this.rtl = params.rtl
+            this.barTopLimit = 0
+            this.resizeDebounce = params.resizeDebounce
 
             // Updating height or width of bar
-            function setBarSize(size) {
-                /* jshint validthis:true */
-                var barMinSize = this.barMinSize || 20;
+            function setBarSize(_size) {
+                var barMinSize = this.barMinSize || 20
+                var size = _size
 
                 if (size > 0 && size < barMinSize) {
-                    size = barMinSize;
+                    size = barMinSize
                 }
 
                 if (this.bar) {
-                    $(this.bar).css(this.origin.size, parseInt(size, 10) + 'px');
+                    _$(this.bar).css(this.origin.size, parseInt(size, 10) + 'px')
                 }
             }
 
             // Updating top or left bar position
-            function posBar(pos) {
-                /* jshint validthis:true */
+            function posBar(_pos) {
                 if (this.bar) {
-                    var was = $(this.bar).css(this.origin.pos),
-                        will = +pos + 'px';
+                    var was = _$(this.bar).css(this.origin.pos),
+                        will = +_pos + 'px'
 
                     if (will && will != was) {
-                        $(this.bar).css(this.origin.pos, will);
+                        _$(this.bar).css(this.origin.pos, will)
                     }
                 }
             }
 
             // Free path for bar
             function k() {
-                /* jshint validthis:true */
-                return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset];
+                return track[this.origin.client] - this.barTopLimit - this.bar[this.origin.offset]
             }
 
             // Relative content top position to bar top position
             function relToPos(r) {
-                /* jshint validthis:true */
-                return r * k.call(this) + this.barTopLimit;
+                return r * k.call(this) + this.barTopLimit
             }
 
             // Bar position to relative content position
             function posToRel(t) {
-                /* jshint validthis:true */
-                return (t - this.barTopLimit) / k.call(this);
+                return (t - this.barTopLimit) / k.call(this)
             }
 
             // Cursor position in main direction in px // Now with iOs support
             this.cursor = function(e) {
                 return e['client' + this.origin.x] ||
-                    (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x];
-            };
+                    (((e.originalEvent || e).touches || {})[0] || {})['page' + this.origin.x]
+            }
 
             // Text selection pos preventing
             function dontPosSelect() {
-                return false;
+                return false
             }
 
             this.pos = function(x) { // Absolute scroller position in px
                 var ie = 'page' + this.origin.x + 'Offset',
-                    key = (this.scroller[ie]) ? ie : this.origin.scroll;
+                    key = (this.scroller[ie]) ? ie : this.origin.scroll
 
-                if (x !== undefined) this.scroller[key] = x;
+                if (x !== undefined) this.scroller[key] = x
 
-                return this.scroller[key];
-            };
+                return this.scroller[key]
+            }
 
             this.rpos = function(r) { // Relative scroller position (0..1)
                 var free = this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client],
-                    x;
+                    x
 
                 if (r) {
-                    x = this.pos(r * free);
+                    x = this.pos(r * free)
                 } else {
-                    x = this.pos();
+                    x = this.pos()
                 }
 
-                return x / (free || 1);
-            };
+                return x / (free || 1)
+            }
 
             // Switch on the bar by adding user-defined CSS classname to scroller
             this.barOn = function(dispose) {
                 if (this.barOnCls) {
-                    if (dispose ||
-                        this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize])
-                    {
-                        if ($(this.root).hasClass(this.barOnCls)) {
-                            $(this.root).removeClass(this.barOnCls);
+                    var noScroll = this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]
+
+                    if (dispose || noScroll) {
+                        if (_$(this.root).hasClass(this.barOnCls)) {
+                            _$(this.root).removeClass(this.barOnCls)
                         }
-                    } else {
-                        if (!$(this.root).hasClass(this.barOnCls)) {
-                            $(this.root).addClass(this.barOnCls);
-                        }
+                    } else if (!_$(this.root).hasClass(this.barOnCls)) {
+                        _$(this.root).addClass(this.barOnCls)
                     }
                 }
-            };
+            }
 
             this._pos0 = function(e) {
-                scrollerPos0 = this.cursor(e) - barPos;
-            };
+                scrollerPos0 = this.cursor(e) - barPos
+            }
 
             this.drag = function(e) {
-                var rel = posToRel.call(this, this.cursor(e) - scrollerPos0);
-                var k = (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client]);
-                this.scroller[this.origin.scroll] = rel * k;
-            };
+                var rel = posToRel.call(this, this.cursor(e) - scrollerPos0)
+                var sub = (this.scroller[this.origin.scrollSize] - this.scroller[this.origin.client])
+
+                this.scroller[this.origin.scroll] = rel * sub
+            }
 
             // Text selection preventing on drag
             this.selection = function(enable) {
-                this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on');
-            };
+                this.event(document, 'selectpos selectstart', dontPosSelect, enable ? 'off' : 'on')
+            }
 
             // onResize & DOM modified handler
             // also fires on init
             // Note: max/min-size didnt sets if size did not really changed (for example, on init in Chrome)
             this.resize = function() {
-                var self = this;
-                var minPeriod = (self.resizeDebounce === undefined) ? 300 : self.resizeDebounce;
-                var delay = 0;
+                var self = this
+                var minPeriod = (self.resizeDebounce === undefined) ? 300 : self.resizeDebounce
+                var delay = 0
 
                 if (getTime() - resizeLastFire < minPeriod) {
-                    clearTimeout(resizePauseTimer);
-                    delay = minPeriod;
+                    clearTimeout(resizePauseTimer)
+                    delay = minPeriod
                 }
 
                 function upd() {
-                    var offset = self.scroller[self.origin.crossOffset];
-                    var client = self.scroller[self.origin.crossClient];
-                    var padding = 0;
+                    var offset = self.scroller[self.origin.crossOffset]
+                    var client = self.scroller[self.origin.crossClient]
+                    var padding = 0
+                    var was, will
 
                     // https://github.com/Diokuz/baron/issues/110
                     if (isMacFF) {
-                        padding = macmsxffScrollbarSize;
+                        padding = macmsxffScrollbarSize
 
                     // Opera 12 bug https://github.com/Diokuz/baron/issues/105
                     } else if (client > 0 && offset === 0) {
@@ -672,190 +653,187 @@
                         // but I dont want to create temporary html-nodes set
                         // just for measuring scrollbar size in Opera 12.
                         // 17px for Windows XP-8.1, 15px for Mac (really rare).
-                        offset = client + opera12maxScrollbarSize;
+                        offset = client + opera12maxScrollbarSize
                     }
 
                     if (offset) { // if there is no size, css should not be set
-                        self.barOn();
+                        self.barOn()
 
                         if (self.impact == 'scroller') { // scroller
-                            var delta = offset - client + padding;
+                            var delta = offset - client + padding
 
                             // `static` position works only for `scroller` impact
                             if (self.position == 'static') { // static
-                                var was = self.$(self.scroller).css(self.origin.crossSize);
-                                var will = self.clipper[self.origin.crossClient] + delta + 'px';
+                                was = self.$(self.scroller).css(self.origin.crossSize)
+                                will = self.clipper[self.origin.crossClient] + delta + 'px'
 
                                 if (was != will) {
-                                    self._setCrossSizes(self.scroller, will);
+                                    self._setCrossSizes(self.scroller, will)
                                 }
                             } else { // absolute
-                                var css = {};
-                                var key = self.rtl ? 'Left' : 'Right';
+                                var css = {}
+                                var key = self.rtl ? 'Left' : 'Right'
 
                                 if (self.direction == 'h') {
-                                    key = 'Bottom';
+                                    key = 'Bottom'
                                 }
 
-                                css['padding' + key] = delta + 'px';
-                                self.$(self.scroller).css(css);
+                                css['padding' + key] = delta + 'px'
+                                self.$(self.scroller).css(css)
                             }
                         } else { // clipper
-                            var was = $(self.clipper).css(self.origin.crossSize);
-                            var will = client + 'px';
+                            was = self.$(self.clipper).css(self.origin.crossSize)
+                            will = client + 'px'
 
                             if (was != will) {
-                                self._setCrossSizes(self.clipper, will);
+                                self._setCrossSizes(self.clipper, will)
                             }
                         }
                     } else {
                         // do nothing (display: none, or something)
                     }
 
-                    Array.prototype.unshift.call(arguments, 'resize');
-                    fire.apply(self, arguments);
+                    Array.prototype.unshift.call(arguments, 'resize')
+                    fire.apply(self, arguments)
 
-                    resizeLastFire = getTime();
+                    resizeLastFire = getTime()
                 }
 
                 if (delay) {
-                    resizePauseTimer = setTimeout(upd, delay);
+                    resizePauseTimer = setTimeout(upd, delay)
                 } else {
-                    upd();
+                    upd()
                 }
-            };
+            }
 
             this.updatePositions = function() {
                 var newBarSize,
-                    self = this;
+                    self = this
 
                 if (self.bar) {
                     newBarSize = (track[self.origin.client] - self.barTopLimit) *
-                        self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize];
+                        self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize]
 
                     // Positioning bar
                     if (parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {
-                        setBarSize.call(self, newBarSize);
-                        oldBarSize = newBarSize;
+                        setBarSize.call(self, newBarSize)
+                        oldBarSize = newBarSize
                     }
 
-                    barPos = relToPos.call(self, self.rpos());
+                    barPos = relToPos.call(self, self.rpos())
 
-                    posBar.call(self, barPos);
+                    posBar.call(self, barPos)
                 }
 
-                Array.prototype.unshift.call( arguments, 'scroll' );
-                fire.apply(self, arguments);
-
-                scrollLastFire = getTime();
-            };
+                Array.prototype.unshift.call( arguments, 'scroll' )
+                fire.apply(self, arguments)
+            }
 
             // onScroll handler
             this.scroll = function() {
-                var self = this;
+                var self = this
 
-                self.updatePositions();
+                self.updatePositions()
 
                 if (self.scrollingCls) {
                     if (!scrollingTimer) {
-                        self.$(self.root).addClass(self.scrollingCls);
+                        self.$(self.root).addClass(self.scrollingCls)
                     }
-                    clearTimeout(scrollingTimer);
+                    clearTimeout(scrollingTimer)
                     scrollingTimer = setTimeout(function() {
-                        self.$(self.root).removeClass(self.scrollingCls);
-                        scrollingTimer = undefined;
-                    }, 300);
+                        self.$(self.root).removeClass(self.scrollingCls)
+                        scrollingTimer = undefined
+                    }, 300)
                 }
-            };
+            }
 
             // https://github.com/Diokuz/baron/issues/116
             this.clipperOnScroll = function() {
                 // WTF is this line? https://github.com/Diokuz/baron/issues/134
-                // if (this.direction == 'h') return;
+                // if (this.direction == 'h') return
 
                 // assign `initial scroll position` to `clipper.scrollLeft` (0 for ltr, ~20 for rtl)
                 if (!this.rtl) {
-                    this.clipper[this.origin.scrollEdge] = 0;
+                    this.clipper[this.origin.scrollEdge] = 0
                 } else {
-                    this.clipper[this.origin.scrollEdge] = this.clipper[this.origin.scrollSize];
+                    this.clipper[this.origin.scrollEdge] = this.clipper[this.origin.scrollSize]
                 }
-            };
+            }
 
             // Flexbox `align-items: stretch` (default) requires to set min-width for vertical
             // and max-height for horizontal scroll. Just set them all.
             // http://www.w3.org/TR/css-flexbox-1/#valdef-align-items-stretch
             this._setCrossSizes = function(node, size) {
-                var css = {};
+                var css = {}
 
-                css[this.origin.crossSize] = size;
-                css[this.origin.crossMinSize] = size;
-                css[this.origin.crossMaxSize] = size;
+                css[this.origin.crossSize] = size
+                css[this.origin.crossMinSize] = size
+                css[this.origin.crossMaxSize] = size
 
-                this.$(node).css(css);
-            };
+                this.$(node).css(css)
+            }
 
             // Set common css rules
             this._dumbCss = function(on) {
-                if (params.cssGuru) return;
+                if (params.cssGuru) return
 
-                var overflow = on ? 'hidden' : null;
-                var msOverflowStyle = on ? 'none' : null;
+                var overflow = on ? 'hidden' : null
+                var msOverflowStyle = on ? 'none' : null
 
                 this.$(this.clipper).css({
                     overflow: overflow,
                     msOverflowStyle: msOverflowStyle,
                     position: this.position == 'static' ? '' : 'relative'
-                });
+                })
 
-                var scroll = on ? 'scroll' : null;
-                var axis = this.direction == 'v' ? 'y' : 'x';
-                var scrollerCss = {};
+                var scroll = on ? 'scroll' : null
+                var axis = this.direction == 'v' ? 'y' : 'x'
+                var scrollerCss = {}
 
-                scrollerCss['overflow-' + axis] = scroll;
-                scrollerCss['box-sizing'] = 'border-box';
-                scrollerCss.margin = '0';
-                scrollerCss.border = '0';
+                scrollerCss['overflow-' + axis] = scroll
+                scrollerCss['box-sizing'] = 'border-box'
+                scrollerCss.margin = '0'
+                scrollerCss.border = '0'
 
                 if (this.position == 'absolute') {
-                    scrollerCss.position = 'absolute';
-                    scrollerCss.top = '0';
+                    scrollerCss.position = 'absolute'
+                    scrollerCss.top = '0'
 
                     if (this.direction == 'h') {
-                        scrollerCss.left = scrollerCss.right = '0';
+                        scrollerCss.left = scrollerCss.right = '0'
                     } else {
-                        scrollerCss.bottom = '0';
-                        scrollerCss.right = this.rtl ? '0' : '';
-                        scrollerCss.left = this.rtl ? '' : '0';
+                        scrollerCss.bottom = '0'
+                        scrollerCss.right = this.rtl ? '0' : ''
+                        scrollerCss.left = this.rtl ? '' : '0'
                     }
                 }
 
-                this.$(this.scroller).css(scrollerCss);
-            };
-
-            // onInit actions
-            this._dumbCss(true);
-
-            if (isMacFF) {
-                var padding = 'paddingRight';
-                var css = {};
-                // getComputedStyle is ie9+, but we here only in f ff
-                var paddingWas = scopedWindow.getComputedStyle(this.scroller)[[padding]];
-                var delta = this.scroller[this.origin.crossOffset] -
-                            this.scroller[this.origin.crossClient];
-
-                if (params.direction == 'h') {
-                    padding = 'paddingBottom';
-                } else if (params.rtl) {
-                    padding = 'paddingLeft';
-                }
-
-                var numWas = parseInt(paddingWas, 10);
-                if (numWas != numWas) numWas = 0;
-                css[padding] = (macmsxffScrollbarSize + numWas) + 'px';
-                $(this.scroller).css(css);
+                this.$(this.scroller).css(scrollerCss)
             }
 
-            return this;
+            // onInit actions
+            this._dumbCss(true)
+
+            if (isMacFF) {
+                var padding = 'paddingRight'
+                var css = {}
+                // getComputedStyle is ie9+, but we here only in f ff
+                var paddingWas = scopedWindow.getComputedStyle(this.scroller)[[padding]]
+
+                if (params.direction == 'h') {
+                    padding = 'paddingBottom'
+                } else if (params.rtl) {
+                    padding = 'paddingLeft'
+                }
+
+                var numWas = parseInt(paddingWas, 10)
+
+                if (numWas != numWas) numWas = 0
+                css[padding] = (macmsxffScrollbarSize + numWas) + 'px'
+                _$(this.scroller).css(css)
+            }
+
+            return this
         },
 
         // fires on any update and on init
@@ -866,83 +844,80 @@
                     'Update on disposed baron instance detected.',
                     'You should clear your stored baron value for this instance:',
                     this
-                ].join(' '), params);
+                ].join(' '), params)
             }
             // endRemoveIf(production)
-            fire.call(this, 'upd', params); // Update all plugins' params
+            fire.call(this, 'upd', params) // Update all plugins' params
 
-            this.resize(1);
-            this.updatePositions();
+            this.resize(1)
+            this.updatePositions()
 
-            return this;
+            return this
         },
 
         // One instance
         dispose: function(params) {
             // removeIf(production)
             if (this._disposed) {
-                log('error', [
-                    'Already disposed:',
-                    this
-                ].join(' '), params);
+                log('error', 'Already disposed:', this)
             }
             // endRemoveIf(production)
 
-            manageEvents(this, this.event, 'off');
-            manageAttr(this.root, params.direction, 'off');
+            manageEvents(this, this.event, 'off')
+            manageAttr(this.root, params.direction, 'off')
             if (params.direction == 'v') {
-                this._setCrossSizes(this.scroller, '');
+                this._setCrossSizes(this.scroller, '')
             } else {
-                this._setCrossSizes(this.clipper, '');
+                this._setCrossSizes(this.clipper, '')
             }
-            this._dumbCss(false);
-            this.barOn(true);
-            fire.call(this, 'dispose');
-            this._disposed = true;
+            this._dumbCss(false)
+            this.barOn(true)
+            fire.call(this, 'dispose')
+            this._disposed = true
         },
 
         on: function(eventName, func, arg) {
-            var names = eventName.split(' ');
+            var names = eventName.split(' ')
 
-            for (var i = 0 ; i < names.length ; i++) {
+            for (var i = 0; i < names.length; i++) {
                 if (names[i] == 'init') {
-                    func.call(this, arg);
+                    func.call(this, arg)
                 } else {
-                    this.events[names[i]] = this.events[names[i]] || [];
+                    this.events[names[i]] = this.events[names[i]] || []
 
                     this.events[names[i]].push(function(userArg) {
-                        func.call(this, userArg || arg);
-                    });
+                        func.call(this, userArg || arg)
+                    })
                 }
             }
         }
-    };
+    }
 
-    baron.fn.constructor.prototype = baron.fn;
-    item.prototype.constructor.prototype = item.prototype;
+    baron.fn.constructor.prototype = baron.fn
+    Item.prototype.constructor.prototype = Item.prototype
 
     // Use when you need "baron" global var for another purposes
     baron.noConflict = function() {
-        scopedWindow.baron = _baron; // Restoring original value of "baron" global var
+        scopedWindow.baron = _baron // Restoring original value of "baron" global var
 
-        return baron;
-    };
+        return baron
+    }
 
-    baron.version = '2.2.4';
+    baron.version = '2.2.4'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
-        module.exports = baron;
+        module.exports = baron
         // @todo webpack
-        require('./fix');
-        require('./pull');
-        require('./controls');
-        require('./autoUpdate');
+        require('./fix')
+        require('./pull')
+        require('./controls')
+        require('./autoUpdate')
     } else {
-        window.baron = baron;
+        window.baron = baron
 
         if ($ && $.fn) { // Adding baron to jQuery as plugin
-            $.fn.baron = baron;
+            $.fn.baron = baron
         }
     }
-})(this);
+}(this))

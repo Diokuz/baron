@@ -3,8 +3,7 @@ var gulp = require('gulp');
 var argv = require('yargs').argv;
 var runSequence = require('run-sequence');
 
-var jshint = require('gulp-jshint');
-var jscs = require('gulp-jscs');
+var eslint = require('gulp-eslint');
 
 var concat = require('gulp-concat');
 var removeCode = require('gulp-remove-code');
@@ -35,34 +34,19 @@ function buildFiles(params) {
 /**
  * Linters
  */
-gulp.task('lint.jshint', function() {
+gulp.task('lint.eslint', function() {
     return gulp.src([
         'src/**/*.js',
         'demo/**/*.js',
-        'test/**/*.js'
+        'test/**/*.js',
+        '!demo/baron.js'
     ])
-    .pipe(jshint('config/.jshint'))
-    .pipe(jshint.reporter('jshint-summary', {
-        verbose: true,
-        reasonCol: 'cyan,bold'
-    }))
-    .on('jshint.failed', function() {
-        console.log('[lint.jshint] failed');
-    });
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
 });
 
-gulp.task('lint.jscs', function() {
-    return gulp.src([
-        'src/**/*.js',
-        'test/**/*.js'
-    ])
-    .pipe(jscs('config/.jscs'))
-    .on('jscs.failed', function() {
-        console.log('[lint.jscs] failed');
-    });
-});
-
-gulp.task('lint', ['lint.jshint', 'lint.jscs']);
+gulp.task('lint', ['lint.eslint']);
 
 /**
  * Build
@@ -118,7 +102,9 @@ gulp.task('test', function() {
 });
 
 gulp.task('unit', function() {
-    return gulp.src(['test/**/*.spec.js'], {read: false})
+    return gulp.src([
+        'test/**/*.spec.js'
+    ], {read: false})
         .pipe(mocha());
 });
 
