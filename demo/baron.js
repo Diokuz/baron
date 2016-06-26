@@ -498,6 +498,14 @@
             // DOM elements
             this.root = params.root // Always html node, not just selector
             this.scroller = getNode(params.scroller)
+            // removeIf(production)
+            if (this.scroller.tagName == 'body') {
+                log('error', [
+                    'Please, do not use BODY as a scroller.',
+                    'https://github.com/Diokuz/baron/blob/master/docs/logs/do-not-use-body.md'
+                ].join(', '), params)
+            }
+            // endRemoveIf(production)
             this.bar = getNode(params.bar, this.root)
             track = this.track = getNode(params.track, this.root)
             if (!this.track && this.bar) {
@@ -903,7 +911,7 @@
         return baron
     }
 
-    baron.version = '2.2.4';
+    baron.version = '2.2.5'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
