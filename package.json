@@ -1,13 +1,13 @@
 {
   "name": "baron",
   "description": "A small, fast and crossbrowser custom scrollbar with native system scroll mechanic.",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "readmeFilename": "README.md",
   "homepage": "https://github.com/Diokuz/baron",
   "scripts": {
     "start": "./node_modules/gulp/bin/gulp.js build",
     "test": "./node_modules/gulp/bin/gulp.js t",
-    "build": "./node_modules/gulp/bin/gulp.js build"
+    "build": "./node_modules/gulp/bin/gulp.js"
   },
   "authors": [
     "Dmitry Kuznecov <@Diokuz>"
