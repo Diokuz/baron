@@ -869,6 +869,8 @@
             if (this._disposed) {
                 log('error', 'Already disposed:', this)
             }
+
+            liveBarons--
             // endRemoveIf(production)
 
             manageEvents(this, this.event, 'off')
