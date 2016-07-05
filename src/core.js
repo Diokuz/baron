@@ -714,7 +714,7 @@
                 }
             }
 
-            this.updatePositions = function() {
+            this.updatePositions = function(force) {
                 var newBarSize,
                     self = this
 
@@ -723,7 +723,7 @@
                         self.scroller[self.origin.client] / self.scroller[self.origin.scrollSize]
 
                     // Positioning bar
-                    if (parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {
+                    if (force || parseInt(oldBarSize, 10) != parseInt(newBarSize, 10)) {
                         setBarSize.call(self, newBarSize)
                         oldBarSize = newBarSize
                     }
@@ -858,7 +858,7 @@
             fire.call(this, 'upd', params) // Update all plugins' params
 
             this.resize(1)
-            this.updatePositions()
+            this.updatePositions(1)
 
             return this
         },
@@ -913,7 +913,7 @@
         return baron
     }
 
-    baron.version = '2.2.6'
+    baron.version = '2.2.7'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {

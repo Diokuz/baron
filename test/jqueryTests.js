@@ -172,6 +172,39 @@ describe('Барон.', function() {
         })
     })
 
+    describe('Проблема с удалением атрибутов https://github.com/Diokuz/baron/issues/147', function() {
+        var baron
+
+        before(function() {
+            $('.wrapper._origin').html(originalHTML)
+
+            baron = $('.wrapper._origin .scroller').baron({
+                bar: '.scroller__bar'
+            })
+
+            scroller = $('.scroller')[0]
+            bar = $('.scroller__bar')[0]
+
+            eachIt(baron)
+        })
+
+        it('Удаляем атрибуты, апдейтим и смотрим на высоту бара', function() {
+            var bar = $('.scroller__bar')[0]
+            var scroller = $('.scroller')[0]
+
+            bar.removeAttribute('style')
+            scroller.removeAttribute('style')
+            scroller.removeAttribute('data-baron-v-id')
+
+            var height = bar.clientHeight
+            assert.equal(height, 0)
+
+            baron.update()
+            height = bar.clientHeight
+            assert(height > 20)
+        })
+    })
+
     describe('RTL', function() {
         var baron,
             scroller,
