@@ -75,7 +75,7 @@ gulp.task('build.baron', function() {
 });
 
 // Копируем в корень собранные файлы, чтоб в репе были готовые версии
-gulp.task('copy', ['build.baron'], function() {
+gulp.task('copy', function() {
     return gulp.src([
         'dist/baron.js',
         'dist/baron.min.js'
@@ -83,8 +83,10 @@ gulp.task('copy', ['build.baron'], function() {
     .pipe(gulp.dest('./'))
 });
 
-gulp.task('build', ['build.baron', 'build.demo', 'copy']);
-gulp.task('default', ['build']);
+gulp.task('build', ['build.baron', 'build.demo']);
+gulp.task('default', function(cb) {
+    runSequence('t', 'build', 'copy', cb);
+});
 
 /**
  * Tests
@@ -109,5 +111,5 @@ gulp.task('unit', function() {
 });
 
 gulp.task('t', function(cb) {
-    runSequence('lint', 'build', 'test', 'unit');
+    runSequence('lint', 'test', 'unit', cb);
 });
