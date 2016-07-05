@@ -182,26 +182,27 @@ describe('Барон.', function() {
                 bar: '.scroller__bar'
             })
 
-            scroller = $('.scroller')[0]
-            bar = $('.scroller__bar')[0]
-
             eachIt(baron)
         })
 
-        it('Удаляем атрибуты, апдейтим и смотрим на высоту бара', function() {
+        it('Удаляем атрибуты, апдейтим и смотрим на высоту бара', function(done) {
             var bar = $('.scroller__bar')[0]
             var scroller = $('.scroller')[0]
 
+            bar.setAttribute('style', '') // hack for phantomjs
             bar.removeAttribute('style')
             scroller.removeAttribute('style')
             scroller.removeAttribute('data-baron-v-id')
 
             var height = bar.clientHeight
+
             assert.equal(height, 0)
 
             baron.update()
+
             height = bar.clientHeight
             assert(height > 20)
+            done()
         })
     })
 
