@@ -1299,7 +1299,9 @@
 
 /* Controls plugin for baron 0.6+ */
 (function(scopedWindow) {
-    var scopedBaron
+    var scopedBaron,
+        forwardControlsTimeout,
+        backwardControlsTimeout;
 
     if (typeof module != 'undefined') {
         scopedBaron = require('./core')
@@ -1320,14 +1322,25 @@
             event = {
                 element: forward,
 
-                handler: function() {
-                    var y = self.pos() + (params.delta || 30)
-
-                    self.pos(y)
+                handler: function (e) {
+                    if (e.type == (('mousedown') || ('touchstart'))) {
+                        setTimeout(forwardControls(), 50);
+                    } else {
+                        if (forwardControlsTimeout) {
+                            clearTimeout(forwardControlsTimeout);
+                        }
+                    }
+                    function forwardControls() {
+                        var forwardControlsIteration = 0;
+                        var y = self.pos() + (params.delta || 30);
+                        self.pos(y + forwardControlsIteration * 10);
+                        forwardControlsIteration++;
+                        forwardControlsTimeout = setTimeout(forwardControls, 50);
+                    }
                 },
 
-                type: 'click'
-            }
+                type: 'mousedown touchstart touchend mouseup mouseleave'
+            },
 
             this._eventHandlers.push(event) // For auto-dispose
             this.event(event.element, event.type, event.handler, 'on')
@@ -1339,14 +1352,25 @@
             event = {
                 element: backward,
 
-                handler: function() {
-                    var y = self.pos() - (params.delta || 30)
-
-                    self.pos(y)
+                handler: function (e) {
+                    if (e.type == (('mousedown') || ('touchstart'))) {
+                        setTimeout(backwardControls(), 50);
+                    } else {
+                        if (backwardControlsTimeout) {
+                            clearTimeout(backwardControlsTimeout);
+                        }
+                    }
+                    function backwardControls() {
+                        var backwardControlsIteration = 0;
+                        var y = self.pos() - (params.delta || 30);
+                        self.pos(y - backwardControlsIteration * 10);
+                        backwardControlsIteration++;
+                        backwardControlsTimeout = setTimeout(backwardControls, 50);
+                    }
                 },
 
-                type: 'click'
-            }
+                type: 'mousedown touchstart touchend mouseup mouseleave'
+            };
 
             this._eventHandlers.push(event) // For auto-dispose
             this.event(event.element, event.type, event.handler, 'on')
