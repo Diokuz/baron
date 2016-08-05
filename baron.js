@@ -1,4 +1,4 @@
-(function(scopedWindow) {
+;(function(scopedWindow) {
     'use strict'
 
     var $ = scopedWindow.$
@@ -913,7 +913,7 @@
         return baron
     }
 
-    baron.version = '2.2.7'
+    baron.version = '2.2.8'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
@@ -933,7 +933,7 @@
 }(this))
 
 /* Fixable elements plugin for baron 0.6+ */
-(function(scopedWindow) {
+;(function(scopedWindow) {
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -1205,7 +1205,7 @@
 }(this))
 
 /* Autoupdate plugin for baron 0.6+ */
-(function(scopedWindow) {
+;(function(scopedWindow) {
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -1298,7 +1298,7 @@
 }(this))
 
 /* Controls plugin for baron 0.6+ */
-(function(scopedWindow) {
+;(function(scopedWindow) {
     var scopedBaron
 
     if (typeof module != 'undefined') {

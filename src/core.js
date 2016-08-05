@@ -1,4 +1,4 @@
-(function(scopedWindow) {
+;(function(scopedWindow) {
     'use strict'
 
     var $ = scopedWindow.$
@@ -913,7 +913,7 @@
         return baron
     }
 
-    baron.version = '2.2.7'
+    baron.version = '2.2.8'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {

@@ -1,5 +1,5 @@
 /* Fixable elements plugin for baron 0.6+ */
-(function(scopedWindow) {
+;(function(scopedWindow) {
     var scopedBaron
 
     if (typeof module != 'undefined') {
