@@ -1,5 +1,9 @@
 /* Controls plugin for baron 0.6+ */
-;(function(scopedWindow) {
+;(function() {
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
+
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -102,4 +106,4 @@
 
         return this
     }
-}(this))
+}())

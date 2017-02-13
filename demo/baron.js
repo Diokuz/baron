@@ -1,5 +1,9 @@
-;(function(scopedWindow) {
+;(function() {
     'use strict'
+
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
 
     var $ = scopedWindow.$
     var _baron = baron // Stored baron value for noConflict usage
@@ -930,10 +934,14 @@
             $.fn.baron = baron
         }
     }
-}(this))
+}())
 
 /* Fixable elements plugin for baron 0.6+ */
-;(function(scopedWindow) {
+;(function() {
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
+
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -1202,10 +1210,14 @@
 
         return this
     }
-}(this))
+}())
 
 /* Autoupdate plugin for baron 0.6+ */
-;(function(scopedWindow) {
+;(function() {
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
+
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -1295,10 +1307,14 @@
 
         return this
     }
-}(this))
+}())
 
 /* Controls plugin for baron 0.6+ */
-;(function(scopedWindow) {
+;(function() {
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
+
     var scopedBaron
 
     if (typeof module != 'undefined') {
@@ -1401,7 +1417,7 @@
 
         return this
     }
-}(this))
+}())
 
 // removeIf(production)
 baron.fn.log = function(level, msg, nodes) {

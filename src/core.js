@@ -1,5 +1,9 @@
-;(function(scopedWindow) {
+;(function() {
     'use strict'
+
+    var scopedWindow = (function() {
+        return this || (1, eval)('this')
+    }())
 
     var $ = scopedWindow.$
     var _baron = baron // Stored baron value for noConflict usage
@@ -930,4 +934,4 @@
             $.fn.baron = baron
         }
     }
-}(this))
+}())

@@ -138,7 +138,7 @@
         "no-eq-null": 1,
 
         // disallow use of eval()
-        "no-eval": 2,
+        "no-eval": 0,
 
         // disallow adding to native types
         "no-extend-native": 2,
