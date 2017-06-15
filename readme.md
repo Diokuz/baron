@@ -47,6 +47,23 @@ $('.my-scroller').baron();
 
 You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [skins](skins/).
 
+## Webpack
+
+Just import baron and use it:
+
+```js
+import baron from 'baron';
+// or: const baron = require('baron');
+
+baron({ scroller: ... });
+```
+
+Note: when baron is used as CommonJS module, it not tries to be a jQuery plugin. If you want it, just do it yourself:
+
+```js
+$.fn.baron = require('baron')
+```
+
 ## Version for development
 
 Note, that `baron.js` is a development version. It contains additional code and log messages, to make the development process easier.

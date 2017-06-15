@@ -39,6 +39,7 @@ gulp.task('lint.eslint', function() {
         'src/**/*.js',
         'demo/**/*.js',
         'test/**/*.js',
+        '!test/webpack/*.js',
         '!demo/baron.js'
     ])
     .pipe(eslint())

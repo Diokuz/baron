@@ -3,7 +3,7 @@
 ### initialization parameters
 
 ```js
-var params = {
+var params = HTMLElement | jQueryObject | {
     // Two modes available: 'static' (width = width + 17), 'absolute' (right: -17px).
     // Note: fixable headers works only in 'static' position
     // Default: 'static'
@@ -81,6 +81,8 @@ var params = {
 ```
 
 All parameters are optional (except scroller; or root, if you are not using baron as jQuery plugin).
+
+If `params` is `HTMLElement` or `jQueryObject`, it converts internally to `{ scroller: params }`.
 
 ### Baron library methods and props
 

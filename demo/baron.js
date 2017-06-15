@@ -52,7 +52,9 @@
 
     // window.baron and jQuery.fn.baron points to this function
     function baron(user) {
-        var params = user
+        var tryNode = (user && user[0]) || user
+        var isNode = tryNode instanceof HTMLElement
+        var params = isNode ? { root: user } : user
         var jQueryMode
         var roots
         var withParams = !!params
@@ -917,7 +919,7 @@
         return baron
     }
 
-    baron.version = '2.2.8'
+    baron.version = '2.3.0'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {

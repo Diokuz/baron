@@ -1,3 +1,11 @@
+## 2.3.0
+
+ - Add webpack example
+ - params now can be HTMLElement or jQueryObject
+ - Rework npm scripts
+ - Add yarn
+ - Add editorconfig
+
 ## 2.2.2
 
  - Fix root bidirect bug && add tests https://github.com/Diokuz/baron/issues/139

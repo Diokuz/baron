@@ -11,9 +11,8 @@
 
 ```bash
 # Change scr/ files,
-# bump version in src/core.js and package.json, then
-gulp
-gulp t
+# bump version in src/core.js and package.json manually, then
+make new
 git push
 npm publish
 ```
