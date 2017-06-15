@@ -919,7 +919,7 @@
         return baron
     }
 
-    baron.version = '2.3.0'
+    baron.version = '2.3.1'
 
     // No AMD support, need it? Notify me.
     if (typeof module != 'undefined') {
