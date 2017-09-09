@@ -1,109 +1,98 @@
+'use strict'
+
 /* Controls plugin for baron 0.6+ */
-;(function() {
-    var scopedWindow = (function() {
-        return this || (1, eval)('this')
-    }())
 
-    var scopedBaron
+function controlsOne(params) {
+    var forward, backward, track, screen,
+        self = this,
+        event
 
-    if (typeof module != 'undefined') {
-        scopedBaron = require('./core')
-    } else {
-        scopedBaron = scopedWindow.baron
+    screen = params.screen || 0.9
+
+    if (params.forward) {
+        forward = this.$(params.forward, this.clipper)
+
+        event = {
+            element: forward,
+
+            handler: function() {
+                var y = self.pos() + (params.delta || 30)
+
+                self.pos(y)
+            },
+
+            type: 'click'
+        }
+
+        this._eventHandlers.push(event) // For auto-dispose
+        this.event(event.element, event.type, event.handler, 'on')
     }
 
-    var controls = function(params) {
-        var forward, backward, track, screen,
-            self = this, // AAAAAA!!!!!11
-            event
+    if (params.backward) {
+        backward = this.$(params.backward, this.clipper)
 
-        screen = params.screen || 0.9
+        event = {
+            element: backward,
 
-        if (params.forward) {
-            forward = this.$(params.forward, this.clipper)
+            handler: function() {
+                var y = self.pos() - (params.delta || 30)
 
+                self.pos(y)
+            },
+
+            type: 'click'
+        }
+
+        this._eventHandlers.push(event) // For auto-dispose
+        this.event(event.element, event.type, event.handler, 'on')
+    }
+
+    if (params.track) {
+        if (params.track === true) {
+            track = this.track
+        } else {
+            track = this.$(params.track, this.clipper)[0]
+        }
+
+        if (track) {
             event = {
-                element: forward,
+                element: track,
 
-                handler: function() {
-                    var y = self.pos() + (params.delta || 30)
+                handler: function(e) {
+                    // https://github.com/Diokuz/baron/issues/121
+                    if (e.target != track) return
+
+                    var x = e['offset' + self.origin.x],
+                        xBar = self.bar[self.origin.offsetPos],
+                        sign = 0
+
+                    if (x < xBar) {
+                        sign = -1
+                    } else if (x > xBar + self.bar[self.origin.offset]) {
+                        sign = 1
+                    }
+
+                    var y = self.pos() + sign * screen * self.scroller[self.origin.client]
 
                     self.pos(y)
                 },
 
-                type: 'click'
+                type: 'mousedown'
             }
 
             this._eventHandlers.push(event) // For auto-dispose
             this.event(event.element, event.type, event.handler, 'on')
         }
+    }
+}
 
-        if (params.backward) {
-            backward = this.$(params.backward, this.clipper)
+module.exports = function controls(params) {
+    var i = 0
 
-            event = {
-                element: backward,
-
-                handler: function() {
-                    var y = self.pos() - (params.delta || 30)
-
-                    self.pos(y)
-                },
-
-                type: 'click'
-            }
-
-            this._eventHandlers.push(event) // For auto-dispose
-            this.event(event.element, event.type, event.handler, 'on')
-        }
-
-        if (params.track) {
-            if (params.track === true) {
-                track = this.track
-            } else {
-                track = this.$(params.track, this.clipper)[0]
-            }
-
-            if (track) {
-                event = {
-                    element: track,
-
-                    handler: function(e) {
-                        // https://github.com/Diokuz/baron/issues/121
-                        if (e.target != track) return
-
-                        var x = e['offset' + self.origin.x],
-                            xBar = self.bar[self.origin.offsetPos],
-                            sign = 0
-
-                        if (x < xBar) {
-                            sign = -1
-                        } else if (x > xBar + self.bar[self.origin.offset]) {
-                            sign = 1
-                        }
-
-                        var y = self.pos() + sign * screen * self.scroller[self.origin.client]
-
-                        self.pos(y)
-                    },
-
-                    type: 'mousedown'
-                }
-
-                this._eventHandlers.push(event) // For auto-dispose
-                this.event(event.element, event.type, event.handler, 'on')
-            }
-        }
+    while (this[i]) {
+        controlsOne.call(this[i], params)
+        i++
     }
 
-    scopedBaron.fn.controls = function(params) {
-        var i = 0
-
-        while (this[i]) {
-            controls.call(this[i], params)
-            i++
-        }
-
-        return this
-    }
-}())
+    return this
+}

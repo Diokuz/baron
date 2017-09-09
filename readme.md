@@ -90,6 +90,10 @@ Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: h
 
 Firefox for Mac OS X now [supported](https://github.com/Diokuz/baron/issues/110).
 
+## 3.0 migration
+
+TODO
+
 ## 2.0 migration
 
 `impact` param default value changed to `scroller` for all directions. That impact horizontal scrollbars.

@@ -13,8 +13,6 @@ var originalHorizontalHTML = [
 ].join('')
 
 describe("Режим position='absolute'.", function() {
-    var scopedBaron = window.baron
-
     before(function() {
         $('.wrapper._origin').html(originalHTML)
     })
@@ -45,10 +43,10 @@ describe("Режим position='absolute'.", function() {
         })
 
         it('Логирование ошибки при одновременном position=absolute && impact=clipper', function() {
-            var _log = scopedBaron.fn.log
+            var _log = console.error
             var i = 0
 
-            scopedBaron.fn.log = function() {
+            console.error = function() {
                 i++
             }
 
@@ -61,15 +59,15 @@ describe("Режим position='absolute'.", function() {
 
             assert.equal(i, 1)
 
-            scopedBaron.fn.log = _log
+            console.error = _log
             baron.dispose()
         })
 
         it('Логирование ошибки при вызове плагина fix (он несовместим с mode=position)', function() {
-            var _log = scopedBaron.fn.log
+            var _log = console.error
             var i = 0
 
-            scopedBaron.fn.log = function() {
+            console.error = function() {
                 i++
             }
 
@@ -81,7 +79,7 @@ describe("Режим position='absolute'.", function() {
 
             assert.equal(i, 3)
 
-            scopedBaron.fn.log = _log
+            console.error = _log
             baron.dispose()
         })
 

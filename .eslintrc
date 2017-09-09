@@ -194,9 +194,6 @@
         // TODO: а не д**** ли будет?
         "no-param-reassign": 1,
 
-        // disallow use of process.env (off by default) - в одном есте разрешить для 12f
-        "no-process-env": 1,
-
         // disallow usage of __proto__ property
         "no-proto": 2,
 

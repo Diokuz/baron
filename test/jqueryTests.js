@@ -437,11 +437,11 @@ describe('Барон.', function() {
         })
 
         it('Высота скроллера и клиппера в вебките должна быть одинаковой', function() {
-            var _log = console.log
+            var _log = console.error
             var msg = ''
             var root
 
-            console.log = function() {
+            console.error = function() {
                 msg += arguments[0]
                 root = arguments[1]
             }
@@ -456,13 +456,13 @@ describe('Барон.', function() {
             var scrollerHeight = $('.scroller_h').height()
 
             assert.equal(clipperHeight, scrollerHeight)
-            assert.equal(msg, 'Scroller not found!', 'Ошибка "скроллер не найден" залогирована 1 раз')
+            assert.equal(msg, 'Baron: Scroller not found!', 'Ошибка "скроллер не найден" залогирована 1 раз')
             assert.ok(
                 root === $('.wrapper._contenteditable')[0],
                 'Ошибка "скроллер не найден" брошена именно с той root-ноды, где его нет'
             )
 
-            console.log = _log
+            console.error = _log
         })
 
         after(function() {

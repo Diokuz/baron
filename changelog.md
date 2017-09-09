@@ -1,3 +1,8 @@
+## 3.0.0
+
+ - Webpack is used to build client bundle
+ -
+
 ## 2.3.0
 
  - Add webpack example
