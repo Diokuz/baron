@@ -1,8 +1,10 @@
 'use strict'
 
-/* Controls plugin for baron 0.6+ */
+/* Controls plugin for baron */
 
-function controlsOne(params) {
+var qs = require('./utils').qs
+
+module.exports = function controls(params) {
     var forward, backward, track, screen,
         self = this,
         event
@@ -10,7 +12,7 @@ function controlsOne(params) {
     screen = params.screen || 0.9
 
     if (params.forward) {
-        forward = this.$(params.forward, this.clipper)
+        forward = qs(params.forward, this.clipper)
 
         event = {
             element: forward,
@@ -29,7 +31,7 @@ function controlsOne(params) {
     }
 
     if (params.backward) {
-        backward = this.$(params.backward, this.clipper)
+        backward = qs(params.backward, this.clipper)
 
         event = {
             element: backward,
@@ -51,7 +53,7 @@ function controlsOne(params) {
         if (params.track === true) {
             track = this.track
         } else {
-            track = this.$(params.track, this.clipper)[0]
+            track = qs(params.track, this.clipper)
         }
 
         if (track) {
@@ -84,15 +86,4 @@ function controlsOne(params) {
             this.event(event.element, event.type, event.handler, 'on')
         }
     }
-}
-
-module.exports = function controls(params) {
-    var i = 0
-
-    while (this[i]) {
-        controlsOne.call(this[i], params)
-        i++
-    }
-
-    return this
 }

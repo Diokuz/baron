@@ -1,3 +1,7 @@
+```
+Deprecated. No jQuery support in baron@3+.
+```
+
 You probably here because you got an error
 
 ```

@@ -16,13 +16,13 @@ Baron — a small, fast and crossbrowser custom scrollbar with native system scr
 
 - Doesn't replace native system scroll mechanic.
 - Customizable scrollbar design with full CSS support.
-- No strong dependencies on jQuery.
+- Do not depends on external libraries (since v3).
 - Can be inited on hidden blocks
 - Vertical, horizontal and bidirectional scroll
 - Infinite scroll
 - Nested scrollers
 
-Baron just hides the system scrollbar, without removing it. This guarantees scrolling will work on any system.
+Baron do not hide native scrollbar, just hides it. This guarantees scrolling will work in any browser.
 
 ## 1. Hiding system scrollbar
 
@@ -40,12 +40,12 @@ Baron just hides the system scrollbar, without removing it. This guarantees scro
 * Initialize baron on your scroller:
 
 ```js
-$('.my-scroller').baron();
+baron('.my-scroller');
 ```
 
 ## 2. Making your own custom-designed scrollbar
 
-You can do everything you want with CSS of your custom scrollbar. There some required and recommended css rules (see [base css](baron.css)), dont forget to use them. You also can use predefined [skins](skins/).
+You can do everything you want with CSS of your custom scrollbar. There are some required and recommended css rules (see [base css](baron.css)) – do not forget to use them. You can also use predefined [skins](skins/).
 
 ## Webpack
 
@@ -58,17 +58,11 @@ import baron from 'baron';
 baron({ scroller: ... });
 ```
 
-Note: when baron is used as CommonJS module, it not tries to be a jQuery plugin. If you want it, just do it yourself:
-
-```js
-$.fn.baron = require('baron')
-```
-
 ## Version for development
 
 Note, that `baron.js` is a development version. It contains additional code and log messages, to make the development process easier.
 
-`baron.min.js` is production-ready: weight less, works a little bit faster.
+`baron.min.js` is a production-ready version: weight less, works a little bit faster.
 
 ## Nested scrollers
 
@@ -84,15 +78,16 @@ Baron uses two old `CSS 2.1` technologies: 1) `overflow: scroll` 2) `overflow: h
 
 | <img src="http://diokuz.github.io/pics/chrome.png" width="48px" height="48px" alt="Chrome logo"> | <img src="http://diokuz.github.io/pics/firefox.png" width="48px" height="48px" alt="Firefox logo"> | <img src="http://diokuz.github.io/pics/ie.png" width="48px" height="48px" alt="Internet Explorer logo"> | <img src="http://diokuz.github.io/pics/opera.png" width="48px" height="48px" alt="Opera logo"> | <img src="http://diokuz.github.io/pics/safari.png" width="48px" height="48px" alt="Safari logo"> | <img src="http://diokuz.github.io/pics/android.png" width="48px" height="48px" alt="Android browser logo"> |
 |:---:|:---:|:---:|:---:|:---:|:---:|
-| 1+ ✔ | 1+ ✔ | 6+ ✔ | 9+ ✔ | 5+ ✔ | 4+ ✔ |
+| 8+ ✔ | 3.6+ ✔ | 10+ ✔ | 11.5+ ✔ | 5.1+ ✔ | 4+ ✔ |
 
-`overflow: scroll` not supported by Opera mini and old versions of Android browser (2-). That means, you cannot make scrollable html-elements for them anyway.
-
-Firefox for Mac OS X now [supported](https://github.com/Diokuz/baron/issues/110).
+Wanna support ie6 and Opera 9? Try baron@2 version + jQuery. Version 3+ uses `classList` API and `style` attribute.
 
 ## 3.0 migration
 
-TODO
+1. Make sure you are satisfied with new supported browser list.
+2. Remove `$` and `event` params if any. You also could remove jQuery from your page.
+3. Make sure you have one html node per one initialization: multi-baron not supported.
+4. `pull` plugin removed, so you cannot use it anymore. But you can add it manually.
 
 ## 2.0 migration
 

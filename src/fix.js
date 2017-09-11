@@ -1,11 +1,15 @@
 'use strict'
 
-/* Fixable elements plugin for baron 0.6+ */
+/* Fixable elements plugin for baron */
 
 var log = require('./log')
+var css = require('./utils').css
+var add = require('./utils').add
+var rm = require('./utils').rm
 
-function fixOne(userParams) {
-    var elements, viewPortSize,
+module.exports = function fix(userParams) {
+    var elements,
+        viewPortSize,
         params = { // Default params
             outside: '',
             inside: '',
@@ -21,7 +25,6 @@ function fixOne(userParams) {
         headerTops = [], // offset positions when not fixed
         scroller = this.scroller,
         eventManager = this.event,
-        $ = this.$,
         self = this
 
     if (process.env.NODE_ENV !== 'production') {
@@ -44,12 +47,15 @@ function fixOne(userParams) {
         }
 
         // Removing all fixing stuff - we can do this because fixElement triggers only when fixState really changed
-        this.$(elements[i]).css(this.origin.pos, '').css(this.origin.oppos, '').removeClass(params.outside)
+        css(elements[i], this.origin.pos, '')
+        css(elements[i], this.origin.oppos, '')
+        rm(elements[i], params.outside)
 
         // Fixing if needed
         if (pos !== undefined) {
             pos += 'px'
-            this.$(elements[i]).css(this.origin[ori], pos).addClass(params.outside)
+            css(elements[i], this.origin[ori], pos)
+            add(elements[i], params.outside)
         }
     }
 
@@ -73,20 +79,26 @@ function fixOne(userParams) {
             params[key] = _params[key]
         }
 
-        elements = this.$(params.elements, this.scroller)
+        if (params.elements instanceof HTMLElement) {
+            elements = [params.elements]
+        } else if (typeof params.elements == 'string') {
+            elements = this.scroller.querySelectorAll(params.elements)
+        } else if (params.elements && params.elements[0] instanceof HTMLElement) {
+            elements = params.elements
+        }
 
         if (elements) {
             viewPortSize = this.scroller[this.origin.client]
             for (var i = 0; i < elements.length; i++) {
                 // Variable header heights
                 pos = {}
-                pos[this.origin.size] = elements[i][this.origin.offset]
+                pos[this.origin.size] = elements[i][this.origin.offset] + 'px'
                 if (elements[i].parentNode !== this.scroller) {
-                    this.$(elements[i].parentNode).css(pos)
+                    css(elements[i].parentNode, pos)
                 }
                 pos = {}
-                pos[this.origin.crossSize] = elements[i].parentNode[this.origin.crossClient]
-                this.$(elements[i]).css(pos)
+                pos[this.origin.crossSize] = elements[i].parentNode[this.origin.crossClient] + 'px'
+                css(elements[i], pos)
 
                 // Between fixed headers
                 viewPortSize -= elements[i][this.origin.offset]
@@ -111,8 +123,8 @@ function fixOne(userParams) {
             if (params.limiter && elements[0]) { // Bottom edge of first header as top limit for track
                 if (this.track && this.track != this.scroller) {
                     pos = {}
-                    pos[this.origin.pos] = elements[0].parentNode[this.origin.offset]
-                    this.$(this.track).css(pos)
+                    pos[this.origin.pos] = elements[0].parentNode[this.origin.offset] + 'px'
+                    css(this.track, pos)
                 } else {
                     this.barTopLimit = elements[0].parentNode[this.origin.offset]
                 }
@@ -129,7 +141,7 @@ function fixOne(userParams) {
             element: elements,
 
             handler: function() {
-                var parent = $(this)[0].parentNode,
+                var parent = this.parentNode,
                     top = parent.offsetTop,
                     num
 
@@ -156,7 +168,9 @@ function fixOne(userParams) {
         if (params.clickable) {
             this._eventHandlers.push(event) // For auto-dispose
             // eventManager(event.element, event.type, event.handler, 'off')
-            eventManager(event.element, event.type, event.handler, 'on')
+            for (var j = 0; j < event.element.length; j++) {
+                eventManager(event.element[j], event.type, event.handler, 'on')
+            }
         }
     }
 
@@ -209,33 +223,37 @@ function fixOne(userParams) {
             if (change) { // At leats one change in elements flag structure occured
                 for (i = 0; i < elements.length; i++) {
                     if (fixFlag[i] == 1 && params.past) {
-                        this.$(elements[i]).addClass(params.past).removeClass(params.future)
+                        add(elements[i], params.past)
+                        rm(elements[i], params.future)
                     }
 
                     if (fixFlag[i] == 2 && params.future) {
-                        this.$(elements[i]).addClass(params.future).removeClass(params.past)
+                        add(elements[i], params.future)
+                        rm(elements[i], params.past)
                     }
 
                     if (fixFlag[i] == 3) {
-                        if (params.future || params.past) this.$(elements[i]).removeClass(params.past).removeClass(params.future)
-                        if (params.inside) this.$(elements[i]).addClass(params.inside)
-                    } else if (params.inside) {
-                        this.$(elements[i]).removeClass(params.inside)
+                        rm(elements[i], params.past)
+                        rm(elements[i], params.future)
+                        add(elements[i], params.inside)
                     }
 
-                    if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && params.before) {
-                        this.$(elements[i]).addClass(params.before).removeClass(params.after) // Last top fixed header
-                    } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && params.after) {
-                        this.$(elements[i]).addClass(params.after).removeClass(params.before) // First bottom fixed header
+                    if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1) {
+                        add(elements[i], params.before)
+                        rm(elements[i], params.after) // Last top fixed header
+                    } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2) {
+                        add(elements[i], params.after)
+                        rm(elements[i], params.before) // First bottom fixed header
                     } else {
-                        this.$(elements[i]).removeClass(params.before).removeClass(params.after)
+                        rm(elements[i], params.before)
+                        rm(elements[i], params.after)
                     }
 
                     if (params.grad) {
                         if (gradFlag[i]) {
-                            this.$(elements[i]).addClass(params.grad)
+                            add(elements[i], params.grad)
                         } else {
-                            this.$(elements[i]).removeClass(params.grad)
+                            rm(elements[i], params.grad)
                         }
                     }
                 }
@@ -246,15 +264,6 @@ function fixOne(userParams) {
     this.on('resize upd', function(updParams) {
         init.call(this, updParams && updParams.fix)
     })
-}
-
-module.exports = function fix(params) {
-    var i = 0
-
-    while (this[i]) {
-        fixOne.call(this[i], params)
-        i++
-    }
 
     return this
 }

@@ -63,11 +63,94 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function each(obj, handler) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            handler(key, obj[key])
+        }
+    }
+}
+
+module.exports.css = function css(node, key, value) {
+    var styles
+
+    if (value === undefined) {
+        // Getter mode
+        if (typeof key == 'string') {
+            return node.style[key]
+        }
+
+        styles = key
+    } else {
+        styles = {}
+        styles[key] = value
+    }
+
+    each(styles, function(key, val) {
+        node.style[key] = val
+    })
+}
+
+module.exports.add = function add(node, cls) {
+    if (!cls) {
+        return
+    }
+
+    node.classList.add(cls)
+}
+
+module.exports.rm = function add(node, cls) {
+    if (!cls) {
+        return
+    }
+
+    node.classList.remove(cls)
+}
+
+module.exports.has = function has(node, cls) {
+    if (!cls) {
+        return false
+    }
+
+    return node.classList.contains(cls)
+}
+
+module.exports.clone = function clone(_input) {
+    var output = {}
+    var input = _input || {}
+
+    each(input, function(key, value) {
+        output[key] = value
+    })
+
+    return output
+}
+
+module.exports.qs = function qs(selector, _ctx) {
+    if (selector instanceof HTMLElement) {
+        return selector
+    }
+
+    var ctx = _ctx || document
+
+    return ctx.querySelector(selector)
+}
+
+module.exports.each = each
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -257,7 +340,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports) {
 
 module.exports = function log(level, msg, more) {
@@ -272,7 +355,7 @@ module.exports = function log(level, msg, more) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -282,9 +365,15 @@ var scopedWindow = (function() {
     return this || (1, eval)('this')
 }())
 
-var $ = scopedWindow.$
+var css = __webpack_require__(0).css
+var add = __webpack_require__(0).add
+var has = __webpack_require__(0).has
+var rm = __webpack_require__(0).rm
+var clone = __webpack_require__(0).clone
+var qs = __webpack_require__(0).qs
+
 var _baron = baron // Stored baron value for noConflict usage
-var Item = {}
+// var Item = {}
 var pos = ['left', 'top', 'right', 'bottom', 'width', 'height']
 // Global store for all baron instances (to be able to dispose them on html-nodes)
 var instances = []
@@ -319,7 +408,7 @@ var isMacFF = macosxffRe.test(scopedWindow.navigator && scopedWindow.navigator.u
 var log, liveBarons, shownErrors
 
 if (process.env.NODE_ENV !== 'production') {
-    log = __webpack_require__(1)
+    log = __webpack_require__(2)
     liveBarons = 0
     shownErrors = {
         liveTooMany: false,
@@ -329,19 +418,23 @@ if (process.env.NODE_ENV !== 'production') {
 
 // window.baron and jQuery.fn.baron points to this function
 function baron(user) {
+    var withParams = !!user
     var tryNode = (user && user[0]) || user
     var isNode = tryNode instanceof HTMLElement
-    var params = isNode ? { root: user } : user
+    var params = isNode ? { root: user } : clone(user)
     var jQueryMode
-    var roots
-    var withParams = !!params
+    var rootNode
     var defaultParams = {
-        $: scopedWindow.jQuery,
         direction: 'v',
         barOnCls: '_scrollbar',
         resizeDebounce: 0,
-        event: function(elem, event, func, mode) {
-            params.$(elem)[mode || 'on'](event, func)
+        event: function(elem, _eventNames, handler, mode) {
+            var eventNames = _eventNames.split(' ')
+            var prefix = mode == 'on' ? 'add' : 'remove'
+
+            eventNames.forEach(function(eventName) {
+                elem[prefix + 'EventListener'](eventName, handler)
+            })
         },
         cssGuru: false,
         impact: 'scroller',
@@ -352,18 +445,12 @@ function baron(user) {
 
     // Extending default params by user-defined params
     for (var key in defaultParams) {
-        if (params[key] === undefined) {
+        if (params[key] == null) { // eslint-disable-line
             params[key] = defaultParams[key]
         }
     }
 
     if (process.env.NODE_ENV !== 'production') {
-        if (!params.$) {
-            log('error', [
-                'no jQuery nor params.$ detected',
-                'https://github.com/Diokuz/baron/blob/master/docs/logs/no-jquery-detected.md'
-            ].join(', '), params)
-        }
         if (params.position == 'absolute' && params.impact == 'clipper') {
             log('error', [
                 'Simultaneous use of `absolute` position and `clipper` impact values detected.',
@@ -373,20 +460,63 @@ function baron(user) {
         }
     }
 
-    // this - something or jQuery instance
-    jQueryMode = params.$ && this instanceof params.$
+    // `this` could be a jQuery instance
+    jQueryMode = this && this instanceof scopedWindow.jQuery
 
     if (params._chain) {
-        roots = params.root
+        rootNode = params.root
     } else if (jQueryMode) {
-        params.root = roots = this
-    } else if (params.$) {
-        roots = params.$(params.root || params.scroller)
+        params.root = rootNode = this[0]
     } else {
-        roots = [] // noop mode, like jQuery when no matched html-nodes found
+        rootNode = qs(params.root || params.scroller)
     }
 
-    var instance = new baron.fn.constructor(roots, params, withParams)
+    if (process.env.NODE_ENV !== 'production') {
+        if (!rootNode) {
+            log('error', [
+                'Barin initialization failed: root node not found.'
+            ].join(', '), params)
+
+            return // or return baron-shell?
+        }
+    }
+
+    var attr = manageAttr(rootNode, params.direction)
+    var id = +attr // Could be NaN
+
+    params.index = id
+
+    // baron() can return existing instances,
+    // @TODO update params on-the-fly
+    // https://github.com/Diokuz/baron/issues/124
+    if (id == id && attr !== null && instances[id]) {
+        if (process.env.NODE_ENV !== 'production') {
+            if (withParams) {
+                log('error', [
+                    'repeated initialization for html-node detected',
+                    'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
+                ].join(', '), params.root)
+            }
+        }
+
+        return instances[id]
+    }
+
+    // root and scroller can be different nodes
+    if (params.root && params.scroller) {
+        params.scroller = qs(params.scroller, rootNode)
+        if (process.env.NODE_ENV !== 'production') {
+            if (!params.scroller) {
+                log('error', 'Scroller not found!', rootNode, params.scroller)
+            }
+        }
+    } else {
+        params.scroller = rootNode
+    }
+
+    params.root = rootNode
+
+    var instance = init(params)
 
     if (instance.autoUpdate) {
         instance.autoUpdate()
@@ -414,100 +544,6 @@ function getTime() {
 
 if (process.env.NODE_ENV !== 'production') {
     baron._instances = instances
-}
-
-baron.fn = {
-    constructor: function(roots, totalParams, withParams) {
-        var params = clone(totalParams)
-
-        // Intrinsic params.event is not the same as totalParams.event
-        params.event = function(elems, e, func, mode) {
-            arrayEach(elems, function(elem) {
-                totalParams.event(elem, e, func, mode)
-            })
-        }
-
-        this.length = 0
-
-        arrayEach.call(this, roots, function(root, i) {
-            var attr = manageAttr(root, params.direction)
-            var id = +attr // Could be NaN
-
-            // baron() can return existing instances,
-            // @TODO update params on-the-fly
-            // https://github.com/Diokuz/baron/issues/124
-            if (id == id && attr !== null && instances[id]) {
-                if (process.env.NODE_ENV !== 'production') {
-                    if (withParams) {
-                        log('error', [
-                            'repeated initialization for html-node detected',
-                            'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
-                        ].join(', '), totalParams.root)
-                    }
-                }
-
-                this[i] = instances[id]
-            } else {
-                var perInstanceParams = clone(params)
-
-                // root and scroller can be different nodes
-                if (params.root && params.scroller) {
-                    perInstanceParams.scroller = params.$(params.scroller, root)
-                    if (!perInstanceParams.scroller.length) {
-                        if (process.env.NODE_ENV !== 'production') {
-                            log('error', 'Scroller not found!', root, params.scroller)
-                        }
-                        return
-                    }
-                } else {
-                    perInstanceParams.scroller = root
-                }
-
-                perInstanceParams.root = root
-                this[i] = init(perInstanceParams)
-            }
-
-            this.length = i + 1
-        })
-
-        this.params = params
-    },
-
-    dispose: function() {
-        var params = this.params
-
-        arrayEach(this, function(instance, index) {
-            instance.dispose(params)
-            instances[index] = null
-        })
-
-        this.params = null
-    },
-
-    update: function() {
-        var args = arguments
-
-        arrayEach(this, function(instance) {
-            // instance cannot be null, because it is stored by user
-            instance.update.apply(instance, args)
-        })
-    },
-
-    // Restriction: only the same scroller can be used
-    baron: function(params) {
-        params.root = []
-        if (this.params.root) {
-            params.scroller = this.params.scroller
-        }
-
-        arrayEach.call(this, this, function(elem) {
-            params.root.push(elem.root)
-        })
-        params.direction = (this.params.direction == 'v') ? 'h' : 'v'
-        params._chain = true
-
-        return baron(params)
-    }
 }
 
 function manageEvents(item, eventManager, mode) {
@@ -549,7 +585,7 @@ function manageEvents(item, eventManager, mode) {
                 item.selection() // Disable text selection in ie8
                 item.drag.now = 1 // Save private byte
                 if (item.draggingCls) {
-                    $(item.root).addClass(item.draggingCls)
+                    add(item.root, item.draggingCls)
                 }
             },
 
@@ -562,7 +598,7 @@ function manageEvents(item, eventManager, mode) {
                 item.selection(1) // Enable text selection
                 item.drag.now = 0
                 if (item.draggingCls) {
-                    $(item.root).removeClass(item.draggingCls)
+                    rm(item.root, item.draggingCls)
                 }
             },
 
@@ -623,7 +659,15 @@ function manageEvents(item, eventManager, mode) {
 
     arrayEach(item._eventHandlers, function(event) {
         if (event.element) {
-            eventManager(event.element, event.type, event.handler, mode)
+            // workaround for element-elements in `fix` plugin
+            // @todo dispose `fix` in proper way and remove workaround
+            if (event.element.length) {
+                for (var i = 0; i < event.element.length; i++) {
+                    eventManager(event.element[i], event.type, event.handler, mode)
+                }
+            } else {
+                eventManager(event.element, event.type, event.handler, mode)
+            }
         }
     })
 
@@ -658,8 +702,7 @@ function manageAttr(node, direction, mode, id) {
 }
 
 function init(params) {
-    // __proto__ of returning object is baron.prototype
-    var out = new Item.prototype.constructor(params)
+    var out = new baron.prototype.constructor(params)
 
     manageEvents(out, params.event, 'on')
 
@@ -692,19 +735,6 @@ function init(params) {
     return out
 }
 
-function clone(_input) {
-    var output = {}
-    var input = _input || {}
-
-    for (var key in input) {
-        if (input.hasOwnProperty(key)) {
-            output[key] = input[key]
-        }
-    }
-
-    return output
-}
-
 function fire(eventName) {
     if (this.events && this.events[eventName]) {
         for (var i = 0; i < this.events[eventName].length; i++) {
@@ -715,7 +745,7 @@ function fire(eventName) {
     }
 }
 
-Item.prototype = {
+baron.prototype = {
     // underscore.js realization
     // used in autoUpdate plugin
     _debounce: function(func, wait) {
@@ -759,8 +789,7 @@ Item.prototype = {
     },
 
     constructor: function(params) {
-        var _$,
-            barPos,
+        var barPos,
             scrollerPos0,
             track,
             resizePauseTimer,
@@ -770,17 +799,13 @@ Item.prototype = {
 
         resizeLastFire = getTime()
 
-        _$ = this.$ = params.$
+        this.params = params
         this.event = params.event
         this.events = {}
 
-        function getNode(sel, context) {
-            return _$(sel, context)[0] // Can be undefined
-        }
-
         // DOM elements
         this.root = params.root // Always html node, not just selector
-        this.scroller = getNode(params.scroller)
+        this.scroller = qs(params.scroller)
         if (process.env.NODE_ENV !== 'production') {
             if (this.scroller.tagName == 'body') {
                 log('error', [
@@ -789,8 +814,8 @@ Item.prototype = {
                 ].join(', '), params)
             }
         }
-        this.bar = getNode(params.bar, this.root)
-        track = this.track = getNode(params.track, this.root)
+        this.bar = qs(params.bar, this.root)
+        track = this.track = qs(params.track, this.root)
         if (!this.track && this.bar) {
             track = this.bar.parentNode
         }
@@ -819,18 +844,18 @@ Item.prototype = {
             }
 
             if (this.bar) {
-                _$(this.bar).css(this.origin.size, parseInt(size, 10) + 'px')
+                css(this.bar, this.origin.size, parseInt(size, 10) + 'px')
             }
         }
 
         // Updating top or left bar position
         function posBar(_pos) {
             if (this.bar) {
-                var was = _$(this.bar).css(this.origin.pos),
+                var was = css(this.bar, this.origin.pos),
                     will = +_pos + 'px'
 
                 if (will && will != was) {
-                    _$(this.bar).css(this.origin.pos, will)
+                    css(this.bar, this.origin.pos, will)
                 }
             }
         }
@@ -889,11 +914,11 @@ Item.prototype = {
                 var noScroll = this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]
 
                 if (dispose || noScroll) {
-                    if (_$(this.root).hasClass(this.barOnCls)) {
-                        _$(this.root).removeClass(this.barOnCls)
+                    if (has(this.root, this.barOnCls)) {
+                        rm(this.root, this.barOnCls)
                     }
-                } else if (!_$(this.root).hasClass(this.barOnCls)) {
-                    _$(this.root).addClass(this.barOnCls)
+                } else if (!has(this.root, this.barOnCls)) {
+                    add(this.root, this.barOnCls)
                 }
             }
         }
@@ -955,25 +980,25 @@ Item.prototype = {
 
                         // `static` position works only for `scroller` impact
                         if (self.position == 'static') { // static
-                            was = self.$(self.scroller).css(self.origin.crossSize)
+                            was = css(self.scroller, self.origin.crossSize)
                             will = self.clipper[self.origin.crossClient] + delta + 'px'
 
                             if (was != will) {
                                 self._setCrossSizes(self.scroller, will)
                             }
                         } else { // absolute
-                            var css = {}
+                            var styles = {}
                             var key = self.rtl ? 'Left' : 'Right'
 
                             if (self.direction == 'h') {
                                 key = 'Bottom'
                             }
 
-                            css['padding' + key] = delta + 'px'
-                            self.$(self.scroller).css(css)
+                            styles['padding' + key] = delta + 'px'
+                            css(self.scroller, styles)
                         }
                     } else { // clipper
-                        was = self.$(self.clipper).css(self.origin.crossSize)
+                        was = css(self.clipper, self.origin.crossSize)
                         will = client + 'px'
 
                         if (was != will) {
@@ -1028,11 +1053,11 @@ Item.prototype = {
 
             if (self.scrollingCls) {
                 if (!scrollingTimer) {
-                    self.$(self.root).addClass(self.scrollingCls)
+                    add(self.root, self.scrollingCls)
                 }
                 clearTimeout(scrollingTimer)
                 scrollingTimer = setTimeout(function() {
-                    self.$(self.root).removeClass(self.scrollingCls)
+                    rm(self.root, self.scrollingCls)
                     scrollingTimer = undefined
                 }, 300)
             }
@@ -1055,13 +1080,13 @@ Item.prototype = {
         // and max-height for horizontal scroll. Just set them all.
         // http://www.w3.org/TR/css-flexbox-1/#valdef-align-items-stretch
         this._setCrossSizes = function(node, size) {
-            var css = {}
+            var styles = {}
 
-            css[this.origin.crossSize] = size
-            css[this.origin.crossMinSize] = size
-            css[this.origin.crossMaxSize] = size
+            styles[this.origin.crossSize] = size
+            styles[this.origin.crossMinSize] = size
+            styles[this.origin.crossMaxSize] = size
 
-            this.$(node).css(css)
+            css(node, styles)
         }
 
         // Set common css rules
@@ -1071,7 +1096,7 @@ Item.prototype = {
             var overflow = on ? 'hidden' : null
             var msOverflowStyle = on ? 'none' : null
 
-            this.$(this.clipper).css({
+            css(this.clipper, {
                 overflow: overflow,
                 msOverflowStyle: msOverflowStyle,
                 position: this.position == 'static' ? '' : 'relative'
@@ -1099,7 +1124,7 @@ Item.prototype = {
                 }
             }
 
-            this.$(this.scroller).css(scrollerCss)
+            css(this.scroller, scrollerCss)
         }
 
         // onInit actions
@@ -1107,7 +1132,7 @@ Item.prototype = {
 
         if (isMacFF) {
             var padding = 'paddingRight'
-            var css = {}
+            var styles = {}
             // getComputedStyle is ie9+, but we here only in f ff
             var paddingWas = scopedWindow.getComputedStyle(this.scroller)[[padding]]
 
@@ -1120,8 +1145,8 @@ Item.prototype = {
             var numWas = parseInt(paddingWas, 10)
 
             if (numWas != numWas) numWas = 0
-            css[padding] = (macmsxffScrollbarSize + numWas) + 'px'
-            _$(this.scroller).css(css)
+            styles[padding] = (macmsxffScrollbarSize + numWas) + 'px'
+            css(this.scroller, styles)
         }
 
         return this
@@ -1148,7 +1173,7 @@ Item.prototype = {
     },
 
     // One instance
-    dispose: function(params) {
+    dispose: function() {
         if (process.env.NODE_ENV !== 'production') {
             if (this._disposed) {
                 log('error', 'Already disposed:', this)
@@ -1158,8 +1183,8 @@ Item.prototype = {
         }
 
         manageEvents(this, this.event, 'off')
-        manageAttr(this.root, params.direction, 'off')
-        if (params.direction == 'v') {
+        manageAttr(this.root, this.params.direction, 'off')
+        if (this.params.direction == 'v') {
             this._setCrossSizes(this.scroller, '')
         } else {
             this._setCrossSizes(this.clipper, '')
@@ -1167,6 +1192,8 @@ Item.prototype = {
         this._dumbCss(false)
         this.barOn(true)
         fire.call(this, 'dispose')
+        instances[this.params.index] = null
+        this.params = null
         this._disposed = true
     },
 
@@ -1184,11 +1211,20 @@ Item.prototype = {
                 })
             }
         }
+    },
+
+    baron: function(params) {
+        params.root = this.params.root
+        params.scroller = this.params.scroller
+        params.direction = (this.params.direction == 'v') ? 'h' : 'v'
+        params._chain = true
+
+        return baron(params)
     }
 }
 
-baron.fn.constructor.prototype = baron.fn
-Item.prototype.constructor.prototype = Item.prototype
+// baron.fn.constructor.prototype = baron.fn
+baron.prototype.constructor.prototype = baron.prototype
 
 // Use when you need "baron" global var for another purposes
 baron.noConflict = function() {
@@ -1199,17 +1235,16 @@ baron.noConflict = function() {
 
 baron.version = '3.0.0-alpha'
 
-baron.fn.autoUpdate = __webpack_require__(3)(scopedWindow)
-baron.fn.fix = __webpack_require__(6)
-baron.fn.controls = __webpack_require__(5)
-baron.fn.pull = __webpack_require__(7)
+baron.prototype.autoUpdate = __webpack_require__(4)(scopedWindow)
+baron.prototype.fix = __webpack_require__(7)
+baron.prototype.controls = __webpack_require__(6)
 
 module.exports = baron
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1290,12 +1325,7 @@ module.exports = function autoUpdateCreator(win) {
     return function autoUpdate() {
         if (!MutationObserver) return this
 
-        var i = 0
-
-        while (this[i]) {
-            autoUpdateOne.call(this[i], MutationObserver)
-            i++
-        }
+        autoUpdateOne.call(this, MutationObserver)
 
         return this
     }
@@ -1303,26 +1333,30 @@ module.exports = function autoUpdateCreator(win) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-window.baron = __webpack_require__(2)
+var _baron = __webpack_require__(3)
+
+window.baron = _baron
 
 if (window.jQuery && window.jQuery.fn) {
-    window.jQuery.fn.baron = baron
+    window.jQuery.fn.baron = _baron
 }
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/* Controls plugin for baron 0.6+ */
+/* Controls plugin for baron */
 
-function controlsOne(params) {
+var qs = __webpack_require__(0).qs
+
+module.exports = function controls(params) {
     var forward, backward, track, screen,
         self = this,
         event
@@ -1330,7 +1364,7 @@ function controlsOne(params) {
     screen = params.screen || 0.9
 
     if (params.forward) {
-        forward = this.$(params.forward, this.clipper)
+        forward = qs(params.forward, this.clipper)
 
         event = {
             element: forward,
@@ -1349,7 +1383,7 @@ function controlsOne(params) {
     }
 
     if (params.backward) {
-        backward = this.$(params.backward, this.clipper)
+        backward = qs(params.backward, this.clipper)
 
         event = {
             element: backward,
@@ -1371,7 +1405,7 @@ function controlsOne(params) {
         if (params.track === true) {
             track = this.track
         } else {
-            track = this.$(params.track, this.clipper)[0]
+            track = qs(params.track, this.clipper)
         }
 
         if (track) {
@@ -1406,31 +1440,24 @@ function controlsOne(params) {
     }
 }
 
-module.exports = function controls(params) {
-    var i = 0
-
-    while (this[i]) {
-        controlsOne.call(this[i], params)
-        i++
-    }
-
-    return this
-}
-
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-/* Fixable elements plugin for baron 0.6+ */
+/* Fixable elements plugin for baron */
 
-var log = __webpack_require__(1)
+var log = __webpack_require__(2)
+var css = __webpack_require__(0).css
+var add = __webpack_require__(0).add
+var rm = __webpack_require__(0).rm
 
-function fixOne(userParams) {
-    var elements, viewPortSize,
+module.exports = function fix(userParams) {
+    var elements,
+        viewPortSize,
         params = { // Default params
             outside: '',
             inside: '',
@@ -1446,7 +1473,6 @@ function fixOne(userParams) {
         headerTops = [], // offset positions when not fixed
         scroller = this.scroller,
         eventManager = this.event,
-        $ = this.$,
         self = this
 
     if (process.env.NODE_ENV !== 'production') {
@@ -1469,12 +1495,15 @@ function fixOne(userParams) {
         }
 
         // Removing all fixing stuff - we can do this because fixElement triggers only when fixState really changed
-        this.$(elements[i]).css(this.origin.pos, '').css(this.origin.oppos, '').removeClass(params.outside)
+        css(elements[i], this.origin.pos, '')
+        css(elements[i], this.origin.oppos, '')
+        rm(elements[i], params.outside)
 
         // Fixing if needed
         if (pos !== undefined) {
             pos += 'px'
-            this.$(elements[i]).css(this.origin[ori], pos).addClass(params.outside)
+            css(elements[i], this.origin[ori], pos)
+            add(elements[i], params.outside)
         }
     }
 
@@ -1498,20 +1527,26 @@ function fixOne(userParams) {
             params[key] = _params[key]
         }
 
-        elements = this.$(params.elements, this.scroller)
+        if (params.elements instanceof HTMLElement) {
+            elements = [params.elements]
+        } else if (typeof params.elements == 'string') {
+            elements = this.scroller.querySelectorAll(params.elements)
+        } else if (params.elements && params.elements[0] instanceof HTMLElement) {
+            elements = params.elements
+        }
 
         if (elements) {
             viewPortSize = this.scroller[this.origin.client]
             for (var i = 0; i < elements.length; i++) {
                 // Variable header heights
                 pos = {}
-                pos[this.origin.size] = elements[i][this.origin.offset]
+                pos[this.origin.size] = elements[i][this.origin.offset] + 'px'
                 if (elements[i].parentNode !== this.scroller) {
-                    this.$(elements[i].parentNode).css(pos)
+                    css(elements[i].parentNode, pos)
                 }
                 pos = {}
-                pos[this.origin.crossSize] = elements[i].parentNode[this.origin.crossClient]
-                this.$(elements[i]).css(pos)
+                pos[this.origin.crossSize] = elements[i].parentNode[this.origin.crossClient] + 'px'
+                css(elements[i], pos)
 
                 // Between fixed headers
                 viewPortSize -= elements[i][this.origin.offset]
@@ -1536,8 +1571,8 @@ function fixOne(userParams) {
             if (params.limiter && elements[0]) { // Bottom edge of first header as top limit for track
                 if (this.track && this.track != this.scroller) {
                     pos = {}
-                    pos[this.origin.pos] = elements[0].parentNode[this.origin.offset]
-                    this.$(this.track).css(pos)
+                    pos[this.origin.pos] = elements[0].parentNode[this.origin.offset] + 'px'
+                    css(this.track, pos)
                 } else {
                     this.barTopLimit = elements[0].parentNode[this.origin.offset]
                 }
@@ -1554,7 +1589,7 @@ function fixOne(userParams) {
             element: elements,
 
             handler: function() {
-                var parent = $(this)[0].parentNode,
+                var parent = this.parentNode,
                     top = parent.offsetTop,
                     num
 
@@ -1581,7 +1616,9 @@ function fixOne(userParams) {
         if (params.clickable) {
             this._eventHandlers.push(event) // For auto-dispose
             // eventManager(event.element, event.type, event.handler, 'off')
-            eventManager(event.element, event.type, event.handler, 'on')
+            for (var j = 0; j < event.element.length; j++) {
+                eventManager(event.element[j], event.type, event.handler, 'on')
+            }
         }
     }
 
@@ -1634,33 +1671,37 @@ function fixOne(userParams) {
             if (change) { // At leats one change in elements flag structure occured
                 for (i = 0; i < elements.length; i++) {
                     if (fixFlag[i] == 1 && params.past) {
-                        this.$(elements[i]).addClass(params.past).removeClass(params.future)
+                        add(elements[i], params.past)
+                        rm(elements[i], params.future)
                     }
 
                     if (fixFlag[i] == 2 && params.future) {
-                        this.$(elements[i]).addClass(params.future).removeClass(params.past)
+                        add(elements[i], params.future)
+                        rm(elements[i], params.past)
                     }
 
                     if (fixFlag[i] == 3) {
-                        if (params.future || params.past) this.$(elements[i]).removeClass(params.past).removeClass(params.future)
-                        if (params.inside) this.$(elements[i]).addClass(params.inside)
-                    } else if (params.inside) {
-                        this.$(elements[i]).removeClass(params.inside)
+                        rm(elements[i], params.past)
+                        rm(elements[i], params.future)
+                        add(elements[i], params.inside)
                     }
 
-                    if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1 && params.before) {
-                        this.$(elements[i]).addClass(params.before).removeClass(params.after) // Last top fixed header
-                    } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2 && params.after) {
-                        this.$(elements[i]).addClass(params.after).removeClass(params.before) // First bottom fixed header
+                    if (fixFlag[i] != fixFlag[i + 1] && fixFlag[i] == 1) {
+                        add(elements[i], params.before)
+                        rm(elements[i], params.after) // Last top fixed header
+                    } else if (fixFlag[i] != fixFlag[i - 1] && fixFlag[i] == 2) {
+                        add(elements[i], params.after)
+                        rm(elements[i], params.before) // First bottom fixed header
                     } else {
-                        this.$(elements[i]).removeClass(params.before).removeClass(params.after)
+                        rm(elements[i], params.before)
+                        rm(elements[i], params.after)
                     }
 
                     if (params.grad) {
                         if (gradFlag[i]) {
-                            this.$(elements[i]).addClass(params.grad)
+                            add(elements[i], params.grad)
                         } else {
-                            this.$(elements[i]).removeClass(params.grad)
+                            rm(elements[i], params.grad)
                         }
                     }
                 }
@@ -1671,180 +1712,11 @@ function fixOne(userParams) {
     this.on('resize upd', function(updParams) {
         init.call(this, updParams && updParams.fix)
     })
-}
-
-module.exports = function fix(params) {
-    var i = 0
-
-    while (this[i]) {
-        fixOne.call(this[i], params)
-        i++
-    }
 
     return this
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/* Pull to load plugin for baron 0.6+ */
-
-function pullOne(params) {
-    var block = this.$(params.block),
-        size = params.size || this.origin.size,
-        limit = params.limit || 80,
-        onExpand = params.onExpand,
-        elements = params.elements || [],
-        inProgress = params.inProgress || '',
-        self = this,
-        _insistence = 0,
-        _zeroXCount = 0,
-        _interval,
-        _timer,
-        _x = 0,
-        _onExpandCalled,
-        _waiting = params.waiting || 500,
-        _on
-
-    function getSize() {
-        return self.scroller[self.origin.scroll] + self.scroller[self.origin.offset]
-    }
-
-    // Scroller content height
-    function getContentSize() {
-        return self.scroller[self.origin.scrollSize]
-    }
-
-    // Scroller height
-    function getScrollerSize() {
-        return self.scroller[self.origin.client]
-    }
-
-    function step(x, force) {
-        var k = x * 0.0005
-
-        return Math.floor(force - k * (x + 550))
-    }
-
-    function toggle(on) {
-        _on = on
-
-        if (on) {
-            update() // First time with no delay
-            _interval = setInterval(update, 200)
-        } else {
-            clearInterval(_interval)
-        }
-    }
-
-    function update() {
-        var pos = {},
-            height = getSize(),
-            scrollHeight = getContentSize(),
-            dx,
-            op4,
-            scrollInProgress = _insistence == 1
-
-        op4 = 0 // Возвращающая сила
-        if (_insistence > 0) {
-            op4 = 40
-        }
-        // if (_insistence > -1) {
-        dx = step(_x, op4)
-        if (height >= scrollHeight - _x && _insistence > -1) {
-            if (scrollInProgress) {
-                _x += dx
-            }
-        } else {
-            _x = 0
-        }
-
-        if (_x < 0) _x = 0
-
-        pos[size] = _x + 'px'
-        if (getScrollerSize() <= getContentSize()) {
-            self.$(block).css(pos)
-            for (var i = 0; i < elements.length; i++) {
-                self.$(elements[i].self).css(elements[i].property, Math.min(_x / limit * 100, 100) + '%')
-            }
-        }
-
-        if (inProgress && _x) {
-            self.$(self.root).addClass(inProgress)
-        }
-
-        if (_x == 0) {
-            if (params.onCollapse) {
-                params.onCollapse()
-            }
-        }
-
-        _insistence = 0
-        _timer = setTimeout(function() {
-            _insistence = -1
-        }, _waiting)
-        // }
-
-        if (onExpand && _x > limit && !_onExpandCalled) {
-            onExpand()
-            _onExpandCalled = true
-        }
-
-        if (_x == 0) {
-            _zeroXCount++
-        } else {
-            _zeroXCount = 0
-        }
-        if (_zeroXCount > 1) {
-            toggle(false)
-            _onExpandCalled = false
-            if (inProgress) {
-                self.$(self.root).removeClass(inProgress)
-            }
-        }
-    }
-
-    this.on('init', function() {
-        toggle(true)
-    })
-
-    this.on('dispose', function() {
-        toggle(false)
-    })
-
-    this.event(this.scroller, 'mousewheel DOMMouseScroll', function(e) {
-        var down = e.wheelDelta < 0 || (e.originalEvent && e.originalEvent.wheelDelta < 0) || e.detail > 0
-
-        if (down) {
-            _insistence = 1
-            clearTimeout(_timer)
-            if (!_on && getSize() >= getContentSize()) {
-                toggle(true)
-            }
-        }
-        //  else {
-        //     toggle(false)
-        // }
-    })
-}
-
-module.exports = function pull(params) {
-    var i = 0
-
-    while (this[i]) {
-        pullOne.call(this[i], params)
-        i++
-    }
-
-    return this
-}
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ })
 /******/ ]);

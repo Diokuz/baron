@@ -73,7 +73,7 @@ describe('Барон.', function() {
             var height = parseInt($(bar).css('height'), 10),
                 expectedHeight = Math.round(scroller.clientHeight * scroller.clientHeight / scroller.scrollHeight)
 
-            assert.ok(baron[0].bar === bar)
+            assert.ok(baron.bar === bar)
             assert.ok(Math.abs(height - expectedHeight) <= 1)
         })
 
@@ -89,7 +89,7 @@ describe('Барон.', function() {
             }, 0)
         })
 
-        it('Повторная инициализация бросает ошибку', function() {
+        it('Repeated initializations logs an error only when with params', function() {
             var _save = console.error
             var i = 0
 
@@ -97,11 +97,12 @@ describe('Барон.', function() {
                 i++
             }
 
-            baron = $('.wrapper._origin .scroller').baron({
-                bar: '.scroller__bar'
-            })
+            $('.wrapper._origin .scroller').baron({})
+            $('.wrapper._origin .scroller').baron()
+            $('.wrapper._origin .scroller').baron({})
+            $('.wrapper._origin .scroller').baron()
 
-            assert.equal(i, 3)
+            assert.equal(i, 2)
             console.error = _save
         })
 
@@ -113,13 +114,15 @@ describe('Барон.', function() {
                 i++
             }
 
-            $('.wrapper._origin .scroller').baron({
-                bar: '.scroller__bar'
-            })
+            $('.wrapper._origin .scroller').baron({})
+            $('.wrapper._origin .scroller').baron({})
+            $('.wrapper._origin .scroller').baron({})
 
             assert.equal(i, 3)
 
             $('.wrapper._origin .scroller').baron() // another three times
+            $('.wrapper._origin .scroller').baron()
+            $('.wrapper._origin .scroller').baron()
 
             assert.equal(i, 3)
             console.error = _save
@@ -140,16 +143,16 @@ describe('Барон.', function() {
                 direction: 'h'
             })
 
-            assert.ok(baron[0] === second[0], 'Без параметров')
-            assert.ok(baron[0] === third[0], 'С параметрами, но тот же direction')
-            assert.ok(baron[0] != fourth[0], 'Другой direction')
+            assert.ok(baron === second, 'Без параметров')
+            assert.ok(baron === third, 'С параметрами, но тот же direction')
+            assert.ok(baron != fourth, 'Другой direction')
 
             console.error = _save
             fourth.dispose()
         })
 
         it('После вызова метода dispose удаляет атрибуты и классы', function() {
-            var sizeDim = baron[0].origin.crossSize
+            var sizeDim = baron.origin.crossSize
 
             baron.dispose()
 
@@ -162,14 +165,15 @@ describe('Барон.', function() {
             assert.ok(!size, 'size')
         })
 
-        it('dispose на бароне где не было элементов', function() {
-            baron = $('.not_exist').baron({
-                bar: '.sadlfhasdhflakjsdhflaksjdhflakjsdh',
-                barOnCls: barOnCls
-            })
+        // @todo: strange test, is it based on real use case?
+        // it('dispose на бароне где не было элементов', function() {
+        //     baron = $('.not_exist').baron({
+        //         bar: '.sadlfhasdhflakjsdhflaksjdhflakjsdh',
+        //         barOnCls: barOnCls
+        //     })
 
-            baron.dispose()
-        })
+        //     baron.dispose()
+        // })
     })
 
     describe('Проблема с удалением атрибутов https://github.com/Diokuz/baron/issues/147', function() {
@@ -240,7 +244,7 @@ describe('Барон.', function() {
             var height = parseInt($(bar).css('height'), 10),
                 expectedHeight = Math.round(scroller.clientHeight * scroller.clientHeight / scroller.scrollHeight)
 
-            assert.ok(baron[0].bar === bar)
+            assert.ok(baron.bar === bar)
             assert.ok(Math.abs(height - expectedHeight) <= 1)
         })
 
@@ -437,15 +441,6 @@ describe('Барон.', function() {
         })
 
         it('Высота скроллера и клиппера в вебките должна быть одинаковой', function() {
-            var _log = console.error
-            var msg = ''
-            var root
-
-            console.error = function() {
-                msg += arguments[0]
-                root = arguments[1]
-            }
-
             baron = $('.wrapper').baron({
                 scroller: '.scroller_h',
                 direction: 'h',
@@ -456,13 +451,6 @@ describe('Барон.', function() {
             var scrollerHeight = $('.scroller_h').height()
 
             assert.equal(clipperHeight, scrollerHeight)
-            assert.equal(msg, 'Baron: Scroller not found!', 'Ошибка "скроллер не найден" залогирована 1 раз')
-            assert.ok(
-                root === $('.wrapper._contenteditable')[0],
-                'Ошибка "скроллер не найден" брошена именно с той root-ноды, где его нет'
-            )
-
-            console.error = _log
         })
 
         after(function() {
@@ -855,13 +843,13 @@ describe('Плагин fix.', function() {
                 bar: '.scroller__bar',
                 barOnCls: barOnCls
             }).fix({
-                elements: $('.header__title').eq(0),
+                elements: $('.header__title').eq(0)[0],
                 outside: 'header__title_state_fixed',
                 before: 'header__title_position_top',
                 after: 'header__title_position_bottom',
                 limiter: true
             }).fix({
-                elements: $('.header__title').eq(1),
+                elements: $('.header__title').eq(1)[0],
                 outside: 'header__title_state_fixed',
                 before: 'header__title_position_top',
                 after: 'header__title_position_bottom'

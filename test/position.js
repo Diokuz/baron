@@ -77,7 +77,7 @@ describe("Режим position='absolute'.", function() {
                 barOnCls: 'baron'
             }).fix()
 
-            assert.equal(i, 3)
+            assert.equal(i, 1)
 
             console.error = _log
             baron.dispose()

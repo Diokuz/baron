@@ -75,12 +75,7 @@ module.exports = function autoUpdateCreator(win) {
     return function autoUpdate() {
         if (!MutationObserver) return this
 
-        var i = 0
-
-        while (this[i]) {
-            autoUpdateOne.call(this[i], MutationObserver)
-            i++
-        }
+        autoUpdateOne.call(this, MutationObserver)
 
         return this
     }

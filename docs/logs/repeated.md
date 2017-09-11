@@ -1,7 +1,7 @@
 You probably here because you got an error
 
 ```
-Baron [ xx:xx:xx ]: repeated initialization for html-node detected https://github.com/Diokuz/baron/blob/master/docs/logs/second.md <... />
+Baron: repeated initialization for html-node detected https://github.com/Diokuz/baron/blob/master/docs/logs/second.md <... />
 ```
 
 You can have only one baron instance per html-node per one direction: that means maximum one for vertical and another one for horizontal direction for given `root` html-node.

@@ -1,7 +1,10 @@
 ## 3.0.0
 
  - Webpack is used to build client bundle
- -
+ - No multiple instances per initialization allowed (only first html node in the list will be taken)
+ - Pull plugin is removed
+ - No more jQuery or other external libraries dependencies
+ - Supported browser list updated: ie9-, Opera 10 and Firefox 3.5- are not supported now
 
 ## 2.3.0
 

@@ -25,7 +25,7 @@ var params = HTMLElement | jQueryObject | {
 
     // `Root` html element for baron. Use this param when your html-scrollbar content is outside scroller
     // Default: scroller
-    root: $('.my_scroller'),
+    root: '.my_scroller',
 
     // Selector for `bar` element
     // Default: 'undefined'
@@ -57,22 +57,6 @@ var params = HTMLElement | jQueryObject | {
     // Minimum time delay between two resize events fires in seconds [0..1] or milliseconds (1..∞)
     // Default: 300 ms
     resizeDebounce: .2, // s
-
-    // Local copy of jQuery-like utility
-    // Default: window.jQuery
-    $: function(selector, context) {
-        return bonzo(qwery(selector, context));
-    },
-
-    // Event manager
-    // Default: function(elem, event, func, mode) { params.$(elem)[mode || 'on'](event, func); };
-    event: function(elem, event, func, mode) { // Events manager
-        if (mode == 'trigger') {
-            mode = 'fire';
-        }
-
-        bean[mode || 'on'](elem, event, func);
-    },
 
     // For dir="rtl"
     // Default: false

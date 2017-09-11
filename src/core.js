@@ -4,9 +4,15 @@ var scopedWindow = (function() {
     return this || (1, eval)('this')
 }())
 
-var $ = scopedWindow.$
+var css = require('./utils').css
+var add = require('./utils').add
+var has = require('./utils').has
+var rm = require('./utils').rm
+var clone = require('./utils').clone
+var qs = require('./utils').qs
+
 var _baron = baron // Stored baron value for noConflict usage
-var Item = {}
+// var Item = {}
 var pos = ['left', 'top', 'right', 'bottom', 'width', 'height']
 // Global store for all baron instances (to be able to dispose them on html-nodes)
 var instances = []
@@ -51,19 +57,23 @@ if (process.env.NODE_ENV !== 'production') {
 
 // window.baron and jQuery.fn.baron points to this function
 function baron(user) {
+    var withParams = !!user
     var tryNode = (user && user[0]) || user
     var isNode = tryNode instanceof HTMLElement
-    var params = isNode ? { root: user } : user
+    var params = isNode ? { root: user } : clone(user)
     var jQueryMode
-    var roots
-    var withParams = !!params
+    var rootNode
     var defaultParams = {
-        $: scopedWindow.jQuery,
         direction: 'v',
         barOnCls: '_scrollbar',
         resizeDebounce: 0,
-        event: function(elem, event, func, mode) {
-            params.$(elem)[mode || 'on'](event, func)
+        event: function(elem, _eventNames, handler, mode) {
+            var eventNames = _eventNames.split(' ')
+            var prefix = mode == 'on' ? 'add' : 'remove'
+
+            eventNames.forEach(function(eventName) {
+                elem[prefix + 'EventListener'](eventName, handler)
+            })
         },
         cssGuru: false,
         impact: 'scroller',
@@ -74,18 +84,12 @@ function baron(user) {
 
     // Extending default params by user-defined params
     for (var key in defaultParams) {
-        if (params[key] === undefined) {
+        if (params[key] == null) { // eslint-disable-line
             params[key] = defaultParams[key]
         }
     }
 
     if (process.env.NODE_ENV !== 'production') {
-        if (!params.$) {
-            log('error', [
-                'no jQuery nor params.$ detected',
-                'https://github.com/Diokuz/baron/blob/master/docs/logs/no-jquery-detected.md'
-            ].join(', '), params)
-        }
         if (params.position == 'absolute' && params.impact == 'clipper') {
             log('error', [
                 'Simultaneous use of `absolute` position and `clipper` impact values detected.',
@@ -95,20 +99,63 @@ function baron(user) {
         }
     }
 
-    // this - something or jQuery instance
-    jQueryMode = params.$ && this instanceof params.$
+    // `this` could be a jQuery instance
+    jQueryMode = this && this instanceof scopedWindow.jQuery
 
     if (params._chain) {
-        roots = params.root
+        rootNode = params.root
     } else if (jQueryMode) {
-        params.root = roots = this
-    } else if (params.$) {
-        roots = params.$(params.root || params.scroller)
+        params.root = rootNode = this[0]
     } else {
-        roots = [] // noop mode, like jQuery when no matched html-nodes found
+        rootNode = qs(params.root || params.scroller)
     }
 
-    var instance = new baron.fn.constructor(roots, params, withParams)
+    if (process.env.NODE_ENV !== 'production') {
+        if (!rootNode) {
+            log('error', [
+                'Barin initialization failed: root node not found.'
+            ].join(', '), params)
+
+            return // or return baron-shell?
+        }
+    }
+
+    var attr = manageAttr(rootNode, params.direction)
+    var id = +attr // Could be NaN
+
+    params.index = id
+
+    // baron() can return existing instances,
+    // @TODO update params on-the-fly
+    // https://github.com/Diokuz/baron/issues/124
+    if (id == id && attr !== null && instances[id]) {
+        if (process.env.NODE_ENV !== 'production') {
+            if (withParams) {
+                log('error', [
+                    'repeated initialization for html-node detected',
+                    'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
+                ].join(', '), params.root)
+            }
+        }
+
+        return instances[id]
+    }
+
+    // root and scroller can be different nodes
+    if (params.root && params.scroller) {
+        params.scroller = qs(params.scroller, rootNode)
+        if (process.env.NODE_ENV !== 'production') {
+            if (!params.scroller) {
+                log('error', 'Scroller not found!', rootNode, params.scroller)
+            }
+        }
+    } else {
+        params.scroller = rootNode
+    }
+
+    params.root = rootNode
+
+    var instance = init(params)
 
     if (instance.autoUpdate) {
         instance.autoUpdate()
@@ -136,100 +183,6 @@ function getTime() {
 
 if (process.env.NODE_ENV !== 'production') {
     baron._instances = instances
-}
-
-baron.fn = {
-    constructor: function(roots, totalParams, withParams) {
-        var params = clone(totalParams)
-
-        // Intrinsic params.event is not the same as totalParams.event
-        params.event = function(elems, e, func, mode) {
-            arrayEach(elems, function(elem) {
-                totalParams.event(elem, e, func, mode)
-            })
-        }
-
-        this.length = 0
-
-        arrayEach.call(this, roots, function(root, i) {
-            var attr = manageAttr(root, params.direction)
-            var id = +attr // Could be NaN
-
-            // baron() can return existing instances,
-            // @TODO update params on-the-fly
-            // https://github.com/Diokuz/baron/issues/124
-            if (id == id && attr !== null && instances[id]) {
-                if (process.env.NODE_ENV !== 'production') {
-                    if (withParams) {
-                        log('error', [
-                            'repeated initialization for html-node detected',
-                            'https://github.com/Diokuz/baron/blob/master/docs/logs/repeated.md'
-                        ].join(', '), totalParams.root)
-                    }
-                }
-
-                this[i] = instances[id]
-            } else {
-                var perInstanceParams = clone(params)
-
-                // root and scroller can be different nodes
-                if (params.root && params.scroller) {
-                    perInstanceParams.scroller = params.$(params.scroller, root)
-                    if (!perInstanceParams.scroller.length) {
-                        if (process.env.NODE_ENV !== 'production') {
-                            log('error', 'Scroller not found!', root, params.scroller)
-                        }
-                        return
-                    }
-                } else {
-                    perInstanceParams.scroller = root
-                }
-
-                perInstanceParams.root = root
-                this[i] = init(perInstanceParams)
-            }
-
-            this.length = i + 1
-        })
-
-        this.params = params
-    },
-
-    dispose: function() {
-        var params = this.params
-
-        arrayEach(this, function(instance, index) {
-            instance.dispose(params)
-            instances[index] = null
-        })
-
-        this.params = null
-    },
-
-    update: function() {
-        var args = arguments
-
-        arrayEach(this, function(instance) {
-            // instance cannot be null, because it is stored by user
-            instance.update.apply(instance, args)
-        })
-    },
-
-    // Restriction: only the same scroller can be used
-    baron: function(params) {
-        params.root = []
-        if (this.params.root) {
-            params.scroller = this.params.scroller
-        }
-
-        arrayEach.call(this, this, function(elem) {
-            params.root.push(elem.root)
-        })
-        params.direction = (this.params.direction == 'v') ? 'h' : 'v'
-        params._chain = true
-
-        return baron(params)
-    }
 }
 
 function manageEvents(item, eventManager, mode) {
@@ -271,7 +224,7 @@ function manageEvents(item, eventManager, mode) {
                 item.selection() // Disable text selection in ie8
                 item.drag.now = 1 // Save private byte
                 if (item.draggingCls) {
-                    $(item.root).addClass(item.draggingCls)
+                    add(item.root, item.draggingCls)
                 }
             },
 
@@ -284,7 +237,7 @@ function manageEvents(item, eventManager, mode) {
                 item.selection(1) // Enable text selection
                 item.drag.now = 0
                 if (item.draggingCls) {
-                    $(item.root).removeClass(item.draggingCls)
+                    rm(item.root, item.draggingCls)
                 }
             },
 
@@ -345,7 +298,15 @@ function manageEvents(item, eventManager, mode) {
 
     arrayEach(item._eventHandlers, function(event) {
         if (event.element) {
-            eventManager(event.element, event.type, event.handler, mode)
+            // workaround for element-elements in `fix` plugin
+            // @todo dispose `fix` in proper way and remove workaround
+            if (event.element.length) {
+                for (var i = 0; i < event.element.length; i++) {
+                    eventManager(event.element[i], event.type, event.handler, mode)
+                }
+            } else {
+                eventManager(event.element, event.type, event.handler, mode)
+            }
         }
     })
 
@@ -380,8 +341,7 @@ function manageAttr(node, direction, mode, id) {
 }
 
 function init(params) {
-    // __proto__ of returning object is baron.prototype
-    var out = new Item.prototype.constructor(params)
+    var out = new baron.prototype.constructor(params)
 
     manageEvents(out, params.event, 'on')
 
@@ -414,19 +374,6 @@ function init(params) {
     return out
 }
 
-function clone(_input) {
-    var output = {}
-    var input = _input || {}
-
-    for (var key in input) {
-        if (input.hasOwnProperty(key)) {
-            output[key] = input[key]
-        }
-    }
-
-    return output
-}
-
 function fire(eventName) {
     if (this.events && this.events[eventName]) {
         for (var i = 0; i < this.events[eventName].length; i++) {
@@ -437,7 +384,7 @@ function fire(eventName) {
     }
 }
 
-Item.prototype = {
+baron.prototype = {
     // underscore.js realization
     // used in autoUpdate plugin
     _debounce: function(func, wait) {
@@ -481,8 +428,7 @@ Item.prototype = {
     },
 
     constructor: function(params) {
-        var _$,
-            barPos,
+        var barPos,
             scrollerPos0,
             track,
             resizePauseTimer,
@@ -492,17 +438,13 @@ Item.prototype = {
 
         resizeLastFire = getTime()
 
-        _$ = this.$ = params.$
+        this.params = params
         this.event = params.event
         this.events = {}
 
-        function getNode(sel, context) {
-            return _$(sel, context)[0] // Can be undefined
-        }
-
         // DOM elements
         this.root = params.root // Always html node, not just selector
-        this.scroller = getNode(params.scroller)
+        this.scroller = qs(params.scroller)
         if (process.env.NODE_ENV !== 'production') {
             if (this.scroller.tagName == 'body') {
                 log('error', [
@@ -511,8 +453,8 @@ Item.prototype = {
                 ].join(', '), params)
             }
         }
-        this.bar = getNode(params.bar, this.root)
-        track = this.track = getNode(params.track, this.root)
+        this.bar = qs(params.bar, this.root)
+        track = this.track = qs(params.track, this.root)
         if (!this.track && this.bar) {
             track = this.bar.parentNode
         }
@@ -541,18 +483,18 @@ Item.prototype = {
             }
 
             if (this.bar) {
-                _$(this.bar).css(this.origin.size, parseInt(size, 10) + 'px')
+                css(this.bar, this.origin.size, parseInt(size, 10) + 'px')
             }
         }
 
         // Updating top or left bar position
         function posBar(_pos) {
             if (this.bar) {
-                var was = _$(this.bar).css(this.origin.pos),
+                var was = css(this.bar, this.origin.pos),
                     will = +_pos + 'px'
 
                 if (will && will != was) {
-                    _$(this.bar).css(this.origin.pos, will)
+                    css(this.bar, this.origin.pos, will)
                 }
             }
         }
@@ -611,11 +553,11 @@ Item.prototype = {
                 var noScroll = this.scroller[this.origin.client] >= this.scroller[this.origin.scrollSize]
 
                 if (dispose || noScroll) {
-                    if (_$(this.root).hasClass(this.barOnCls)) {
-                        _$(this.root).removeClass(this.barOnCls)
+                    if (has(this.root, this.barOnCls)) {
+                        rm(this.root, this.barOnCls)
                     }
-                } else if (!_$(this.root).hasClass(this.barOnCls)) {
-                    _$(this.root).addClass(this.barOnCls)
+                } else if (!has(this.root, this.barOnCls)) {
+                    add(this.root, this.barOnCls)
                 }
             }
         }
@@ -677,25 +619,25 @@ Item.prototype = {
 
                         // `static` position works only for `scroller` impact
                         if (self.position == 'static') { // static
-                            was = self.$(self.scroller).css(self.origin.crossSize)
+                            was = css(self.scroller, self.origin.crossSize)
                             will = self.clipper[self.origin.crossClient] + delta + 'px'
 
                             if (was != will) {
                                 self._setCrossSizes(self.scroller, will)
                             }
                         } else { // absolute
-                            var css = {}
+                            var styles = {}
                             var key = self.rtl ? 'Left' : 'Right'
 
                             if (self.direction == 'h') {
                                 key = 'Bottom'
                             }
 
-                            css['padding' + key] = delta + 'px'
-                            self.$(self.scroller).css(css)
+                            styles['padding' + key] = delta + 'px'
+                            css(self.scroller, styles)
                         }
                     } else { // clipper
-                        was = self.$(self.clipper).css(self.origin.crossSize)
+                        was = css(self.clipper, self.origin.crossSize)
                         will = client + 'px'
 
                         if (was != will) {
@@ -750,11 +692,11 @@ Item.prototype = {
 
             if (self.scrollingCls) {
                 if (!scrollingTimer) {
-                    self.$(self.root).addClass(self.scrollingCls)
+                    add(self.root, self.scrollingCls)
                 }
                 clearTimeout(scrollingTimer)
                 scrollingTimer = setTimeout(function() {
-                    self.$(self.root).removeClass(self.scrollingCls)
+                    rm(self.root, self.scrollingCls)
                     scrollingTimer = undefined
                 }, 300)
             }
@@ -777,13 +719,13 @@ Item.prototype = {
         // and max-height for horizontal scroll. Just set them all.
         // http://www.w3.org/TR/css-flexbox-1/#valdef-align-items-stretch
         this._setCrossSizes = function(node, size) {
-            var css = {}
+            var styles = {}
 
-            css[this.origin.crossSize] = size
-            css[this.origin.crossMinSize] = size
-            css[this.origin.crossMaxSize] = size
+            styles[this.origin.crossSize] = size
+            styles[this.origin.crossMinSize] = size
+            styles[this.origin.crossMaxSize] = size
 
-            this.$(node).css(css)
+            css(node, styles)
         }
 
         // Set common css rules
@@ -793,7 +735,7 @@ Item.prototype = {
             var overflow = on ? 'hidden' : null
             var msOverflowStyle = on ? 'none' : null
 
-            this.$(this.clipper).css({
+            css(this.clipper, {
                 overflow: overflow,
                 msOverflowStyle: msOverflowStyle,
                 position: this.position == 'static' ? '' : 'relative'
@@ -821,7 +763,7 @@ Item.prototype = {
                 }
             }
 
-            this.$(this.scroller).css(scrollerCss)
+            css(this.scroller, scrollerCss)
         }
 
         // onInit actions
@@ -829,7 +771,7 @@ Item.prototype = {
 
         if (isMacFF) {
             var padding = 'paddingRight'
-            var css = {}
+            var styles = {}
             // getComputedStyle is ie9+, but we here only in f ff
             var paddingWas = scopedWindow.getComputedStyle(this.scroller)[[padding]]
 
@@ -842,8 +784,8 @@ Item.prototype = {
             var numWas = parseInt(paddingWas, 10)
 
             if (numWas != numWas) numWas = 0
-            css[padding] = (macmsxffScrollbarSize + numWas) + 'px'
-            _$(this.scroller).css(css)
+            styles[padding] = (macmsxffScrollbarSize + numWas) + 'px'
+            css(this.scroller, styles)
         }
 
         return this
@@ -870,7 +812,7 @@ Item.prototype = {
     },
 
     // One instance
-    dispose: function(params) {
+    dispose: function() {
         if (process.env.NODE_ENV !== 'production') {
             if (this._disposed) {
                 log('error', 'Already disposed:', this)
@@ -880,8 +822,8 @@ Item.prototype = {
         }
 
         manageEvents(this, this.event, 'off')
-        manageAttr(this.root, params.direction, 'off')
-        if (params.direction == 'v') {
+        manageAttr(this.root, this.params.direction, 'off')
+        if (this.params.direction == 'v') {
             this._setCrossSizes(this.scroller, '')
         } else {
             this._setCrossSizes(this.clipper, '')
@@ -889,6 +831,8 @@ Item.prototype = {
         this._dumbCss(false)
         this.barOn(true)
         fire.call(this, 'dispose')
+        instances[this.params.index] = null
+        this.params = null
         this._disposed = true
     },
 
@@ -906,11 +850,20 @@ Item.prototype = {
                 })
             }
         }
+    },
+
+    baron: function(params) {
+        params.root = this.params.root
+        params.scroller = this.params.scroller
+        params.direction = (this.params.direction == 'v') ? 'h' : 'v'
+        params._chain = true
+
+        return baron(params)
     }
 }
 
-baron.fn.constructor.prototype = baron.fn
-Item.prototype.constructor.prototype = Item.prototype
+// baron.fn.constructor.prototype = baron.fn
+baron.prototype.constructor.prototype = baron.prototype
 
 // Use when you need "baron" global var for another purposes
 baron.noConflict = function() {
@@ -921,9 +874,8 @@ baron.noConflict = function() {
 
 baron.version = '3.0.0-alpha'
 
-baron.fn.autoUpdate = require('./autoUpdate')(scopedWindow)
-baron.fn.fix = require('./fix')
-baron.fn.controls = require('./controls')
-baron.fn.pull = require('./pull')
+baron.prototype.autoUpdate = require('./autoUpdate')(scopedWindow)
+baron.prototype.fix = require('./fix')
+baron.prototype.controls = require('./controls')
 
 module.exports = baron

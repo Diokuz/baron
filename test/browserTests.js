@@ -47,7 +47,7 @@ describe('Плагин autoUpdate', function() {
         var headerScroller = $('.wrapper._origin.wrapper_headers .scroller')
         var st = headerScroller.offset().top
 
-        $('.wrapper._origin .container').prepend('text before' + segment)
+        $('.wrapper._origin .container').prepend('text before' + segment + segment + segment)
 
         setTimeout(function() {
             var barHeight2 = $('.scroller__bar').height()
