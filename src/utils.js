@@ -1,5 +1,36 @@
 'use strict'
 
+// Test via a getter in the options object to see if the passive property is accessed
+// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
+var supportsPassive = false
+
+try {
+    var opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+            supportsPassive = true
+        }
+    })
+
+    window.addEventListener('test', null, opts)
+} catch (e) {
+    // pass
+}
+
+module.exports.event = function event(elem, _eventNames, handler, mode) {
+    var eventNames = _eventNames.split(' ')
+    var prefix = mode == 'on' ? 'add' : 'remove'
+
+    eventNames.forEach(function(eventName) {
+        var opts = false
+
+        if (['scroll', 'touchstart', 'touchmove'].indexOf(eventName) != -1 && supportsPassive) {
+            opts = { passive: true }
+        }
+
+        elem[prefix + 'EventListener'](eventName, handler, opts)
+    })
+}
+
 function each(obj, handler) {
     for (var key in obj) {
         if (obj.hasOwnProperty(key)) {

@@ -4,6 +4,7 @@ var scopedWindow = (function() {
     return this || (1, eval)('this')
 }())
 
+var event = require('./utils').event
 var css = require('./utils').css
 var add = require('./utils').add
 var has = require('./utils').has
@@ -67,14 +68,7 @@ function baron(user) {
         direction: 'v',
         barOnCls: '_scrollbar',
         resizeDebounce: 0,
-        event: function(elem, _eventNames, handler, mode) {
-            var eventNames = _eventNames.split(' ')
-            var prefix = mode == 'on' ? 'add' : 'remove'
-
-            eventNames.forEach(function(eventName) {
-                elem[prefix + 'EventListener'](eventName, handler)
-            })
-        },
+        event: event,
         cssGuru: false,
         impact: 'scroller',
         position: 'static'

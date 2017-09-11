@@ -73,6 +73,37 @@
 "use strict";
 
 
+// Test via a getter in the options object to see if the passive property is accessed
+// https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md#feature-detection
+var supportsPassive = false
+
+try {
+    var opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+            supportsPassive = true
+        }
+    })
+
+    window.addEventListener('test', null, opts)
+} catch (e) {
+    // pass
+}
+
+module.exports.event = function event(elem, _eventNames, handler, mode) {
+    var eventNames = _eventNames.split(' ')
+    var prefix = mode == 'on' ? 'add' : 'remove'
+
+    eventNames.forEach(function(eventName) {
+        var opts = false
+
+        if (['scroll', 'touchstart', 'touchmove'].indexOf(eventName) != -1 && supportsPassive) {
+            opts = { passive: true }
+        }
+
+        elem[prefix + 'EventListener'](eventName, handler, opts)
+    })
+}
+
 function each(obj, handler) {
     for (var key in obj) {
         if (obj.hasOwnProperty(key)) {
@@ -365,6 +396,7 @@ var scopedWindow = (function() {
     return this || (1, eval)('this')
 }())
 
+var event = __webpack_require__(0).event
 var css = __webpack_require__(0).css
 var add = __webpack_require__(0).add
 var has = __webpack_require__(0).has
@@ -428,14 +460,7 @@ function baron(user) {
         direction: 'v',
         barOnCls: '_scrollbar',
         resizeDebounce: 0,
-        event: function(elem, _eventNames, handler, mode) {
-            var eventNames = _eventNames.split(' ')
-            var prefix = mode == 'on' ? 'add' : 'remove'
-
-            eventNames.forEach(function(eventName) {
-                elem[prefix + 'EventListener'](eventName, handler)
-            })
-        },
+        event: event,
         cssGuru: false,
         impact: 'scroller',
         position: 'static'
