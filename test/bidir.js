@@ -47,11 +47,15 @@ describe('Скроллирование в двух направлениях од
 
         assert.equal(barH.offsetLeft, 0)
         scroller.scrollLeft = 9999
-        setTimeout(function() {
-            assert.ok(barH.offsetLeft > 0)
-            instance.dispose()
-            done()
-        }, 0)
+        window.requestAnimationFrame(function() {
+            // repaint,
+            // and then measurement
+            window.requestAnimationFrame(function() {
+                assert.ok(barH.offsetLeft > 0)
+                instance.dispose()
+                done()
+            })
+        })
     })
 
     it('Баг baron().baron() root && scroller', function(done) {
@@ -73,10 +77,14 @@ describe('Скроллирование в двух направлениях од
 
         assert.equal(barH.offsetLeft, 0)
         scroller.scrollLeft = 9999
-        setTimeout(function() {
-            assert.ok(barH.offsetLeft > 0)
-            instance.dispose()
-            done()
-        }, 0)
+        window.requestAnimationFrame(function() {
+            // repaint,
+            // and then measurement
+            window.requestAnimationFrame(function() {
+                assert.ok(barH.offsetLeft > 0)
+                instance.dispose()
+                done()
+            })
+        })
     })
 })

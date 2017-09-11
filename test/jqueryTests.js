@@ -83,10 +83,14 @@ describe('Барон.', function() {
 
             clipper.scrollLeft = 9999
 
-            setTimeout(function() {
-                assert.equal(clipper.scrollLeft, 0)
-                done()
-            }, 0)
+            window.requestAnimationFrame(function() {
+                // repaint,
+                // and then measurement
+                window.requestAnimationFrame(function() {
+                    assert.equal(clipper.scrollLeft, 0)
+                    done()
+                })
+            })
         })
 
         it('Repeated initializations logs an error only when with params', function() {

@@ -44,10 +44,14 @@ describe('Автовозвращение скроллирования конте
 
             assert.equal(clipper.scrollLeft, 21, 'Проверяем, что контент действительно уехал')
 
-            setTimeout(function() {
-                assert.equal(clipper.scrollLeft, 0, 'В следующем тике контент должен вернуться в начальное положение')
-                done()
-            }, 0)
+            window.requestAnimationFrame(function() {
+                // repaint,
+                // and then measurement
+                window.requestAnimationFrame(function() {
+                    assert.equal(clipper.scrollLeft, 0, 'В следующем тике контент должен вернуться в начальное положение')
+                    done()
+                })
+            })
         })
 
         after(function() {
@@ -89,14 +93,18 @@ describe('Автовозвращение скроллирования конте
             clipper.scrollLeft = 0
             assert.equal(clipper.scrollLeft, 0, 'После принудительного подскролливания позиция должна сбиться на выравнивание по левому краю')
 
-            setTimeout(function() {
-                assert.equal(
-                    clipper.scrollLeft,
-                    clipper.scrollWidth - clipper.clientWidth,
-                    'В следующем тике барон должен вернуть контент, в данном случае выровнять его по правому краю как было'
-                )
-                done()
-            }, 0)
+            window.requestAnimationFrame(function() {
+                // repaint,
+                // and then measurement
+                window.requestAnimationFrame(function() {
+                    assert.equal(
+                        clipper.scrollLeft,
+                        clipper.scrollWidth - clipper.clientWidth,
+                        'В следующем тике барон должен вернуть контент, в данном случае выровнять его по правому краю как было'
+                    )
+                    done()
+                })
+            })
         })
 
         after(function() {
@@ -136,14 +144,18 @@ describe('Автовозвращение скроллирования конте
             clipper.scrollTop = 23
             assert.equal(clipper.scrollTop, 23, 'После принудительного подскролливания позиция должна сбиться')
 
-            setTimeout(function() {
-                assert.equal(
-                    clipper.scrollTop,
-                    0,
-                    'В следующем тике барон должен вернуть контент, в данном случае выровнять его по верхнему краю как было'
-                )
-                done()
-            }, 0)
+            window.requestAnimationFrame(function() {
+                // repaint,
+                // and then measurement
+                window.requestAnimationFrame(function() {
+                    assert.equal(
+                        clipper.scrollTop,
+                        0,
+                        'В следующем тике барон должен вернуть контент, в данном случае выровнять его по верхнему краю как было'
+                    )
+                    done()
+                })
+            })
         })
 
         after(function() {
