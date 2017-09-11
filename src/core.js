@@ -866,7 +866,7 @@ baron.noConflict = function() {
     return baron
 }
 
-baron.version = '3.0.0-alpha'
+baron.version = '3.0.0'
 
 baron.prototype.autoUpdate = require('./autoUpdate')(scopedWindow)
 baron.prototype.fix = require('./fix')

@@ -1258,7 +1258,7 @@ baron.noConflict = function() {
     return baron
 }
 
-baron.version = '3.0.0-alpha'
+baron.version = '3.0.0'
 
 baron.prototype.autoUpdate = __webpack_require__(4)(scopedWindow)
 baron.prototype.fix = __webpack_require__(7)
