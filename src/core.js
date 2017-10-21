@@ -2,7 +2,7 @@
 
 var scopedWindow = (function() {
     return this || (1, eval)('this')
-}())
+}()).window
 
 var event = require('./utils').event
 var css = require('./utils').css
