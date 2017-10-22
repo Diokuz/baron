@@ -1,8 +1,9 @@
 'use strict'
 
-var scopedWindow = (function() {
+var g = (function() {
     return this || (1, eval)('this')
-}()).window
+}())
+var scopedWindow = g && g.window || g
 
 var event = require('./utils').event
 var css = require('./utils').css
@@ -866,7 +867,7 @@ baron.noConflict = function() {
     return baron
 }
 
-baron.version = '3.0.0'
+baron.version = '3.0.1'
 
 baron.prototype.autoUpdate = require('./autoUpdate')(scopedWindow)
 baron.prototype.fix = require('./fix')

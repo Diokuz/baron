@@ -392,9 +392,10 @@ module.exports = function log(level, msg, more) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-var scopedWindow = (function() {
+var g = (function() {
     return this || (1, eval)('this')
 }())
+var scopedWindow = g && g.window || g
 
 var event = __webpack_require__(0).event
 var css = __webpack_require__(0).css
@@ -1258,7 +1259,7 @@ baron.noConflict = function() {
     return baron
 }
 
-baron.version = '3.0.0'
+baron.version = '3.0.1'
 
 baron.prototype.autoUpdate = __webpack_require__(4)(scopedWindow)
 baron.prototype.fix = __webpack_require__(7)
