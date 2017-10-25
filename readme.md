@@ -6,6 +6,8 @@
 
 Baron — a small, fast and crossbrowser custom scrollbar with native system scroll mechanic.
 
+See also [react-baron](https://github.com/Diokuz/react-baron).
+
 ## [Demo](http://diokuz.github.io/baron/)
 
 ## [API](docs/api.md)
