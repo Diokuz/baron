@@ -438,7 +438,7 @@ baron.prototype = {
         this.events = {}
 
         // DOM elements
-        this.root = params.root // Always html node, not just selector
+        this.root = params.root // Always an html node, not just a selector
         this.scroller = qs(params.scroller)
         if (process.env.NODE_ENV !== 'production') {
             if (this.scroller.tagName == 'body') {

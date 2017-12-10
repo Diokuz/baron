@@ -23,7 +23,7 @@ var params = HTMLElement | jQueryObject | string | {
     // Default: this (in jQuery mode).
     scroller: '.scroller',
 
-    // `Root` html element for baron. Use this param when your html-scrollbar content is outside scroller
+    // `Root` html element for baron. Use this param when your html-scrollbar content is outside of scroller
     // Default: scroller
     root: '.my_scroller',
 
