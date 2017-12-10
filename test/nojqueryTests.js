@@ -16,6 +16,12 @@ describe('Барон.', function() {
         document.querySelector('.wrapper._origin').innerHTML = originalHTML
     })
 
+    it('Инициализация со строкой', function() {
+        var baronInstance = baron('.wrapper._origin .scroller')
+
+        baronInstance.dispose()
+    })
+
     describe('Успешная инициализация барона по-умолчанию', function() {
         var baronInstance,
             scroller,

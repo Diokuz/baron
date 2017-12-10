@@ -1,7 +1,7 @@
 {
   "name": "baron",
   "description": "A small, fast and crossbrowser custom scrollbar with native system scroll mechanic.",
-  "version": "3.0.1",
+  "version": "3.0.3",
   "readmeFilename": "README.md",
   "homepage": "https://github.com/Diokuz/baron",
   "authors": [
@@ -16,6 +16,9 @@
     "custom",
     "crossbrowser"
   ],
+  "scripts": {
+    "prepublishOnly": "make all"
+  },
   "main": "./src/core.js",
   "devDependencies": {
     "chai": "~3.2.0",

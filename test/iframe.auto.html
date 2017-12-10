@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <script src="../baron.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="baron.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+    <style>
+        .wrapper {
+            width: 200px;
+            display: inline-block;
+        }
+        .test {
+            display: block;
+            height: auto;
+            width: auto;
+            background: #fff;
+            box-shadow: none;
+        }
+    </style>
+
+    <title>Baron iframe test page</title>
+
+</head>
+
+<body style="padding-left: 20px">
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script>
+        var assert = chai.assert;
+
+        mocha.ui('bdd');
+        mocha.reporter('html');
+    </script>
+
+    <div class="wrapper">
+    </div>
+
+    <div id="mocha"></div>
+
+    <iframe id='iframe' src="https://example.com"></iframe>
+    <iframe src="https://example.com"></iframe>
+
+    <script src="iframe.js"></script>
+
+    <script>
+        // waiting until iframe will load
+        document.getElementById('iframe').onload = function() {
+            if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+            else { mocha.run(); }
+        };
+    </script>
+
+</body>
+
+</html>

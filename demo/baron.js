@@ -94,13 +94,13 @@ module.exports.event = function event(elem, _eventNames, handler, mode) {
     var prefix = mode == 'on' ? 'add' : 'remove'
 
     eventNames.forEach(function(eventName) {
-        var opts = false
+        var options = false
 
         if (['scroll', 'touchstart', 'touchmove'].indexOf(eventName) != -1 && supportsPassive) {
-            opts = { passive: true }
+            options = { passive: true }
         }
 
-        elem[prefix + 'EventListener'](eventName, handler, opts)
+        elem[prefix + 'EventListener'](eventName, handler, options)
     })
 }
 
@@ -127,8 +127,8 @@ module.exports.css = function css(node, key, value) {
         styles[key] = value
     }
 
-    each(styles, function(key, val) {
-        node.style[key] = val
+    each(styles, function(k, val) {
+        node.style[k] = val
     })
 }
 
@@ -392,9 +392,10 @@ module.exports = function log(level, msg, more) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-var scopedWindow = (function() {
+var g = (function() {
     return this || (1, eval)('this')
 }())
+var scopedWindow = g && g.window || g
 
 var event = __webpack_require__(0).event
 var css = __webpack_require__(0).css
@@ -452,7 +453,7 @@ if (process.env.NODE_ENV !== 'production') {
 function baron(user) {
     var withParams = !!user
     var tryNode = (user && user[0]) || user
-    var isNode = tryNode instanceof HTMLElement
+    var isNode = typeof user == 'string' || tryNode instanceof HTMLElement
     var params = isNode ? { root: user } : clone(user)
     var jQueryMode
     var rootNode
@@ -499,7 +500,7 @@ function baron(user) {
     if (process.env.NODE_ENV !== 'production') {
         if (!rootNode) {
             log('error', [
-                'Barin initialization failed: root node not found.'
+                'Baron initialization failed: root node not found.'
             ].join(', '), params)
 
             return // or return baron-shell?
@@ -682,16 +683,16 @@ function manageEvents(item, eventManager, mode) {
         }
     ]
 
-    arrayEach(item._eventHandlers, function(event) {
-        if (event.element) {
+    arrayEach(item._eventHandlers, function(evt) {
+        if (evt.element) {
             // workaround for element-elements in `fix` plugin
             // @todo dispose `fix` in proper way and remove workaround
-            if (event.element.length) {
-                for (var i = 0; i < event.element.length; i++) {
-                    eventManager(event.element[i], event.type, event.handler, mode)
+            if (evt.element.length && evt.element !== scopedWindow) {
+                for (var i = 0; i < evt.element.length; i++) {
+                    eventManager(evt.element[i], evt.type, evt.handler, mode)
                 }
             } else {
-                eventManager(event.element, event.type, event.handler, mode)
+                eventManager(evt.element, evt.type, evt.handler, mode)
             }
         }
     })
@@ -1258,7 +1259,7 @@ baron.noConflict = function() {
     return baron
 }
 
-baron.version = '3.0.0'
+baron.version = '3.0.1'
 
 baron.prototype.autoUpdate = __webpack_require__(4)(scopedWindow)
 baron.prototype.fix = __webpack_require__(7)

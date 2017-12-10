@@ -21,13 +21,13 @@ module.exports.event = function event(elem, _eventNames, handler, mode) {
     var prefix = mode == 'on' ? 'add' : 'remove'
 
     eventNames.forEach(function(eventName) {
-        var opts = false
+        var options = false
 
         if (['scroll', 'touchstart', 'touchmove'].indexOf(eventName) != -1 && supportsPassive) {
-            opts = { passive: true }
+            options = { passive: true }
         }
 
-        elem[prefix + 'EventListener'](eventName, handler, opts)
+        elem[prefix + 'EventListener'](eventName, handler, options)
     })
 }
 
@@ -54,8 +54,8 @@ module.exports.css = function css(node, key, value) {
         styles[key] = value
     }
 
-    each(styles, function(key, val) {
-        node.style[key] = val
+    each(styles, function(k, val) {
+        node.style[k] = val
     })
 }
 
