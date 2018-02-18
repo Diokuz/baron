@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+
+    <meta charset="utf-8" />
+
+    <script src="../baron.min.js"></script>
+
+    <title>Baron min for non-existing dom element</title>
+
+</head>
+
+<body>
+
+    <script>
+        console.log('You must see `Uncaught TypeError: Cannot read property \'getAttribute\' of null` error below ↓↓↓');
+        baron({
+            scroller: document.getElementById('qwertyu')
+        })
+    </script>
+
+</body>
+
+</html>
