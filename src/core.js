@@ -340,7 +340,12 @@ function init(params) {
 
     manageEvents(out, params.event, 'on')
 
-    manageAttr(out.root, params.direction, 'on', instances.length)
+    var attr = manageAttr(out.root, params.direction, 'on', instances.length)
+
+    var id = +attr
+
+    params.index = id
+    out.params.index = id
     instances.push(out)
 
     if (process.env.NODE_ENV !== 'production') {
